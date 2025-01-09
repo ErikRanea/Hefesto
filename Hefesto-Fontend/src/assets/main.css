@@ -1,35 +1,31 @@
-@import './base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+@font-face {
+  font-family: 'Helvetica'; 
+  src: url('fonts/Helvetica.ttf') format('truetype');
+  /* src: url('./assets/fonts/mi-fuente.otf') format('opentype'); Ruta al archivo OTF 
+  */
+  font-weight: normal; 
+  font-style: normal; 
+  font-display: swap;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+@font-face {
+  font-family: 'aegis1e'; 
+  src: url('fonts/aegis1e.ttf') format('truetype');
+  font-weight: normal; 
+  font-style: normal; 
+  font-display: swap;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica';
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+body {
+  min-height: 100vh;
+  font-family: sans-serif; 
+  background-color: #232323;
 }
