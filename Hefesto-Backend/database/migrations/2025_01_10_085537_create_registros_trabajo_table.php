@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('habilitado')->default(true);
             $table->timestamps();
 
-            $table->foreign('id_usuario')->references('id_usuario')->on('usuarios')->onDelete('cascade');
+            $table->foreign('id_usuario')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('id_tarea')->references('id_tarea')->on('tareas')->onDelete('cascade');
 
             $table->unique(['id_usuario', 'id_tarea', 'fecha_trabajo']);

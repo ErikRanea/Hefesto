@@ -30,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_maquina')->references('id_maquina')->on('maquinas');
-            $table->foreign('usuario_creacion')->references('id_usuario')->on('usuarios');
+            $table->foreign('usuario_creacion')->references('id')->on('users');
 
             $table->index('id_maquina');
             $table->index('prioridad_maquina');
