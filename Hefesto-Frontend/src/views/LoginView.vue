@@ -1,0 +1,319 @@
+<script setup>
+import { ref, computed } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+import Loader from '../components/Loader.vue'; // Importa el componente Loader
+
+const router = useRouter();
+
+// Variable reactiva para controlar el estado del icono
+const isPasswordVisible = ref(false);
+
+const inputType = computed(() =>
+  isPasswordVisible.value ? 'text' : 'password'
+);
+
+const iconClass = computed(() =>
+  isPasswordVisible.value ? 'bx bx-show' : 'bx bx-hide'
+);
+
+// Alternar visibilidad de La contraseña
+const togglePasswordVisibility = () => {
+  isPasswordVisible.value = !isPasswordVisible.value;
+};
+
+// Variables reactivas para el formulario y mensajes de error
+const email = ref('');
+const password = ref('');
+const errorMessage = ref('');
+const successMessage = ref('');
+const isLoading = ref(false);
+
+// URL del endpoint de Login
+const loginUrl = import.meta.env.VITE_API_AUTH_URL + '/v1/auth/login';
+
+const login = async () => {
+  isLoading.value = true;
+  errorMessage.value = '';
+  successMessage.value = '';
+  try {
+    const response = await axios.post(loginUrl, {
+      email: email.value,
+      password: password.value,
+    });
+
+    const { access_token, token_type } = response.data;
+    localStorage.setItem('token', access_token);
+    localStorage.setItem('token_type', token_type);
+
+    successMessage.value = 'Inicio de sesión exitoso!';
+
+    setTimeout(() => {
+      router.push('/home');
+    }, 1500);
+
+  } catch (error) {
+    if (error.response) {
+      errorMessage.value =
+        error.response.data.error || 'Error en el inicio de sesión';
+    } else {
+      errorMessage.value = error.message || 'Error en la conexión';
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+</script>
+
+<template>
+  <div class="container">
+    <form class="form" @submit.prevent="login">
+      <p id="heading">HEFESTO</p>
+      <div class="input-container">
+        <input required type="email" name="email" class="input" v-model="email">
+        <label class="label">Correo Electrónico</label>
+      </div>
+      <div class="input-container">
+        <input
+          required
+          :type="inputType"
+          name="password"
+          class="input"
+          v-model="password"
+        >
+        <label class="label">Contraseña</label>
+        <span class="password-toggle-icon" @click="togglePasswordVisibility">
+          <i :class="iconClass"></i>
+        </span>
+      </div>
+      <div class="btn">
+        <button class="neu-button with-dots" :disabled="isLoading">
+          <Loader v-if="isLoading" />
+          <span v-else>Iniciar Sesión</span>
+        </button>
+      </div>
+      <div class="forgot-password">
+        <a href="#">¿Has olvidado la contraseña?</a>
+      </div>
+
+      <div v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      <div v-if="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
+    </form>
+  </div>
+</template>
+
+<style scoped>
+/* ... (Mantén los estilos existentes de tu componente de login) ... */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 3em;
+  background-color: #171717;
+  border-radius: 35px;
+  transition: .4s ease-in-out;
+  width: 450px;
+}
+
+.form:hover {
+  transform: scale(1.05);
+  border: 1px solid black;
+}
+
+#heading {
+  text-align: center;
+  margin: 2em 0;
+  color: rgb(255, 255, 255);
+  font-size: 2.2em;
+  font-family: 'aegis1e';
+}
+
+.input-container {
+  position: relative;
+  color: white;
+}
+
+.input-container .label {
+  font-size: 1.1em;
+  padding-left: 15px;
+  position: absolute;
+  top: 15px;
+  transition: 0.3s;
+  pointer-events: none;
+  left: 0;
+  color: #aaa;
+}
+
+.input {
+  width: 100%;
+  height: 55px;
+  border: none;
+  outline: none;
+  padding: 15px;
+  padding-left: 15px;
+  border-radius: 35px;
+  color: #fff;
+  font-size: 1.2em;
+  background-color: transparent;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.8),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+}
+
+.input:focus {
+  border: 2px solid transparent;
+  color: #fff;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.8),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+}
+
+.input-container .input:focus ~ .label,
+.input-container .input:valid ~ .label {
+  transition: 0.3s;
+  padding-left: 10px;
+  transform: translateY(-30px) scale(0.8);
+  color: #bbb;
+}
+
+.form .btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.7em;
+}
+
+.neu-button {
+  background-color: #171717;
+  border-radius: 60px;
+  box-shadow: 5px 5px 12px #0e0e0e, -5px -5px 12px #202020;
+  color: #fff;
+  cursor: pointer;
+  font-size: 22px;
+  padding: 20px 50px;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centrar el Loader y el texto */
+  gap: 8px; /* Espacio entre el Loader y el texto */
+}
+
+.neu-button:hover {
+  box-shadow: inset 3px 3px 7px #0e0e0e, inset -3px -3px 7px #202020, 3px 3px 7px #0e0e0e, -3px -3px 7px #202020;
+}
+
+.neu-button:focus {
+  outline: none;
+  box-shadow: inset 3px 3px 7px #0e0e0e, inset -3px -3px 7px #202020, 3px 3px 7px #0e0e0e, -3px -3px 7px #202020;
+}
+
+.neu-button.with-dots {
+  padding: 20px 50px;
+}
+
+.dots_border {
+  --size_border: calc(100% + 4px);
+  --border_radius: 62px;
+
+  overflow: hidden;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: var(--size_border);
+  height: var(--size_border);
+  background-color: transparent;
+
+  border-radius: var(--border_radius);
+  z-index: -1;
+}
+
+.dots_border::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: left;
+
+  width: 100%;
+  height: 2px;
+  background-color: white;
+
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.forgot-password {
+  text-align: center;
+  margin-top: 2.2em;
+}
+
+.forgot-password a {
+  color: #aaa;
+  text-decoration: none;
+  font-size: 1.1em;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+  color: #ccc;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 15px;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #aaa;
+}
+
+.error-message {
+  color: #ff4d4d;
+  margin-top: 1em;
+  text-align: center;
+}
+
+.success-message {
+  color: #4caf50;
+  margin-top: 1em;
+  text-align: center;
+}
+
+/* Elimina los estilos del spinner anterior */
+/* .spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+} */
+</style>

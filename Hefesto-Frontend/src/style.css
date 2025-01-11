@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Helvetica'; 
+  src: url('/src/assets/fonts/Helvetica.ttf') format('truetype');
+  /* src: url('./assets/fonts/mi-fuente.otf') format('opentype'); Ruta al archivo OTF 
+  */
+  font-weight: normal; 
+  font-style: normal; 
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'aegis1e'; 
+  src: url('/src/assets/fonts/aegis1e.ttf') format('truetype');
+  font-weight: normal; 
+  font-style: normal; 
+  font-display: swap;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica';
+}
+
+body {
+  min-height: 100vh;
+  font-family: sans-serif; 
+  background-color: #232323;
+}
