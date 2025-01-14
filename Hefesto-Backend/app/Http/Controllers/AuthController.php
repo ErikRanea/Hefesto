@@ -71,7 +71,7 @@ class AuthController extends Controller
                 'segundo_apellido' => htmlspecialchars($request->input('segundo_apellido')),
                 'foto_perfil' => htmlspecialchars($request->input('foto_perfil')),
                 'email' => htmlspecialchars($request->input('email')),
-                'password' => Hash::make($request->input('password')),
+                'password' => Hash::make($request->input('password')),//haseo de la contraseña
                 'rol' => 'operario',
                 'habilitado' => true,
                 
@@ -84,6 +84,24 @@ class AuthController extends Controller
             return response()->json(['error' => 'Ya existe un usuario con ese email'], Response::HTTP_BAD_REQUEST);
         }
     }
+
+    /**
+     * Valida si el token es válido
+     */
+    public function validateToken()
+    {
+        try {
+            // Si el token es válido, auth()->user() no lanzará una excepción
+            $user = auth()->user();
+            return response()->json(['message' => 'Token válido'], Response::HTTP_OK);
+        } catch (TokenInvalidException $e) {
+            return response()->json(['error' => 'Token inválido'], Response::HTTP_UNAUTHORIZED);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al validar el token'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
     /**
      * Get the authenticated User.
@@ -152,7 +170,7 @@ class AuthController extends Controller
     protected function respondWithToken($token)
     {
         return response()->json([
-            'access_token' => $token,
+            'access_token' => $token,// El token en sí
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
         ], Response::HTTP_OK);

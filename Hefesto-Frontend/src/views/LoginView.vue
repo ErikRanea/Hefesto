@@ -40,8 +40,9 @@ const login = async () => {
     const response = await axios.post(loginUrl, {
       email: email.value,
       password: password.value,
-    });
+    }); 
 
+    //login
     const { access_token, token_type } = response.data;
     localStorage.setItem('token', access_token);
     localStorage.setItem('token_type', token_type);

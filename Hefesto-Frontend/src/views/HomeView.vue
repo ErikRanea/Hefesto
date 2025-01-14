@@ -25,6 +25,7 @@
     setup() {
       const router = useRouter();
   
+      //El metodo logout envía el TOKEN para cerrar la sesión
       const logout = async () => {
         const token = localStorage.getItem('token');
         if (token) {
