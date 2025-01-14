@@ -51,7 +51,7 @@ const login = async () => {
 
     setTimeout(() => {
       router.push('/home');
-    }, 1500);
+    }, 1);
 
   } catch (error) {
     if (error.response) {
