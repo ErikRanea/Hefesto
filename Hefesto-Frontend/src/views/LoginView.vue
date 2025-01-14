@@ -2,7 +2,8 @@
 import { ref, computed } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import Loader from '../components/Loader.vue'; // Importa el componente Loader
+import Loader from '../components/Loader.vue';
+import ErrorPopup from '../components/ErrorPopup.vue'; // Importa el componente ErrorPopup
 
 const router = useRouter();
 
@@ -22,46 +23,55 @@ const togglePasswordVisibility = () => {
   isPasswordVisible.value = !isPasswordVisible.value;
 };
 
-// Variables reactivas para el formulario y mensajes de error
+// Variables reactivas para el formulario
 const email = ref('');
 const password = ref('');
-const errorMessage = ref('');
-const successMessage = ref('');
 const isLoading = ref(false);
+
+// Variables reactivas para el popup de error
+const showErrorPopup = ref(false);
+const popupErrorMessage = ref('');
 
 // URL del endpoint de Login
 const loginUrl = import.meta.env.VITE_API_AUTH_URL + '/v1/auth/login';
 
+// Función para abrir el popup de error
+const openErrorPopup = (message) => {
+  popupErrorMessage.value = message;
+  showErrorPopup.value = true;
+};
+
+// Función para cerrar el popup de error
+const closeErrorPopup = () => {
+  showErrorPopup.value = false;
+  popupErrorMessage.value = '';
+};
+
 const login = async () => {
   isLoading.value = true;
-  errorMessage.value = '';
-  successMessage.value = '';
   try {
     const response = await axios.post(loginUrl, {
       email: email.value,
       password: password.value,
-    }); 
+    });
 
     //login
     const { access_token, token_type } = response.data;
     localStorage.setItem('token', access_token);
     localStorage.setItem('token_type', token_type);
 
-    successMessage.value = 'Inicio de sesión exitoso!';
-
     setTimeout(() => {
       router.push('/home');
-    }, 1);
+      isLoading.value = false;
+    }, 1500);
 
   } catch (error) {
-    if (error.response) {
-      errorMessage.value =
-        error.response.data.error || 'Error en el inicio de sesión';
-    } else {
-      errorMessage.value = error.message || 'Error en la conexión';
-    }
-  } finally {
     isLoading.value = false;
+    if (error.response) {
+      openErrorPopup(error.response.data.error || 'Error en el inicio de sesión');
+    } else {
+      openErrorPopup(error.message || 'Error en la conexión');
+    }
   }
 };
 </script>
@@ -96,19 +106,19 @@ const login = async () => {
       <div class="forgot-password">
         <a href="#">¿Has olvidado la contraseña?</a>
       </div>
-
-      <div v-if="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
-      <div v-if="successMessage" class="success-message">
-        {{ successMessage }}
-      </div>
     </form>
   </div>
+
+  <!-- Usa el componente ErrorPopup -->
+  <ErrorPopup
+    :visible="showErrorPopup"
+    :message="popupErrorMessage"
+    @close="closeErrorPopup"
+  />
 </template>
 
 <style scoped>
-/* ... (Mantén los estilos existentes de tu componente de login) ... */
+
 .container {
   display: flex;
   justify-content: center;
@@ -301,20 +311,4 @@ const login = async () => {
   margin-top: 1em;
   text-align: center;
 }
-
-/* Elimina los estilos del spinner anterior */
-/* .spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-} */
 </style>
