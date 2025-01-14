@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('tipo_maquina')->nullable();
             $table->unsignedBigInteger('id_campus')->nullable();
             $table->unsignedBigInteger('id_seccion')->nullable();
+            $table->integer('prioridad')->default(0);
             $table->boolean('habilitado')->default(true);
             $table->timestamps();
 

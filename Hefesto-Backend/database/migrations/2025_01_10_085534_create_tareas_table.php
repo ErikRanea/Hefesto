@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('id_maquina');
             $table->dateTime('fecha_creacion');
             $table->dateTime('fecha_cierre')->nullable();
-            $table->integer('prioridad_maquina');
             $table->integer('prioridad_averia')->nullable();
             $table->string('tipo_averia')->nullable();
             $table->text('descripcion')->nullable();
@@ -33,7 +32,6 @@ return new class extends Migration
             $table->foreign('usuario_creacion')->references('id')->on('users');
 
             $table->index('id_maquina');
-            $table->index('prioridad_maquina');
             $table->index('prioridad_averia');
             $table->index('estado');
         });
