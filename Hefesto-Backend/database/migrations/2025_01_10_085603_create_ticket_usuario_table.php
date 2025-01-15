@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tarea_usuario', function (Blueprint $table) {
+        Schema::create('ticket_usuario', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('id_tarea');
+            $table->unsignedBigInteger('id_ticket');
             $table->unsignedBigInteger('id_usuario');
             $table->dateTime('fecha_inicio')->nullable();
             $table->dateTime('fecha_fin')->nullable();
@@ -21,10 +21,10 @@ return new class extends Migration
             $table->boolean('habilitado')->default(true);
             $table->timestamps();
 
-            $table->foreign('id_tarea')->references('id_tarea')->on('tareas')->onDelete('cascade');
+            $table->foreign('id_ticket')->references('id')->on('tickets')->onDelete('cascade');
             $table->foreign('id_usuario')->references('id')->on('users')->onDelete('cascade');
 
-            $table->unique(['id_tarea', 'id_usuario']);
+            $table->unique(['id_ticket', 'id_usuario']);
         });
     }
 
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tarea_usuario');
+        Schema::dropIfExists('ticket_usuario');
     }
 };

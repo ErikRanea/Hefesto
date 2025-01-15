@@ -3,11 +3,11 @@
     <div v-if="userRole && !isLoggingOut" class="content-wrapper">
       <div class="top-bar">
         <div class="left-items" v-if="userRole === 'administrador'">
-          <span>MAQUINAS</span>
-          <span>TICKETS</span>
-          <span>MANTENIMIENTO</span>
-          <span>ADMINISTRACION</span>
-        </div>
+            <span>MAQUINAS</span>
+            <span>TICKETS</span>
+            <span>MANTENIMIENTO</span>
+            <span><a href="/admin">ADMINISTRACION</a></span>
+          </div>
         <div class="left-items" v-else-if="userRole === 'tecnico'">
           <span>MAQUINAS</span>
           <span>TICKETS</span>
