@@ -1,155 +1,172 @@
 <template>
-  <div class="navbar">
-    <div class="profile">
-      <div class="imgbox">
-        <img src="https://image.europafm.com/clipping/cmsimages02/2024/09/10/2A6D30A4-242D-4B91-9CA9-72D93E9F96CE/lamine-yamal-joven-futbolista-records-que-escucha-karol_98.jpg?crop=4917,2766,x0,y0&width=1900&height=1069&optimize=low&format=webply" alt="" />
+    <div class="navbar">
+      <div class="profile">
+        <div class="imgbox">
+          <img :src="profilePictureUrl" alt="" />
+        </div>
+        <div class="heading">
+          <h3 class="title">{{ userName }} {{ userLastName }}</h3>
+          <h4 class="label">
+            {{ userRole }}
+          </h4>
+        </div>
       </div>
-      <div class="heading">
-        <h3 class="title">Webkit Coding</h3>
-        <h4 class="label">
-          {{ userRole }}
-        </h4>
-      </div>
+      <!-- navitems -->
+      <ul>
+        <template v-if="userRole === 'administrador'">
+          <li text-data="maquinas">
+            <a href="#">
+              <i class="uil uil-server"></i>
+              <span>maquinas</span>
+            </a>
+          </li>
+          <li text-data="tickets">
+            <a href="#">
+              <i class="uil uil-ticket"></i>
+              <span>tickets</span>
+            </a>
+          </li>
+          <li text-data="mantenimiento">
+            <a href="#">
+              <i class="uil uil-wrench"></i>
+              <span>mantenimiento</span>
+            </a>
+          </li>
+          <li text-data="administracion">
+            <a href="#">
+              <i class="uil uil-setting"></i>
+              <span>administracion</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="uil uil-setting"></i>
+              <span>ajustes</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="$emit('logout')">
+              <i class="uil uil-signout"></i>
+              <span>cerrar sesion</span>
+            </a>
+          </li>
+        </template>
+        <template v-else-if="userRole === 'tecnico'">
+          <li text-data="maquinas">
+            <a href="#">
+              <i class="uil uil-server"></i>
+              <span>maquinas</span>
+            </a>
+          </li>
+          <li text-data="tickets">
+            <a href="#">
+              <i class="uil uil-ticket"></i>
+              <span>tickets</span>
+            </a>
+          </li>
+          <li text-data="mantenimiento">
+            <a href="#">
+              <i class="uil uil-wrench"></i>
+              <span>mantenimiento</span>
+            </a>
+          </li>
+          <li text-data="mis tickets">
+            <a href="#">
+              <i class="uil uil-clipboard-notes"></i>
+              <span>mis tickets</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="uil uil-setting"></i>
+              <span>ajustes</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="$emit('logout')">
+              <i class="uil uil-signout"></i>
+              <span>cerrar sesion</span>
+            </a>
+          </li>
+        </template>
+        <template v-else-if="userRole === 'operario'">
+          <li text-data="maquinas">
+            <a href="#">
+              <i class="uil uil-server"></i>
+              <span>maquinas</span>
+            </a>
+          </li>
+          <li text-data="tickets">
+            <a href="#">
+              <i class="uil uil-ticket"></i>
+              <span>tickets</span>
+            </a>
+          </li>
+          <li text-data="mantenimiento">
+            <a href="#">
+              <i class="uil uil-wrench"></i>
+              <span>mantenimiento</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="uil uil-setting"></i>
+              <span>ajustes</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="$emit('logout')">
+              <i class="uil uil-signout"></i>
+              <span>cerrar sesion</span>
+            </a>
+          </li>
+        </template>
+        <template v-else>
+          <li>
+            <a href="#">
+              <i class="uil uil-setting"></i>
+              <span>ajustes</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" @click.prevent="$emit('logout')">
+              <i class="uil uil-signout"></i>
+              <span>cerrar sesion</span>
+            </a>
+          </li>
+        </template>
+      </ul>
     </div>
-    <!-- navitems -->
-    <ul>
-      <template v-if="userRole === 'administrador'">
-        <li text-data="maquinas">
-          <a href="#">
-            <i class="uil uil-server"></i>
-            <span>maquinas</span>
-          </a>
-        </li>
-        <li text-data="tickets">
-          <a href="#">
-            <i class="uil uil-ticket"></i>
-            <span>tickets</span>
-          </a>
-        </li>
-        <li text-data="mantenimiento">
-          <a href="#">
-            <i class="uil uil-wrench"></i>
-            <span>mantenimiento</span>
-          </a>
-        </li>
-        <li text-data="administracion">
-          <a href="#">
-            <i class="uil uil-setting"></i>
-            <span>administracion</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="uil uil-setting"></i>
-            <span>ajustes</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" @click.prevent="$emit('logout')">
-            <i class="uil uil-signout"></i>
-            <span>cerrar sesion</span>
-          </a>
-        </li>
-      </template>
-      <template v-else-if="userRole === 'tecnico'">
-        <li text-data="maquinas">
-          <a href="#">
-            <i class="uil uil-server"></i>
-            <span>maquinas</span>
-          </a>
-        </li>
-        <li text-data="tickets">
-          <a href="#">
-            <i class="uil uil-ticket"></i>
-            <span>tickets</span>
-          </a>
-        </li>
-        <li text-data="mantenimiento">
-          <a href="#">
-            <i class="uil uil-wrench"></i>
-            <span>mantenimiento</span>
-          </a>
-        </li>
-        <li text-data="mis tickets">
-          <a href="#">
-            <i class="uil uil-clipboard-notes"></i>
-            <span>mis tickets</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="uil uil-setting"></i>
-            <span>ajustes</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" @click.prevent="$emit('logout')">
-            <i class="uil uil-signout"></i>
-            <span>cerrar sesion</span>
-          </a>
-        </li>
-      </template>
-      <template v-else-if="userRole === 'operario'">
-        <li text-data="maquinas">
-          <a href="#">
-            <i class="uil uil-server"></i>
-            <span>maquinas</span>
-          </a>
-        </li>
-        <li text-data="tickets">
-          <a href="#">
-            <i class="uil uil-ticket"></i>
-            <span>tickets</span>
-          </a>
-        </li>
-        <li text-data="mantenimiento">
-          <a href="#">
-            <i class="uil uil-wrench"></i>
-            <span>mantenimiento</span>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <i class="uil uil-setting"></i>
-            <span>ajustes</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" @click.prevent="$emit('logout')">
-            <i class="uil uil-signout"></i>
-            <span>cerrar sesion</span>
-          </a>
-        </li>
-      </template>
-      <template v-else>
-        <li>
-          <a href="#">
-            <i class="uil uil-setting"></i>
-            <span>ajustes</span>
-          </a>
-        </li>
-        <li>
-          <a href="#" @click.prevent="$emit('logout')">
-            <i class="uil uil-signout"></i>
-            <span>cerrar sesion</span>
-          </a>
-        </li>
-      </template>
-    </ul>
-  </div>
-</template>
-
-<script>
-export default {
-  name: 'Sidebar',
-  props: {
-    userRole: {
-      type: String,
-      required: true,
+  </template>
+  
+  <script>
+  export default {
+    name: 'Sidebar',
+    props: {
+      userRole: {
+        type: String,
+        required: true,
+      },
+      userName: {
+        type: String,
+        required: true,
+      },
+      userLastName: {
+        type: String,
+        required: true,
+      },
+      userPicture: {
+        type: String,
+        required: true,
+      },
     },
-  },
-};
-</script>
+    computed: {
+      profilePictureUrl() {
+        return `../src/assets/images/userPicture/${this.userPicture}`;
+      },
+    },
+  };
+  </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
@@ -167,12 +184,12 @@ export default {
   backdrop-filter: blur(10px);
   padding: 20px;
   width: 270px;
-  top: 20px; /* Added top margin */
+  top: 40px; /* Added top margin */
   left: 20px; /* Added left margin */
   margin-bottom: 20px; /* Added bottom margin */
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px; /* Modified border-radius to be consistent on all corners */
-  height: calc(100vh - 40px); /* Adjusted height to account for top and bottom margins */
+  height: calc(100vh - 100px); /* Adjusted height to account for top and bottom margins */
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);

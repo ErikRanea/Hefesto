@@ -1,11 +1,17 @@
 <template>
   <div class="home-view">
-    <Sidebar v-if="userRole" :user-role="userRole" @logout="logout" />
+    <Sidebar v-if="userRole" :user-role="userRole" 
+    :user-name="userName"
+    :user-last-name="userLastName"
+    :user-Picture="userPicture"
+    @logout="logout" />
     <div v-if="userRole && !isLoggingOut" class="content-wrapper">
       <div class="content">
         <h1>Bienvenido</h1>
-        <p v-if="userRole">{{ userRole }}</p>
-        <p>Haz cosas de {{ userRole }}</p>
+        <p v-if="userName">Nombre: {{ userName }}</p>
+        <p v-if="userLastName">Apellido: {{ userLastName }}</p>
+        <p v-if="userRole">Rol: {{ userRole }}</p>
+        <p>Haz cosas de {{ userRole }} y de {{ userPicture }}</p>
       </div>
     </div>
     <div v-else-if="isLoggingOut" class="loading-container">
@@ -32,6 +38,9 @@ export default {
   setup() {
     const router = useRouter();
     const userRole = ref(null);
+    const userName = ref(null);
+    const userLastName = ref(null);
+    const userPicture = ref(null);
     const meUrl = import.meta.env.VITE_API_AUTH_URL + '/v1/auth/me';
     const isLoggingOut = ref(false);
 
@@ -45,8 +54,11 @@ export default {
             },
           });
           userRole.value = response.data.rol;
+          userName.value = response.data.name;
+          userLastName.value = response.data.primer_apellido;
+          userPicture.value = response.data.foto_perfil;
         } catch (error) {
-          console.error('Error fetching user role:', error);
+          console.error('Error fetching user data:', error);
           router.push('/');
         }
       } else {
@@ -81,7 +93,7 @@ export default {
       }
     };
 
-    return { logout, userRole, isLoggingOut };
+    return { logout, userRole, userName, userLastName,userPicture, isLoggingOut };
   },
 };
 </script>
