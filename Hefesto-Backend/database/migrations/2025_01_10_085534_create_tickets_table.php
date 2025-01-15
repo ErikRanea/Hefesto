@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tareas', function (Blueprint $table) {
-            $table->bigIncrements('id_tarea');
-            $table->enum('tipo_tarea', ['incidencia', 'mantenimiento']);
+        Schema::create('tickets', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->enum('tipo_ticket', ['incidencia', 'mantenimiento']);
             $table->unsignedBigInteger('id_maquina');
             $table->dateTime('fecha_creacion');
             $table->dateTime('fecha_cierre')->nullable();
@@ -42,6 +42,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tareas');
+        Schema::dropIfExists('tickets');
     }
 };

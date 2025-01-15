@@ -160,7 +160,7 @@ const login = async () => {
   font-size: 1.1em;
   padding-left: 15px;
   position: absolute;
-  top: 15px;
+  top: 20px;
   transition: 0.3s;
   pointer-events: none;
   left: 0;

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '../views/LoginView.vue';
 import axios from 'axios';
 import HomeView from '../views/HomeView.vue';
+import AdminView from '../views/AdminView.vue';
 
 const urlBack = import.meta.env.VITE_API_AUTH_URL;
 
@@ -13,8 +14,13 @@ const routes = [
   {
     path: '/home',
     component: HomeView,  
-    meta: { requiresAuth: true },
+    meta: { estarAutenticado: true },
   },
+  {
+    path: '/admin',
+    component: AdminView,
+    meta: { estarAutenticado: true },
+  }
 ];
 
 const router = createRouter({
@@ -23,12 +29,56 @@ const router = createRouter({
 });
 
 
+router.beforeEach(async (to, from, next) => {
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+  const { isValid, isAdmin } = await fetchUserRole();
+
+  if (authRequired && !isValid) {
+    sessionStorage.removeItem('token');
+    return next('/login');
+  }
+
+  if (to.meta.requiresAdmin && !isAdmin) {
+    alert('Necesita ser administrador para acceder a esta página');
+    return next('/home');
+  }
+
+  next();
+})
+
+
+const comprobarToken = async () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const response = await axios.get(urlBack + '/v1/auth/validate-token', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    }
+    catch (error) {
+      console.error('Error al validar el token:', error);
+      return false;
+    }
+  }
+  else {
+    return false;
+  }
+ç
+};
 
 
 // Añade un guard de navegación global
 router.beforeEach(async (to, from, next) => {
+
+
+
+
   const token = localStorage.getItem('token');
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some(record => record.meta.estarAutenticado)) {
     if (token) {
       try {
         const response = await axios.get(urlBack + '/v1/auth/validate-token', {
