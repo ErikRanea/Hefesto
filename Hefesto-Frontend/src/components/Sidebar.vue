@@ -1,0 +1,329 @@
+<template>
+  <div class="navbar">
+    <div class="profile">
+      <div class="imgbox">
+        <img src="https://image.europafm.com/clipping/cmsimages02/2024/09/10/2A6D30A4-242D-4B91-9CA9-72D93E9F96CE/lamine-yamal-joven-futbolista-records-que-escucha-karol_98.jpg?crop=4917,2766,x0,y0&width=1900&height=1069&optimize=low&format=webply" alt="" />
+      </div>
+      <div class="heading">
+        <h3 class="title">Webkit Coding</h3>
+        <h4 class="label">
+          {{ userRole }}
+        </h4>
+      </div>
+    </div>
+    <!-- navitems -->
+    <ul>
+      <template v-if="userRole === 'administrador'">
+        <li text-data="maquinas">
+          <a href="#">
+            <i class="uil uil-server"></i>
+            <span>maquinas</span>
+          </a>
+        </li>
+        <li text-data="tickets">
+          <a href="#">
+            <i class="uil uil-ticket"></i>
+            <span>tickets</span>
+          </a>
+        </li>
+        <li text-data="mantenimiento">
+          <a href="#">
+            <i class="uil uil-wrench"></i>
+            <span>mantenimiento</span>
+          </a>
+        </li>
+        <li text-data="administracion">
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>administracion</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ajustes</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="$emit('logout')">
+            <i class="uil uil-signout"></i>
+            <span>cerrar sesion</span>
+          </a>
+        </li>
+      </template>
+      <template v-else-if="userRole === 'tecnico'">
+        <li text-data="maquinas">
+          <a href="#">
+            <i class="uil uil-server"></i>
+            <span>maquinas</span>
+          </a>
+        </li>
+        <li text-data="tickets">
+          <a href="#">
+            <i class="uil uil-ticket"></i>
+            <span>tickets</span>
+          </a>
+        </li>
+        <li text-data="mantenimiento">
+          <a href="#">
+            <i class="uil uil-wrench"></i>
+            <span>mantenimiento</span>
+          </a>
+        </li>
+        <li text-data="mis tickets">
+          <a href="#">
+            <i class="uil uil-clipboard-notes"></i>
+            <span>mis tickets</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ajustes</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="$emit('logout')">
+            <i class="uil uil-signout"></i>
+            <span>cerrar sesion</span>
+          </a>
+        </li>
+      </template>
+      <template v-else-if="userRole === 'operario'">
+        <li text-data="maquinas">
+          <a href="#">
+            <i class="uil uil-server"></i>
+            <span>maquinas</span>
+          </a>
+        </li>
+        <li text-data="tickets">
+          <a href="#">
+            <i class="uil uil-ticket"></i>
+            <span>tickets</span>
+          </a>
+        </li>
+        <li text-data="mantenimiento">
+          <a href="#">
+            <i class="uil uil-wrench"></i>
+            <span>mantenimiento</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ajustes</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="$emit('logout')">
+            <i class="uil uil-signout"></i>
+            <span>cerrar sesion</span>
+          </a>
+        </li>
+      </template>
+      <template v-else>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ajustes</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" @click.prevent="$emit('logout')">
+            <i class="uil uil-signout"></i>
+            <span>cerrar sesion</span>
+          </a>
+        </li>
+      </template>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Sidebar',
+  props: {
+    userRole: {
+      type: String,
+      required: true,
+    },
+  },
+};
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+.navbar {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  width: 270px;
+  top: 20px; /* Added top margin */
+  left: 20px; /* Added left margin */
+  margin-bottom: 20px; /* Added bottom margin */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px; /* Modified border-radius to be consistent on all corners */
+  height: calc(100vh - 40px); /* Adjusted height to account for top and bottom margins */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.profile {
+  position: relative;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.profile::after {
+  position: absolute;
+  content: '';
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  left: 0;
+  bottom: 0;
+}
+
+.profile .imgbox {
+  position: relative;
+  height: 60px;
+  width: 60px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.imgbox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heading {
+  color: #fff;
+}
+
+.heading h3 {
+  font-size: 1.1em;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.heading h4 {
+  opacity: 0.7;
+  font-size: 0.9em;
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+ul {
+  margin-top: 30px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+ul li {
+  list-style: none;
+}
+
+ul li a {
+  color: #fff;
+  font-size: 0.95em;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 45px;
+  text-decoration: none;
+  text-transform: capitalize;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+ul li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+ul li a i {
+  font-size: 1.2em;
+  margin-right: 12px;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    width: 80px;
+    padding: 15px 10px;
+    top: 10px; /* Adjusted top margin for smaller screens */
+    left: 10px; /* Adjusted left margin for smaller screens */
+    margin-bottom: 10px; /* Adjusted bottom margin for smaller screens */
+    height: calc(100vh - 20px); /* Adjusted height for smaller screens */
+    border-radius: 10px 10px 0 0; /* Keep the border radius on top for smaller screens */
+  }
+
+  .profile {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .heading {
+    display: none;
+  }
+
+  ul li a {
+    justify-content: center;
+    padding: 0;
+  }
+
+  ul li a span {
+    display: none;
+  }
+
+  ul li a i {
+    margin: 0;
+    font-size: 1.4em;
+  }
+
+  ul li {
+    position: relative;
+  }
+
+  ul li::before {
+    position: absolute;
+    content: attr(text-data);
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 0.85em;
+    font-weight: 500;
+    top: 50%;
+    left: 85px;
+    transform: translateY(-50%);
+    border-radius: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  ul li:hover::before {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+</style>
