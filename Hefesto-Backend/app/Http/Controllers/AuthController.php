@@ -72,7 +72,7 @@ class AuthController extends Controller
                 'foto_perfil' => htmlspecialchars($request->input('foto_perfil')),
                 'email' => htmlspecialchars($request->input('email')),
                 'password' => Hash::make($request->input('password')),//haseo de la contraseña
-                'rol' => 'administrador',
+                'rol' => 'operario',
                 'habilitado' => true,
                 
             ]);
