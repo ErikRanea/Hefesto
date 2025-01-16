@@ -6,7 +6,7 @@
         <div class="card-body">
           <h6>Tickets pendientes</h6>
           <div class="d-flex justify-content-between align-items-center">
-            <h2>10</h2>
+            <h2 class="pendiente-h2">10</h2>
             <img src="../assets/images/icons/pendientes.svg">
           </div>
         </div>
@@ -17,7 +17,7 @@
         <div class="card-body">
           <h6>Tickets en curso</h6>
           <div class="d-flex justify-content-between align-items-center">
-            <h2>10</h2>
+            <h2 class="curso-h2">10</h2>
             <img src="../assets/images/icons/curso.svg">
           </div>
         </div>
@@ -28,7 +28,7 @@
         <div class="card-body">
           <h6>Tickets cerrados</h6>
           <div class="d-flex justify-content-between align-items-center">
-            <h2>10</h2>
+            <h2 class="cerrado-h2">10</h2>
             <img src="../assets/images/icons/cerrados.svg">
           </div>
         </div>
@@ -36,10 +36,10 @@
     </div>
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-total">
-        <div class="card-body">
+        <div class="card-bodyTotal">
           <h6>Total de tickets</h6>
           <div class="d-flex justify-content-between align-items-center">
-            <h2>10</h2>
+            <h2 class="total-h2">10</h2>
             <img src="../assets/images/icons/total.svg">
           </div>
         </div>
@@ -54,7 +54,7 @@
       <div class="card glassmorphic-card mb-4">
         <div class="card-body">
           <div class="d-flex justify-content-between mb-4">
-            <div>
+            <div class="ticketsabiertos">
               <h6 class="text-muted mb-1">Tickets abiertos</h6>
               <div class="d-flex align-items-baseline">
                 <span class="h3 mb-0">20</span>
@@ -243,18 +243,18 @@ onMounted(() => {
 
 <style scoped>
 .glassmorphic-card {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
 }
 
 .text-muted {
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: rgba(0, 0, 0, 0.6) !important;
 }
 
 .h3 {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.466);
 }
 
 table {
@@ -299,32 +299,35 @@ canvas {
   padding: 1.5rem;
 }
 
+.card-bodyTotal {
+  padding: 1.9rem;
+}
 /* Color Shadows for Top Cards */
 .colored-shadow-pending {
-  box-shadow: 0 4px 16px 0 rgba(255, 193, 7, 0.5); /* Yellowish for pending */
+  box-shadow: 0 4px 16px 0 #B89B00; /* Yellowish for pending */
 }
 
 .colored-shadow-in-progress {
-  box-shadow: 0 4px 16px 0 rgba(139, 92, 246, 0.5); /* Purple for in progress */
+  box-shadow: 0 4px 16px 0 #600484; /* Purple for in progress */
 }
 
 .colored-shadow-closed {
-  box-shadow: 0 4px 16px 0 rgba(76, 175, 80, 0.5); /* Green for closed */
+  box-shadow: 0 4px 16px 0 #000000; /* Green for closed */
 }
 
 .colored-shadow-total {
-  box-shadow: 0 4px 16px 0 rgba(33, 150, 243, 0.5); /* Blue for total */
+  box-shadow: 0 4px 16px 0 #FFFFFF; /* Blue for total */
 }
 
 .text-sm {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #000000;
 }
 
 .btn-ver-todos {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: #000000;
   font-size: 0.875rem;
   display: flex;
   align-items: center;
@@ -371,7 +374,7 @@ canvas {
 .ticket-date {
   min-width: 100px;
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #000000;
 }
 
 .ticket-description {
@@ -379,12 +382,12 @@ canvas {
 }
 
 .ticket-title {
-  color: rgba(255, 255, 255, 0.9);
+  color: #000000;
   margin-bottom: 0.25rem;
 }
 
 .ticket-subtitle {
-  color: rgba(255, 255, 255, 0.6);
+  color: #747474;
   font-size: 0.875rem;
 }
 
@@ -413,4 +416,26 @@ canvas {
   background-color: rgba(255, 193, 7, 0.2);
   color: #ffc107;
 }
+
+.pendiente-h2 {
+  color: #B89B00;
+  font-size: 70px;
+}
+
+.curso-h2 {
+  color: #600484;
+  font-size: 70px;
+}
+
+.cerrado-h2 {
+  color: #000000;
+  font-size: 70px;
+}
+
+.total-h2 {
+  color: #FFFFFF;
+  
+}
+
+
 </style>
