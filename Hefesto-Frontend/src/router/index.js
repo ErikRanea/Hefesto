@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '../views/LoginView.vue';
 import axios from 'axios';
 import HomeView from '../views/HomeView.vue';
-import AdminView from '../views/AdminView.vue';
+//import comprobarToken from './authManager';
 
 const urlBack = import.meta.env.VITE_API_AUTH_URL;
 
@@ -16,11 +16,6 @@ const routes = [
     component: HomeView,  
     meta: { estarAutenticado: true },
   },
-  {
-    path: '/admin',
-    component: AdminView,
-    meta: { estarAutenticado: true },
-  }
 ];
 
 const router = createRouter({
