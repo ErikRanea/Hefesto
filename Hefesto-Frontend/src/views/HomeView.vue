@@ -1,25 +1,20 @@
 <template>
   <div class="home-view">
-    <Sidebar v-if="userRole" :user-role="userRole" 
-    :user-name="userName"
-    :user-last-name="userLastName"
-    :user-Picture="userPicture"
-    @logout="logout" />
-    <div v-if="userRole && !isLoggingOut" class="content-wrapper">
-      <div class="content">
-        <h1>Bienvenido</h1>
-        <p v-if="userName">Nombre: {{ userName }}</p>
-        <p v-if="userLastName">Apellido: {{ userLastName }}</p>
-        <p v-if="userRole">Rol: {{ userRole }}</p>
-        <p>Haz cosas de {{ userRole }} y de {{ userPicture }}</p>
-      </div>
-    </div>
+    <Sidebar
+      v-if="userRole"
+      :user-role="userRole"
+      :user-name="userName"
+      :user-last-name="userLastName"
+      :user-Picture="userPicture"
+      @logout="logout"
+    />
     <div v-else-if="isLoggingOut" class="loading-container">
       <ProgressBarLoader />
     </div>
     <div v-else class="loading-container">
       <ProgressBarLoader />
     </div>
+    <Panel v-if="userRole"  />
   </div>
 </template>
 
@@ -29,11 +24,13 @@ import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import ProgressBarLoader from '../components/ProgressBarLoader.vue';
 import Sidebar from '../components/Sidebar.vue';
+import Panel from '../components/Panel.vue'
 
 export default {
   components: {
     ProgressBarLoader,
     Sidebar,
+    Panel,
   },
   setup() {
     const router = useRouter();
