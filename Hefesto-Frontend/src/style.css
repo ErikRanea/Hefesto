@@ -11,9 +11,6 @@
   font-style: normal; 
   font-display: swap;
 }
-body{
-  background-image: url('/src/assets/images/background.jpg');
-}
 
 @font-face {
   font-family: 'aegis1e'; 

@@ -26,10 +26,11 @@
     <!-- Sidebar -->
     <div class="sidebar p-4 d-flex flex-column">
       <div class="logo mb-5">
-        <img src="../assets/images/icons/logos.png" alt="Logo" class="img-fluid mb-4" style="max-width: 150px;">
+        <img src="../assets/images/icons/Logos.png" alt="Logo" class="img-fluid mb-4" style="max-width: 150px;">
       </div>
 
       <nav class="nav flex-column">
+
         <router-link v-for="item in filteredMenuItems"
                      :key="item.name"
                      :to="item.to"
@@ -37,7 +38,7 @@
                      @click.prevent="setActiveItem(item.name)">
           <img :src="item.icon" class="me-3" alt="" aria-hidden="true">
           {{ item.name }}
-        </router-link>
+        </a>
       </nav>
 
       <button @click="logout" class="nav-link mt-auto d-flex align-items-center">
@@ -68,7 +69,7 @@
       <!-- Content Area -->
       <div class="content p-4">
         <div class="content-panel p-4">
-          <Panel />
+          <component :is="currentComponent"/>
         </div>
       </div>
     </div>
@@ -76,10 +77,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import Panel from '../components/Panel.vue';
 
 const router = useRouter();
 const userRole = ref(null);
@@ -91,6 +91,32 @@ const activeItem = ref('Panel');
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
 const LOGOUT_URL = `${API_AUTH_URL}/v1/auth/logout`;
+
+
+const Panel = defineAsyncComponent(() => import('../components/Panel.vue'))
+const Ticket = defineAsyncComponent(() => import('../components/Tickets.vue'))
+const Maquinas = defineAsyncComponent(() => import('../components/Maquinas.vue'))
+const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'))
+const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'))
+
+const currentView = ref('Panel');
+const currentComponent = computed(() => {
+    switch(currentView.value){
+      case 'Panel':
+        return Panel
+      case 'Tickets':
+        return Ticket
+      case 'Maquinas':
+          return Maquinas
+      case 'Mantenimiento':
+          return Mantenimiento
+        case 'Ajustes':
+            return Ajustes
+        default:
+            return Panel
+    }
+})
+
 
 const baseMenuItems = [
   { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
@@ -124,8 +150,10 @@ const filteredMenuItems = computed(() => {
   return allMenuItems[userRole.value] || [];
 });
 
+
 const setActiveItem = (itemName) => {
   activeItem.value = itemName;
+  currentView.value = itemName;
 };
 
 // Computed property to construct the image path
@@ -180,6 +208,8 @@ const logout = async () => {
     isLoggingOut.value = false;
   }
 };
+
+
 </script>
 
 <style scoped>

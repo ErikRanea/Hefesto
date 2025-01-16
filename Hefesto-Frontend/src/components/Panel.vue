@@ -1,8 +1,8 @@
 <template>
   <!-- Stats Cards -->
   <div class="row g-4 mb-4">
-    <div class="col-sm-6 col-md-3">
-      <div class="card glassmorphic-card colored-shadow-pending">
+    <div class="col-md-3">
+      <div class="card glassmorphic-card">
         <div class="card-body">
           <h6>Tickets pendientes</h6>
           <div class="d-flex justify-content-between align-items-center">
@@ -12,8 +12,8 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-6 col-md-3">
-      <div class="card glassmorphic-card colored-shadow-in-progress">
+    <div class="col-md-3">
+      <div class="card glassmorphic-card">
         <div class="card-body">
           <h6>Tickets en curso</h6>
           <div class="d-flex justify-content-between align-items-center">
@@ -23,8 +23,8 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-6 col-md-3">
-      <div class="card glassmorphic-card colored-shadow-closed">
+    <div class="col-md-3">
+      <div class="card glassmorphic-card">
         <div class="card-body">
           <h6>Tickets cerrados</h6>
           <div class="d-flex justify-content-between align-items-center">
@@ -34,6 +34,7 @@
         </div>
       </div>
     </div>
+
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-total">
         <div class="card-bodyTotal">
@@ -50,7 +51,7 @@
   <!-- Main Content Area -->
   <div class="row g-4">
     <!-- Left Column - Charts -->
-    <div class="col-md-4">
+    <div class="col-4">
       <div class="card glassmorphic-card mb-4">
         <div class="card-body">
           <div class="d-flex justify-content-between mb-4">
@@ -74,52 +75,32 @@
     </div>
 
     <!-- Right Column - Tickets List -->
-    <div class="col-md-8">
+    <div class="col-8">
       <div class="card glassmorphic-card h-100">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-4">
             <h5 class="card-title mb-0">Últimos tickets</h5>
-            <div class="d-flex align-items-center gap-4">
-              <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center">
-                  <span class="status-dot alta"></span>
-                  <span class="ms-1 text-sm">Alta</span>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="status-dot media"></span>
-                  <span class="ms-1 text-sm">Media</span>
-                </div>
-                <div class="d-flex align-items-center">
-                  <span class="status-dot baja"></span>
-                  <span class="ms-1 text-sm">Baja</span>
-                </div>
-              </div>
-              <button class="btn-ver-todos">
-                Ver todos <i class="bi bi-chevron-right ms-1"></i>
-              </button>
-            </div>
+            <button class="btn btn-outline-light btn-sm">Ver todos</button>
           </div>
-
-          <div class="tickets-list">
-            <div v-for="(ticket, index) in tickets" :key="index"
-                 class="ticket-row">
-              <div class="ticket-priority-bar" :class="ticket.priority"></div>
-              <div class="ticket-content">
-                <div class="ticket-date">
-                  <div>{{ ticket.date }}</div>
-                  <div>{{ ticket.time }}</div>
-                </div>
-                <div class="ticket-description">
-                  <div class="ticket-title">{{ ticket.title }}</div>
-                  <div class="ticket-subtitle">{{ ticket.subtitle }}</div>
-                </div>
-                <div class="ticket-status">
-                  <span class="status-badge" :class="ticket.status.toLowerCase()">
-                    {{ ticket.status }}
-                  </span>
-                </div>
-              </div>
-            </div>
+          <div class="table-responsive">
+            <table class="table table-hover table-borderless">
+              <thead>
+                <tr>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="i in 8" :key="i">
+                  <td><span class="status-dot bg-warning"></span></td>
+                  <td>Enero 16, 2025</td>
+                  <td>La fresadora tiene ruidos raros pero funciona...</td>
+                  <td><span class="badge bg-warning">Pendiente</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -133,41 +114,6 @@ import { Chart } from 'chart.js/auto'
 
 const lineChart = ref(null)
 const barChart = ref(null)
-
-const tickets = [
-  {
-    priority: 'alta',
-    date: 'Enero 16, 2025',
-    time: '8:45',
-    title: 'La fresadora tiene ruidos raros pero funciona',
-    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
-    status: 'Pendiente'
-  },
-  {
-    priority: 'media',
-    date: 'Enero 16, 2025',
-    time: '8:45',
-    title: 'La fresadora tiene ruidos raros pero funciona',
-    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
-    status: 'Cerrada'
-  },
-  {
-    priority: 'baja',
-    date: 'Enero 16, 2025',
-    time: '8:45',
-    title: 'La fresadora tiene ruidos raros pero funciona',
-    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
-    status: 'Abierta'
-  },
-  {
-    priority: 'alta',
-    date: 'Enero 16, 2025',
-    time: '8:45',
-    title: 'La fresadora tiene ruidos raros pero funciona',
-    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
-    status: 'Nueva'
-  }
-]
 
 onMounted(() => {
   // Line Chart
@@ -277,22 +223,14 @@ canvas {
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
   display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 
-.status-dot.alta {
-  background-color: #dc3545;
-}
-
-.status-dot.media {
-  background-color: #ffc107;
-}
-
-.status-dot.baja {
-  background-color: #198754;
+.card.h-100 {
+  height: calc(100vh - 200px) !important;
 }
 
 .card-body {
