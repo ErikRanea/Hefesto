@@ -1,4 +1,26 @@
 <template>
+  <div class="background">
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+   <span></span>
+</div>
   <section>
     <div class="box">
       <div class="square" style="--i: 0;"></div>
@@ -148,6 +170,8 @@ const login = async () => {
   box-shadow: border-box;
   font-family: 'helvetica';
 }
+
+
 
 body {
   background: #031323;
