@@ -72,7 +72,7 @@ class AuthController extends Controller
                 'foto_perfil' => htmlspecialchars($request->input('foto_perfil')),
                 'email' => htmlspecialchars($request->input('email')),
                 'password' => Hash::make($request->input('password')),//haseo de la contraseña
-                'rol' => 'administrador',
+                'rol' => 'operario',
                 'habilitado' => true,
                 
             ]);
@@ -93,7 +93,7 @@ class AuthController extends Controller
         try {
             // Si el token es válido, auth()->user() no lanzará una excepción
             $user = auth()->user();
-            return response()->json(['message' => 'Token válido'], Response::HTTP_OK);
+            return response()->json(['message' => 'Token válido','data' => auth()->user()], Response::HTTP_OK);
         } catch (TokenInvalidException $e) {
             return response()->json(['error' => 'Token inválido'], Response::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {

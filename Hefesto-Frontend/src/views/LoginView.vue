@@ -50,12 +50,13 @@ const closeErrorPopup = () => {
 const login = async () => {
   isLoading.value = true;
   try {
+    console.log("Enviando peticion");
     const response = await axios.post(loginUrl, {
       email: email.value,
       password: password.value,
     });
 
-    //login
+    console.log("Respuesta recibida");  
     const { access_token, token_type } = response.data;
     localStorage.setItem('token', access_token);
     localStorage.setItem('token_type', token_type);
@@ -159,7 +160,7 @@ const login = async () => {
   font-size: 1.1em;
   padding-left: 15px;
   position: absolute;
-  top: 15px;
+  top: 20px;
   transition: 0.3s;
   pointer-events: none;
   left: 0;
@@ -192,7 +193,7 @@ const login = async () => {
 .input-container .input:valid ~ .label {
   transition: 0.3s;
   padding-left: 10px;
-  transform: translateY(-30px) scale(0.8);
+  transform: translateY(-40px) scale(0.8);
   color: #bbb;
 }
 
