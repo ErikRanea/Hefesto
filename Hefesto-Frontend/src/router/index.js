@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '../views/LoginView.vue';
 import axios from 'axios';
 import HomeView from '../views/HomeView.vue';
+import MaquinasView from '../views/MaquinasView.vue';
 
 const urlBack = import.meta.env.VITE_API_AUTH_URL;
 
@@ -13,6 +14,11 @@ const routes = [
   {
     path: '/home',
     component: HomeView,  
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/maquinasview',
+    component: MaquinasView,  
     meta: { requiresAuth: true },
   },
 ];

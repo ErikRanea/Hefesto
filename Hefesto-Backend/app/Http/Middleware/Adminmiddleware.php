@@ -17,7 +17,7 @@ class Adminmiddleware
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            if (Auth::user()->id_rol == "admin") { 
+            if (Auth::user()->rol == "administrador") { 
                 return $next($request);
             } else {
                 return response()->json(['message' => 'Forbidden: You do not have the required admin role.'], 403);
