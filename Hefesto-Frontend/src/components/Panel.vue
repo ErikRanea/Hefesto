@@ -1,8 +1,8 @@
 <template>
   <!-- Stats Cards -->
   <div class="row g-4 mb-4">
-    <div class="col-md-3">
-      <div class="card glassmorphic-card">
+    <div class="col-sm-6 col-md-3">
+      <div class="card glassmorphic-card colored-shadow-pending">
         <div class="card-body">
           <h6>Tickets pendientes</h6>
           <div class="d-flex justify-content-between align-items-center">
@@ -12,8 +12,8 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card glassmorphic-card">
+    <div class="col-sm-6 col-md-3">
+      <div class="card glassmorphic-card colored-shadow-in-progress">
         <div class="card-body">
           <h6>Tickets en curso</h6>
           <div class="d-flex justify-content-between align-items-center">
@@ -23,8 +23,8 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card glassmorphic-card">
+    <div class="col-sm-6 col-md-3">
+      <div class="card glassmorphic-card colored-shadow-closed">
         <div class="card-body">
           <h6>Tickets cerrados</h6>
           <div class="d-flex justify-content-between align-items-center">
@@ -34,8 +34,8 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="card glassmorphic-card">
+    <div class="col-sm-6 col-md-3">
+      <div class="card glassmorphic-card colored-shadow-total">
         <div class="card-body">
           <h6>Total de tickets</h6>
           <div class="d-flex justify-content-between align-items-center">
@@ -50,7 +50,7 @@
   <!-- Main Content Area -->
   <div class="row g-4">
     <!-- Left Column - Charts -->
-    <div class="col-4">
+    <div class="col-md-4">
       <div class="card glassmorphic-card mb-4">
         <div class="card-body">
           <div class="d-flex justify-content-between mb-4">
@@ -74,32 +74,52 @@
     </div>
 
     <!-- Right Column - Tickets List -->
-    <div class="col-8">
+    <div class="col-md-8">
       <div class="card glassmorphic-card h-100">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="card-title mb-0">Últimos tickets</h5>
-            <button class="btn btn-outline-light btn-sm">Ver todos</button>
+            <div class="d-flex align-items-center gap-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center">
+                  <span class="status-dot alta"></span>
+                  <span class="ms-1 text-sm">Alta</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="status-dot media"></span>
+                  <span class="ms-1 text-sm">Media</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="status-dot baja"></span>
+                  <span class="ms-1 text-sm">Baja</span>
+                </div>
+              </div>
+              <button class="btn-ver-todos">
+                Ver todos <i class="bi bi-chevron-right ms-1"></i>
+              </button>
+            </div>
           </div>
-          <div class="table-responsive">
-            <table class="table table-hover table-borderless">
-              <thead>
-                <tr>
-                  <th>Estado</th>
-                  <th>Fecha</th>
-                  <th>Descripción</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="i in 8" :key="i">
-                  <td><span class="status-dot bg-warning"></span></td>
-                  <td>Enero 16, 2025</td>
-                  <td>La fresadora tiene ruidos raros pero funciona...</td>
-                  <td><span class="badge bg-warning">Pendiente</span></td>
-                </tr>
-              </tbody>
-            </table>
+
+          <div class="tickets-list">
+            <div v-for="(ticket, index) in tickets" :key="index"
+                 class="ticket-row">
+              <div class="ticket-priority-bar" :class="ticket.priority"></div>
+              <div class="ticket-content">
+                <div class="ticket-date">
+                  <div>{{ ticket.date }}</div>
+                  <div>{{ ticket.time }}</div>
+                </div>
+                <div class="ticket-description">
+                  <div class="ticket-title">{{ ticket.title }}</div>
+                  <div class="ticket-subtitle">{{ ticket.subtitle }}</div>
+                </div>
+                <div class="ticket-status">
+                  <span class="status-badge" :class="ticket.status.toLowerCase()">
+                    {{ ticket.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -113,6 +133,41 @@ import { Chart } from 'chart.js/auto'
 
 const lineChart = ref(null)
 const barChart = ref(null)
+
+const tickets = [
+  {
+    priority: 'alta',
+    date: 'Enero 16, 2025',
+    time: '8:45',
+    title: 'La fresadora tiene ruidos raros pero funciona',
+    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
+    status: 'Pendiente'
+  },
+  {
+    priority: 'media',
+    date: 'Enero 16, 2025',
+    time: '8:45',
+    title: 'La fresadora tiene ruidos raros pero funciona',
+    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
+    status: 'Cerrada'
+  },
+  {
+    priority: 'baja',
+    date: 'Enero 16, 2025',
+    time: '8:45',
+    title: 'La fresadora tiene ruidos raros pero funciona',
+    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
+    status: 'Abierta'
+  },
+  {
+    priority: 'alta',
+    date: 'Enero 16, 2025',
+    time: '8:45',
+    title: 'La fresadora tiene ruidos raros pero funciona',
+    subtitle: 'Ayer por la mañana no tenía ningún ruido extra...',
+    status: 'Nueva'
+  }
+]
 
 onMounted(() => {
   // Line Chart
@@ -222,17 +277,140 @@ canvas {
 }
 
 .status-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  display: inline-block;
 }
 
-.card.h-100 {
-  height: calc(100vh - 200px) !important;
+.status-dot.alta {
+  background-color: #dc3545;
+}
+
+.status-dot.media {
+  background-color: #ffc107;
+}
+
+.status-dot.baja {
+  background-color: #198754;
 }
 
 .card-body {
   padding: 1.5rem;
+}
+
+/* Color Shadows for Top Cards */
+.colored-shadow-pending {
+  box-shadow: 0 4px 16px 0 rgba(255, 193, 7, 0.5); /* Yellowish for pending */
+}
+
+.colored-shadow-in-progress {
+  box-shadow: 0 4px 16px 0 rgba(139, 92, 246, 0.5); /* Purple for in progress */
+}
+
+.colored-shadow-closed {
+  box-shadow: 0 4px 16px 0 rgba(76, 175, 80, 0.5); /* Green for closed */
+}
+
+.colored-shadow-total {
+  box-shadow: 0 4px 16px 0 rgba(33, 150, 243, 0.5); /* Blue for total */
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-ver-todos {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.tickets-list {
+  margin-top: 1rem;
+}
+
+.ticket-row {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 0.5rem;
+  min-height: 60px;
+}
+
+.ticket-priority-bar {
+  width: 4px;
+  border-radius: 2px;
+  margin-right: 1rem;
+}
+
+.ticket-priority-bar.alta {
+  background-color: #dc3545;
+}
+
+.ticket-priority-bar.media {
+  background-color: #ffc107;
+}
+
+.ticket-priority-bar.baja {
+  background-color: #198754;
+}
+
+.ticket-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.ticket-date {
+  min-width: 100px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ticket-description {
+  flex: 1;
+}
+
+.ticket-title {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.25rem;
+}
+
+.ticket-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+.status-badge.pendiente {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.status-badge.cerrada {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+}
+
+.status-badge.abierta {
+  background-color: rgba(139, 92, 246, 0.2);
+  color: #8b5cf6;
+}
+
+.status-badge.nueva {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
 }
 </style>
