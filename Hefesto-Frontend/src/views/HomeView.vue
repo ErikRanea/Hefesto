@@ -20,6 +20,7 @@
    <span></span>
    <span></span>
    <span></span>
+   <span></span>
 </div>
   <div class="dashboard min-vh-100">
     <!-- Sidebar -->
@@ -29,11 +30,12 @@
       </div>
 
       <nav class="nav flex-column">
-        <a v-for="item in menuItems"
-             :key="item.name"
-             href="#"
-             :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
-             @click.prevent="setActiveItem(item.name)">
+
+        <router-link v-for="item in filteredMenuItems"
+                     :key="item.name"
+                     :to="item.to"
+                     :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
+                     @click.prevent="setActiveItem(item.name)">
           <img :src="item.icon" class="me-3" alt="" aria-hidden="true">
           {{ item.name }}
         </a>
@@ -49,7 +51,7 @@
     <div class="main-content">
       <!-- Header -->
       <header class="header px-4 py-3 d-flex justify-content-between align-items-center">
-        <h1 class="h4 mb-0">Dashboard</h1>
+        <h1 class="h4 mb-0"></h1>
         <div class="d-flex align-items-center gap-3">
           <div class="text-end">
             <span class="user-name">{{ userName }} {{ userLastName }}</span>
@@ -116,13 +118,38 @@ const currentComponent = computed(() => {
 })
 
 
-const menuItems = ref([
-  { name: 'Panel', icon: '../src/assets/images/icons/panel.svg'},
-  { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg'},
-  { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg'},
-  { name: 'Mantenimiento', icon: '../src/assets/images/icons/Mantenimiento.svg'},
-  { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg'}
-]);
+const baseMenuItems = [
+  { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
+  { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
+  { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
+  { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
+];
+
+const allMenuItems = {
+  administrador: [
+    { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
+    ...baseMenuItems,
+    { name: 'Administracion', icon: '../src/assets/images/icons/administracion.svg', to: '/administracion' },
+  ],
+  operario: [
+    { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
+    { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
+    { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
+    { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
+  ],
+  tecnico: [
+    { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
+    { name: 'Mis tickets', icon: '../src/assets/images/icons/mistickets.svg', to: '/mis-tickets' },
+    { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
+    { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
+    { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
+  ],
+};
+
+const filteredMenuItems = computed(() => {
+  return allMenuItems[userRole.value] || [];
+});
+
 
 const setActiveItem = (itemName) => {
   activeItem.value = itemName;
@@ -195,7 +222,7 @@ const logout = async () => {
 
 /* Glassmorphic Sidebar */
 .sidebar {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   height: 100vh;
@@ -226,9 +253,8 @@ const logout = async () => {
 
 /* Header */
 .header {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
 }
 
@@ -262,7 +288,7 @@ const logout = async () => {
 
 /* Content Area */
 .content-panel {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -292,5 +318,9 @@ const logout = async () => {
 .main-content {
   overflow-y: auto;
   height: 100vh;
+}
+
+.logo img {
+  max-width: 100px;
 }
 </style>
