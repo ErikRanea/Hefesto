@@ -12,7 +12,7 @@
       <ProgressBarLoader />
     </div>
     <div class="container">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center">
           <div v-for="maquina in maquinas.slice(0,8)" :key="maquina.id_maquina" class="col d-flex justify-content-center">
             <div class="machine-card">
               <div class="d-flex justify-content-between">
@@ -184,8 +184,6 @@ export default {
     margin: 1em;
     background-size: cover;
     background-position: center;
-    height: 100vh;
-    width: 100vw;
     flex-direction: row;
 }
 
@@ -199,18 +197,6 @@ export default {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-}
-
-.home-view {
-  background: url(https://images.wallpapersden.com/image/download/abstract-purple-waves_a2ZlZ2WUmZqaraWkpJRnamtlrWZpaWU.jpg);
-  background-position: center;
-  background-size: cover;
-  color: white;
-  height: 100vh; /* Ensure full viewport height */
-  width: 100vw;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch; /* Make children take full height */
 }
 
 .machine-card {
