@@ -32,7 +32,12 @@
               </span>
             </div>
             <div class="inputBx button-container">
-              <button class="neu-button" :disabled="isLoading">
+               <button
+                 class="neu-button"
+                 :disabled="isLoading"
+                 type="submit"
+                 :class="{ 'loading-button': isLoading }"
+               >
                 <Loader v-if="isLoading" />
                 <span v-if="!isLoading">Iniciar Sesión</span>
               </button>
@@ -51,7 +56,7 @@
       <ErrorPopup
         :visible="showPasswordRecoveryPopup"
         :message="passwordRecoveryMessage"
-         @close="closePasswordRecoveryPopup"
+        @close="closePasswordRecoveryPopup"
       />
     </div>
   </section>
@@ -80,8 +85,8 @@ const email = ref('');
 const password = ref('');
 const isLoading = ref(false);
 
-const showErrorPopup = ref(true); // Mostrar popup de error inicialmente
-const popupErrorMessage = ref('Datos de acceso incorrectos. Por favor, verifica tus credenciales.');
+const showErrorPopup = ref(false);
+const popupErrorMessage = ref('');
 
 const showPasswordRecoveryPopup = ref(false)
 const passwordRecoveryMessage = ref('Por favor contacta con un administrador para recuperar tu contraseña.')
@@ -123,12 +128,13 @@ const login = async () => {
 
     router.push('/home');
   } catch (error) {
-    isLoading.value = false;
     if (error.response) {
       openErrorPopup(error.response.data.error || 'Error en el inicio de sesión');
     } else {
       openErrorPopup(error.message || 'Error en la conexión');
     }
+  } finally {
+     isLoading.value = false;
   }
 };
 </script>
@@ -140,7 +146,7 @@ const login = async () => {
   margin: 0;
   padding: 0;
   box-shadow: border-box;
-  font-family: 'El Messiri', sans-serif;
+  font-family: 'helvetica';
 }
 
 body {
@@ -157,7 +163,7 @@ section {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background: linear-gradient(-45deg, #6b0779, #6b0779, #dc47f0, #b764c2);
   background-size: 400% 400%;
   animation: gradient 10s ease infinite;
 }
@@ -446,4 +452,13 @@ section {
   padding: 20px 50px;
 }
 
+.loading-button {
+  background: linear-gradient(
+    115deg,
+    rgba(0, 0, 0, 0.1),
+    rgba(255, 255, 255, 0.25)
+  );
+  color: #fff;
+  transition: 0.5s;
+}
 </style>
