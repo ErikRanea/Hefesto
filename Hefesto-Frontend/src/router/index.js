@@ -28,7 +28,13 @@ const router = createRouter({
   routes,
 });
 
+const rutasAdmin = [
+  '/admin',
+];
 
+const rutasGenericas = [
+  '/home'
+];
 
 
 const comprobarToken = async () => {
@@ -40,15 +46,25 @@ const comprobarToken = async () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data;
+      console.log('Token válido:', response.data);
+      return{
+        isValid: true,
+        rol: response.data.data.rol,
+      } 
     }
     catch (error) {
       console.error('Error al validar el token:', error);
-      return false;
+      return {
+        isValid: false,
+        rol: false,
+      };
     }
   }
   else {
-    return false;
+    return{
+      isValid: false,
+      rol: false,
+    };
   }
 ç
 };
@@ -56,21 +72,21 @@ const comprobarToken = async () => {
 
 // Añade un guard de navegación global
 router.beforeEach(async (to, from, next) => {
-
-
-
-
   const token = localStorage.getItem('token');
   if (to.matched.some(record => record.meta.estarAutenticado)) {
     if (token) {
       try {
-        const response = await axios.get(urlBack + '/v1/auth/validate-token', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const { isValid, rol } = await comprobarToken();
         // Si la validación es exitosa, permite el acceso
-        next();
+        const permisoAdmin = rutasAdmin.includes(to.path);
+
+        if (permisoAdmin && rol !== 'administrador') {
+          alert('No tienes permisos para acceder a esta página');
+          next('/home');
+        } else {
+          next();
+        }
+
       } catch (error) {
         console.error('Error al validar el token:', error);
         // Si hay un error en la validación, redirige al login
