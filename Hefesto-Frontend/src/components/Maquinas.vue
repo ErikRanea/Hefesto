@@ -1,18 +1,6 @@
 <template>
-  <div class="home-view">
-    <Sidebar v-if="userRole" :user-role="userRole"
-      :user-name="userName"
-      :user-last-name="userLastName"
-      :user-Picture="userPicture"
-      @logout="logout" />
-    <div v-else-if="isLoggingOut" class="loading-container d-flex justify-content-center align-items-center">
-      <ProgressBarLoader />
-    </div>
-    <div v-else class="loading-container d-flex justify-content-center align-items-center">
-      <ProgressBarLoader />
-    </div>
     <div class="container">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center">
           <div v-for="maquina in maquinas.slice(0,8)" :key="maquina.id_maquina" class="col d-flex justify-content-center">
             <div class="machine-card">
               <div class="d-flex justify-content-between">
@@ -45,7 +33,6 @@
           </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -164,29 +151,16 @@ export default {
 
 <style scoped>
 
-.home-view {
-    background: url(https://images.wallpapersden.com/image/download/abstract-purple-waves_a2ZlZ2WUmZqaraWkpJRnamtlrWZpaWU.jpg);
-    background-position: center;
-    background-size: cover;
-    color: white;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-}
-
 .container {
     padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1em;
     background-size: cover;
     background-position: center;
-    height: 100vh;
-    width: 100vw;
     flex-direction: row;
+    color: white;
+    height: 100vh;
 }
 
 .loading-container {
@@ -199,18 +173,6 @@ export default {
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-}
-
-.home-view {
-  background: url(https://images.wallpapersden.com/image/download/abstract-purple-waves_a2ZlZ2WUmZqaraWkpJRnamtlrWZpaWU.jpg);
-  background-position: center;
-  background-size: cover;
-  color: white;
-  height: 100vh; /* Ensure full viewport height */
-  width: 100vw;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch; /* Make children take full height */
 }
 
 .machine-card {
