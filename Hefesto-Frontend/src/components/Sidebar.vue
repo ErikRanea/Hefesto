@@ -1,172 +1,156 @@
 <template>
-    <div class="navbar">
-      <div class="profile">
-        <div class="imgbox">
-          <img :src="profilePictureUrl" alt="" />
-        </div>
-        <div class="heading">
-          <h3 class="title">{{ userName }} {{ userLastName }}</h3>
-          <h4 class="label">
-            {{ userRole }}
-          </h4>
-        </div>
+  <div class="navbar">
+    <div class="profile">
+      <div class="imgbox">
+        <img :src="profilePictureUrl" alt="" />
       </div>
-      <!-- navitems -->
-      <ul>
-        <template v-if="userRole === 'administrador'">
-          <li text-data="maquinas">
-            <a href="#">
-              <i class="uil uil-server"></i>
-              <span>maquinas</span>
-            </a>
-          </li>
-          <li text-data="tickets">
-            <a href="#">
-              <i class="uil uil-ticket"></i>
-              <span>tickets</span>
-            </a>
-          </li>
-          <li text-data="mantenimiento">
-            <a href="#">
-              <i class="uil uil-wrench"></i>
-              <span>mantenimiento</span>
-            </a>
-          </li>
-          <li text-data="administracion">
-            <a href="#">
-              <i class="uil uil-setting"></i>
-              <span>administracion</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="uil uil-setting"></i>
-              <span>ajustes</span>
-            </a>
-          </li>
-          <li>
-            <a href="#" @click.prevent="$emit('logout')">
-              <i class="uil uil-signout"></i>
-              <span>cerrar sesion</span>
-            </a>
-          </li>
-        </template>
-        <template v-else-if="userRole === 'tecnico'">
-          <li text-data="maquinas">
-            <a href="#">
-              <i class="uil uil-server"></i>
-              <span>maquinas</span>
-            </a>
-          </li>
-          <li text-data="tickets">
-            <a href="#">
-              <i class="uil uil-ticket"></i>
-              <span>tickets</span>
-            </a>
-          </li>
-          <li text-data="mantenimiento">
-            <a href="#">
-              <i class="uil uil-wrench"></i>
-              <span>mantenimiento</span>
-            </a>
-          </li>
-          <li text-data="mis tickets">
-            <a href="#">
-              <i class="uil uil-clipboard-notes"></i>
-              <span>mis tickets</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="uil uil-setting"></i>
-              <span>ajustes</span>
-            </a>
-          </li>
-          <li>
-            <a href="#" @click.prevent="$emit('logout')">
-              <i class="uil uil-signout"></i>
-              <span>cerrar sesion</span>
-            </a>
-          </li>
-        </template>
-        <template v-else-if="userRole === 'operario'">
-          <li text-data="maquinas">
-            <a href="#">
-              <i class="uil uil-server"></i>
-              <span>maquinas</span>
-            </a>
-          </li>
-          <li text-data="tickets">
-            <a href="#">
-              <i class="uil uil-ticket"></i>
-              <span>tickets</span>
-            </a>
-          </li>
-          <li text-data="mantenimiento">
-            <a href="#">
-              <i class="uil uil-wrench"></i>
-              <span>mantenimiento</span>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i class="uil uil-setting"></i>
-              <span>ajustes</span>
-            </a>
-          </li>
-          <li>
-            <a href="#" @click.prevent="$emit('logout')">
-              <i class="uil uil-signout"></i>
-              <span>cerrar sesion</span>
-            </a>
-          </li>
-        </template>
-        <template v-else>
-          <li>
-            <a href="#">
-              <i class="uil uil-setting"></i>
-              <span>ajustes</span>
-            </a>
-          </li>
-          <li>
-            <a href="#" @click.prevent="$emit('logout')">
-              <i class="uil uil-signout"></i>
-              <span>cerrar sesion</span>
-            </a>
-          </li>
-        </template>
-      </ul>
+      <div class="heading">
+        <h3 class="title">{{ userName }} {{ userLastName }}</h3>
+        <h4 class="label">
+          {{ userRole }}
+        </h4>
+      </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'Sidebar',
-    props: {
-      userRole: {
-        type: String,
-        required: true,
-      },
-      userName: {
-        type: String,
-        required: true,
-      },
-      userLastName: {
-        type: String,
-        required: true,
-      },
-      userPicture: {
-        type: String,
-        required: true,
-      },
+    <!-- navitems -->
+    <ul class="nav-items">
+      <template v-if="userRole === 'administrador'">
+        <li text-data="maquinas">
+          <a href="#">
+            <i class="uil uil-server"></i>
+            <span>MAQUINAS</span>
+          </a>
+        </li>
+        <li text-data="tickets">
+          <a href="#">
+            <i class="uil uil-ticket"></i>
+            <span>TICKETS</span>
+          </a>
+        </li>
+        <li text-data="mantenimiento">
+          <a href="#">
+            <i class="uil uil-wrench"></i>
+            <span>MANTENIMIENTO</span>
+          </a>
+        </li>
+        <li text-data="administracion">
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ADMINISTRACION</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>AJUSTES</span>
+          </a>
+        </li>
+      </template>
+      <template v-else-if="userRole === 'tecnico'">
+        <li text-data="maquinas">
+          <a href="#">
+            <i class="uil uil-server"></i>
+            <span>maquinas</span>
+          </a>
+        </li>
+        <li text-data="tickets">
+          <a href="#">
+            <i class="uil uil-ticket"></i>
+            <span>tickets</span>
+          </a>
+        </li>
+        <li text-data="mantenimiento">
+          <a href="#">
+            <i class="uil uil-wrench"></i>
+            <span>mantenimiento</span>
+          </a>
+        </li>
+        <li text-data="mis tickets">
+          <a href="#">
+            <i class="uil uil-clipboard-notes"></i>
+            <span>mis tickets</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ajustes</span>
+          </a>
+        </li>
+      </template>
+      <template v-else-if="userRole === 'operario'">
+        <li text-data="maquinas">
+          <a href="#">
+            <i class="uil uil-server"></i>
+            <span>maquinas</span>
+          </a>
+        </li>
+        <li text-data="tickets">
+          <a href="#">
+            <i class="uil uil-ticket"></i>
+            <span>tickets</span>
+          </a>
+        </li>
+        <li text-data="mantenimiento">
+          <a href="#">
+            <i class="uil uil-wrench"></i>
+            <span>mantenimiento</span>
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ajustes</span>
+          </a>
+        </li>
+      </template>
+      <template v-else>
+        <li>
+          <a href="#">
+            <i class="uil uil-setting"></i>
+            <span>ajustes</span>
+          </a>
+        </li>
+      </template>
+    </ul>
+    <ul class="logout-list">
+         <li>
+            <a href="#" @click.prevent="$emit('logout')">
+              <i class="uil uil-signout"></i>
+              <span>cerrar sesion</span>
+            </a>
+          </li>
+    </ul>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Sidebar',
+  props: {
+    userRole: {
+      type: String,
+      required: true,
     },
-    computed: {
-      profilePictureUrl() {
-        return `../src/assets/images/userPicture/${this.userPicture}`;
-      },
+    userName: {
+      type: String,
+      required: true,
     },
-  };
-  </script>
+    userLastName: {
+      type: String,
+      required: true,
+    },
+    userPicture: {
+      type: String,
+      required: true,
+    },
+  },
+  computed: {
+    profilePictureUrl() {
+      return `../src/assets/images/userPicture/${this.userPicture}`;
+    },
+  },
+};
+</script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
@@ -175,7 +159,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Helvetica', sans-serif;
 }
 
 .navbar {
@@ -184,12 +168,12 @@
   backdrop-filter: blur(10px);
   padding: 20px;
   width: 270px;
-  top: 40px; /* Added top margin */
-  left: 20px; /* Added left margin */
-  margin-bottom: 20px; /* Added bottom margin */
+  top: 40px;
+  left: 20px;
+  margin-bottom: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px; /* Modified border-radius to be consistent on all corners */
-  height: calc(100vh - 100px); /* Adjusted height to account for top and bottom margins */
+  border-radius: 20px;
+  height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
@@ -246,12 +230,18 @@
   text-transform: capitalize;
 }
 
-ul {
+.nav-items {
   margin-top: 30px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+.logout-list {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 ul li {
@@ -285,11 +275,11 @@ ul li a i {
   .navbar {
     width: 80px;
     padding: 15px 10px;
-    top: 10px; /* Adjusted top margin for smaller screens */
-    left: 10px; /* Adjusted left margin for smaller screens */
-    margin-bottom: 10px; /* Adjusted bottom margin for smaller screens */
-    height: calc(100vh - 20px); /* Adjusted height for smaller screens */
-    border-radius: 10px 10px 0 0; /* Keep the border radius on top for smaller screens */
+    top: 10px;
+    left: 10px;
+    margin-bottom: 10px;
+    height: calc(100vh - 20px);
+    border-radius: 10px 10px 0 0;
   }
 
   .profile {

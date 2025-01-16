@@ -29,23 +29,6 @@ const router = createRouter({
 });
 
 
-router.beforeEach(async (to, from, next) => {
-  const publicPages = ['/login'];
-  const authRequired = !publicPages.includes(to.path);
-  const { isValid, isAdmin } = await fetchUserRole();
-
-  if (authRequired && !isValid) {
-    sessionStorage.removeItem('token');
-    return next('/login');
-  }
-
-  if (to.meta.requiresAdmin && !isAdmin) {
-    alert('Necesita ser administrador para acceder a esta página');
-    return next('/home');
-  }
-
-  next();
-})
 
 
 const comprobarToken = async () => {

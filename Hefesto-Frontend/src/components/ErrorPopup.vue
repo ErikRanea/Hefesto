@@ -1,114 +1,82 @@
 <template>
-    <div v-if="visible" class="error-popup-container">
-      <div class="popup-overlay"></div>
-      <form class="form">
-        <p id="heading">Error</p>
-        <div class="error-message" style="color: white; text-align: center;">
-          {{ message }}
-        </div>
-        <div class="btn">
-          <button type="button" class="neu-button" @click="$emit('close')">
-            Cerrar
-          </button>
-        </div>
-      </form>
+  <div v-if="visible" class="container">
+    <div class="card">
+      <h1 class="title">Error</h1>
+      <p class="subtitle" style="text-align:center">{{ message }}</p>
+      <button class="btn" @click="$emit('close')">Cerrar</button>
     </div>
-  </template>
-  
-  <script setup>
-  
-  defineProps({
-    visible: Boolean,
-    message: String,
-  });
-  
-  defineEmits(['close']);
-  </script>
-  
-  <style scoped>
-  .error-popup-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  </div>
+</template>
+
+<script setup>
+defineProps({
+  visible: Boolean,
+  message: String,
+});
+
+defineEmits(['close']);
+</script>
+
+<style scoped>
+/* Estilos proporcionados por el usuario */
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: "Nunito", sans-serif;
+}
+body {
+  background: #1f1f47;
+}
+
+.container {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Asegura que el popup esté encima de todo */
-  }
-  
-  .popup-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
+    min-height: 100vh;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semi-transparente */
-  }
-  
-  .error-popup-container .form {
-    /* Puedes ajustar los estilos del formulario dentro del popup si es necesario */
-    z-index: 1001; /* Asegura que el formulario esté encima del overlay */
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 3em;
-    background-color: #171717;
-    border-radius: 35px;
-    transition: .4s ease-in-out;
-    width: 450px;
-  }
-  
-  .error-popup-container .form:hover {
-    transform: scale(1.05);
-    border: 1px solid black;
-  }
-  
-  .error-popup-container #heading {
-    text-align: center;
-    margin: 2em 0;
-    color: rgb(255, 255, 255);
-    font-size: 2.2em;
-    font-family: 'Helvetica';
-  }
-  
-  .error-popup-container .btn {
-    display: flex;
-    justify-content: center;
-    margin-top: 1em; /* Ajusta el margen del botón en el popup */
-  }
-  
-  .error-popup-container .neu-button {
-    background-color: #171717;
-    border-radius: 60px;
-    box-shadow: 5px 5px 12px #0e0e0e, -5px -5px 12px #202020;
-    color: #fff;
-    cursor: pointer;
-    font-size: 22px;
-    padding: 20px 50px;
-    transition: all 0.2s ease-in-out;
-    border: none;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Centrar el Loader y el texto */
-    gap: 8px; /* Espacio entre el Loader y el texto */
-  }
-  
-  .error-popup-container .neu-button:hover {
-    box-shadow: inset 3px 3px 7px #0e0e0e, inset -3px -3px 7px #202020, 3px 3px 7px #0e0e0e, -3px -3px 7px #202020;
-  }
-  
-  .error-popup-container .neu-button:focus {
-    outline: none;
-    box-shadow: inset 3px 3px 7px #0e0e0e, inset -3px -3px 7px #202020, 3px 3px 7px #0e0e0e, -3px -3px 7px #202020;
-  }
-  
-  .error-popup-container .error-message {
-    color: #ff4d4d;
-    margin-top: 1em;
-    text-align: center;
-  }
-  </style>
+
+}
+
+.card {
+  width: 400px;
+  min-height: 250px;
+  background: rgba( 255, 255, 255, 0.15 );
+  box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+  backdrop-filter: blur( 18px );
+  -webkit-backdrop-filter: blur( 18px );
+  border: 1px solid rgba( 255, 255, 255, 0.18 );
+  border-radius: 1rem;
+  padding: 1.5rem;
+  z-index: 10;
+  color: whitesmoke;
+}
+
+.title {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+
+}
+
+.btn {
+  background: none;
+  border: none;
+  text-align: center;
+  font-size: 1rem;
+  color: whitesmoke;
+  background-color: #fa709a;
+  padding: 0.8rem 1.8rem;
+  border-radius: 2rem;
+  cursor: pointer;
+    margin: auto;
+    display: block;
+    margin-top: 20px
+}
+</style>
