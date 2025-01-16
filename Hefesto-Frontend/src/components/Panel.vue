@@ -1,182 +1,238 @@
 <template>
-    <div class="ticket-container p-3 bg-light rounded-3">
-      <!-- Navigation Tabs -->
-      <ul class="nav nav-tabs mb-3">
-        <li class="nav-item">
-          <a class="nav-link" :class="{ active: activeTab === 'entrantes' }" href="#" @click.prevent="activeTab = 'entrantes'">
-            Entrantes
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" :class="{ active: activeTab === 'realizados' }" href="#" @click.prevent="activeTab = 'realizados'">
-            Realizados
-          </a>
-        </li>
-      </ul>
-  
-      <!-- Priority Filters -->
-      <div class="priority-filters mb-4">
-        <ul class="nav nav-underline">
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activePriority === 'todos' }" href="#" @click.prevent="activePriority = 'todos'">
-              Todos
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activePriority === 'urgente' }" href="#" @click.prevent="activePriority = 'urgente'">
-              Urgente
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activePriority === 'medio' }" href="#" @click.prevent="activePriority = 'medio'">
-              Medio
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" :class="{ active: activePriority === 'baja' }" href="#" @click.prevent="activePriority = 'baja'">
-              Baja
-            </a>
-          </li>
-        </ul>
-      </div>
-  
-      <!-- Ticket List -->
-      <div class="ticket-list">
-        <div v-for="ticket in filteredTickets" :key="ticket.id" class="ticket-item p-3 mb-2 d-flex align-items-center justify-content-between">
-          <div class="d-flex align-items-center flex-grow-1">
-            <span class="ticket-text">{{ ticket.description }}</span>
-            <span class="priority-indicator ms-2">
-              <span class="dot"></span>
-              {{ ticket.priority }}
-            </span>
-          </div>
-          <div class="d-flex align-items-center">
-            <div class="form-check me-3">
-              <input 
-                type="checkbox" 
-                class="form-check-input" 
-                :id="'ticket-' + ticket.id"
-                v-model="ticket.checked"
-              >
-            </div>
-            <button class="btn btn-enter px-3">Entrar</button>
+  <!-- Stats Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card glassmorphic-card">
+        <div class="card-body">
+          <h6>Tickets pendientes</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2>10</h2>
+            <img src="../assets/images/icons/pendientes.svg">
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue'
-  
-  const activeTab = ref('entrantes')
-  const activePriority = ref('todos')
-  
-  const tickets = ref([
-    { id: 1, description: 'Se ha roto la fresadora en la sección de mecanica', priority: 'urgente', checked: false },
-    { id: 2, description: 'Se ha roto la fresadora en la sección de mecanica', priority: 'urgente', checked: false },
-    { id: 3, description: 'Se ha roto la fresadora en la sección de mecanica', priority: 'urgente', checked: false },
-    { id: 4, description: 'Se ha roto la fresadora en la sección de mecanica', priority: 'urgente', checked: false },
-    { id: 5, description: 'Se ha roto la fresadora en la sección de mecanica', priority: 'urgente', checked: false },
-  ])
-  
-  const filteredTickets = computed(() => {
-    if (activePriority.value === 'todos') return tickets.value
-    return tickets.value.filter(ticket => ticket.priority === activePriority.value)
+    <div class="col-md-3">
+      <div class="card glassmorphic-card">
+        <div class="card-body">
+          <h6>Tickets en curso</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2>10</h2>
+            <img src="../assets/images/icons/curso.svg">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card glassmorphic-card">
+        <div class="card-body">
+          <h6>Tickets cerrados</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2>10</h2>
+            <img src="../assets/images/icons/cerrados.svg">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card glassmorphic-card">
+        <div class="card-body">
+          <h6>Total de tickets</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2>10</h2>
+            <img src="../assets/images/icons/total.svg">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="row g-4">
+    <!-- Left Column - Charts -->
+    <div class="col-4">
+      <div class="card glassmorphic-card mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-4">
+            <div>
+              <h6 class="text-muted mb-1">Tickets abiertos</h6>
+              <div class="d-flex align-items-baseline">
+                <span class="h3 mb-0">20</span>
+                <span class="text-muted ms-2">hoy</span>
+              </div>
+            </div>
+          </div>
+          <canvas ref="lineChart" height="100"></canvas>
+        </div>
+      </div>
+      <div class="card glassmorphic-card">
+        <div class="card-body">
+          <h5 class="card-title">Estadísticas</h5>
+          <canvas ref="barChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Tickets List -->
+    <div class="col-8">
+      <div class="card glassmorphic-card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">Últimos tickets</h5>
+            <button class="btn btn-outline-light btn-sm">Ver todos</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover table-borderless">
+              <thead>
+                <tr>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="i in 8" :key="i">
+                  <td><span class="status-dot bg-warning"></span></td>
+                  <td>Enero 16, 2025</td>
+                  <td>La fresadora tiene ruidos raros pero funciona...</td>
+                  <td><span class="badge bg-warning">Pendiente</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { Chart } from 'chart.js/auto'
+
+const lineChart = ref(null)
+const barChart = ref(null)
+
+onMounted(() => {
+  // Line Chart
+  new Chart(lineChart.value, {
+    type: 'line',
+    data: {
+      labels: ['8:00', '12:00', '15:00', '20:00', '00:00'],
+      datasets: [{
+        label: 'Tickets',
+        data: [5, 15, 8, 12, 7],
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        tension: 0.4,
+        fill: true,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.7)',
+            padding: 10
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.7)',
+            padding: 10
+          }
+        }
+      }
+    }
   })
-  </script>
-  
-  <style scoped>
-  .ticket-container {
-    background: linear-gradient(145deg, #e6e6e6, #d5d5d5) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .ticket-item {
-    background: linear-gradient(145deg, #f5f5f5, #e6e6e6);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
-  }
-  
-  .nav-tabs .nav-link,
-  .nav-underline .nav-link {
-    color: #666;
-    border: none;
-  }
-  
-  .nav-tabs .nav-link.active,
-  .nav-underline .nav-link.active {
-    color: #333;
-    font-weight: 500;
-    border-bottom: 2px solid #333;
-  }
-  
-  .priority-indicator {
-    display: flex;
-    align-items: center;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-  .dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background-color: #dc3545;
-    border-radius: 50%;
-    margin-right: 5px;
-  }
-  
-  .form-check-input {
-    width: 1.2rem;
-    height: 1.2rem;
-    border-radius: 50%;
-    border: 2px solid #666;
-    cursor: pointer;
-  }
-  
-  .form-check-input:checked {
-    background-color: #198754;
-    border-color: #198754;
-  }
-  
-  .btn-enter {
-    background: linear-gradient(145deg, #f5f5f5, #e6e6e6);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #666;
-    border-radius: 20px;
-    padding: 0.25rem 1rem;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-  }
-  
-  .btn-enter:hover {
-    background: linear-gradient(145deg, #e6e6e6, #d5d5d5);
-    color: #333;
-  }
-  
-  .ticket-text {
-    color: #333;
-    font-size: 0.95rem;
-  }
-  
-  /* Custom scrollbar for webkit browsers */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #666;
-  }
-  </style>
+
+  // Bar Chart
+  new Chart(barChart.value, {
+    type: 'bar',
+    data: {
+      labels: ['15/01', '17/01', '18/01', '19/01', '20/01', '21/01', '22/01'],
+      datasets: [{
+        label: 'Tickets',
+        data: [30, 20, 25, 35, 25, 20, 25],
+        backgroundColor: '#8b5cf6'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }
+  })
+})
+</script>
+
+<style scoped>
+.glassmorphic-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.h3 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+table {
+  color: rgba(255, 255, 255, 0.9) !important;
+  background-color: transparent !important;
+}
+
+.table-responsive {
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  background-color: transparent !important;
+}
+
+.table > :not(caption) > * > * {
+  background-color: transparent !important;
+}
+
+canvas {
+  max-height: 300px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.card.h-100 {
+  height: calc(100vh - 200px) !important;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+</style>
