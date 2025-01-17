@@ -26,16 +26,15 @@
     <!-- Sidebar -->
     <div class="sidebar p-4 d-flex flex-column">
       <div class="logo mb-5">
-        <img src="../assets/images/icons/Logos.png" alt="Logo" class="img-fluid mb-4" style="max-width: 150px;">
+        <img src="../assets/images/icons/logos.png" alt="Logo" class="img-fluid mb-4" style="max-width: 150px;">
       </div>
 
       <nav class="nav flex-column">
-
-        <router-link v-for="item in filteredMenuItems"
-                     :key="item.name"
-                     :to="item.to"
-                     :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
-                     @click.prevent="setActiveItem(item.name)">
+        <a v-for="item in filteredMenuItems"
+             :key="item.name"
+             href="#"
+             :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
+             @click.prevent="setActiveItem(item.name)">
           <img :src="item.icon" class="me-3" alt="" aria-hidden="true">
           {{ item.name }}
         </a>
@@ -69,7 +68,7 @@
       <!-- Content Area -->
       <div class="content p-4">
         <div class="content-panel p-4">
-          <component :is="currentComponent"/>
+          <component :is="componenteActual" />
         </div>
       </div>
     </div>
@@ -77,9 +76,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, defineAsyncComponent } from 'vue'
+import { ref, defineAsyncComponent , onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+
 
 const router = useRouter();
 const userRole = ref(null);
@@ -92,30 +92,11 @@ const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
 const LOGOUT_URL = `${API_AUTH_URL}/v1/auth/logout`;
 
-
-const Panel = defineAsyncComponent(() => import('../components/Panel.vue'))
-const Ticket = defineAsyncComponent(() => import('../components/Tickets.vue'))
-const Maquinas = defineAsyncComponent(() => import('../components/Maquinas.vue'))
-const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'))
-const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'))
-
-const currentView = ref('Panel');
-const currentComponent = computed(() => {
-    switch(currentView.value){
-      case 'Panel':
-        return Panel
-      case 'Tickets':
-        return Ticket
-      case 'Maquinas':
-          return Maquinas
-      case 'Mantenimiento':
-          return Mantenimiento
-        case 'Ajustes':
-            return Ajustes
-        default:
-            return Panel
-    }
-})
+const Panel = defineAsyncComponent(() => import('../components/Panel.vue'));
+const Tickets = defineAsyncComponent(() => import('../components/Tickets.vue'));
+const Maquinas = defineAsyncComponent(() => import('../components/Maquinas.vue'));  
+const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'));
+const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'));
 
 
 const baseMenuItems = [
@@ -132,12 +113,14 @@ const allMenuItems = {
     { name: 'Administracion', icon: '../src/assets/images/icons/administracion.svg', to: '/administracion' },
   ],
   operario: [
+    { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
     { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
     { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
   ],
   tecnico: [
+    { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
     { name: 'Mis tickets', icon: '../src/assets/images/icons/mistickets.svg', to: '/mis-tickets' },
     { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
@@ -150,10 +133,26 @@ const filteredMenuItems = computed(() => {
   return allMenuItems[userRole.value] || [];
 });
 
+const componenteActual = computed(() => {
+  switch (activeItem.value) {
+    case 'Panel':
+      return Panel;
+    case 'Tickets':
+      return Tickets;
+    case 'Maquinas':
+      return Maquinas;
+    case 'Mantenimiento':
+      return Mantenimiento;
+    case 'Ajustes':
+      return Ajustes;
+    default:
+      return Panel; // Default to Panel component if none of the above match
+  }
+});
 
 const setActiveItem = (itemName) => {
   activeItem.value = itemName;
-  currentView.value = itemName;
+  console.log('Active item:', itemName);
 };
 
 // Computed property to construct the image path
@@ -208,8 +207,6 @@ const logout = async () => {
     isLoggingOut.value = false;
   }
 };
-
-
 </script>
 
 <style scoped>
