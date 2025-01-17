@@ -57,8 +57,8 @@
             <div class="ticketsabiertos">
               <h6 class="text-muted mb-1">Tickets abiertos</h6>
               <div class="d-flex align-items-baseline">
-                <span class="h3 mb-0">20</span>
-                <span class="text-muted ms-2">hoy</span>
+                <span class="abiertos-h3 mb-0">20</span>
+                <span class="text-muted ms-2" style="color: rgba(116, 116, 116, 1) !important;">hoy</span>
               </div>
             </div>
           </div>
@@ -178,7 +178,7 @@ onMounted(() => {
       datasets: [{
         label: 'Tickets',
         data: [5, 15, 8, 12, 7],
-        borderColor: '#8b5cf6',
+        borderColor: '#600484',
         backgroundColor: 'rgba(139, 92, 246, 0.1)',
         tension: 0.4,
         fill: true,
@@ -197,11 +197,11 @@ onMounted(() => {
         y: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: 'rgba(116, 116, 116, 1)',
             drawBorder: false
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'rgba(116, 116, 116, 1)',
             padding: 10
           }
         },
@@ -210,7 +210,7 @@ onMounted(() => {
             display: false
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'rgba(116, 116, 116, 1)',
             padding: 10
           }
         }
@@ -222,22 +222,43 @@ onMounted(() => {
   new Chart(barChart.value, {
     type: 'bar',
     data: {
-      labels: ['15/01', '17/01', '18/01', '19/01', '20/01', '21/01', '22/01'],
-      datasets: [{
-        label: 'Tickets',
-        data: [30, 20, 25, 35, 25, 20, 25],
-        backgroundColor: '#8b5cf6'
-      }]
+      labels: ['16/01', '17/01', '18/01', '19/01', '20/01', '21/01', '22/01'],
+      datasets: [
+        {
+          label: 'Promedio tickets resueltos',
+          data: [15, 12, 16, 16, 20, 13, 16],
+          backgroundColor: '#600484',
+           borderRadius: 10, 
+           stack: 'combined',
+        },
+        {
+          label: 'Promedio tickets abiertos',
+          data: [19, 10, 8, 16, 19, 9, 11],
+          backgroundColor: '#a470c2',
+           borderRadius: 10, 
+          stack: 'combined',
+        }
+      ]
     },
     options: {
       responsive: true,
+      scales:{
+        y:{
+            beginAtZero: true,
+           max:40,
+           ticks:{
+                stepSize:10,
+            }
+        }
+    },
       plugins: {
         legend: {
-          display: false
-        }
-      }
+         display: true,
+        },
+       roundedBars: true 
+      },
     }
-  })
+  });
 })
 </script>
 
@@ -250,7 +271,7 @@ onMounted(() => {
 }
 
 .text-muted {
-  color: rgba(0, 0, 0, 0.6) !important;
+  color: rgba(116, 116, 116, 1) !important;
 }
 
 .h3 {
@@ -284,15 +305,15 @@ canvas {
 }
 
 .status-dot.alta {
-  background-color: #dc3545;
+  background-color: #FF4D4D;
 }
 
 .status-dot.media {
-  background-color: #ffc107;
+  background-color: #DEB614;
 }
 
 .status-dot.baja {
-  background-color: #198754;
+  background-color: #57C200;
 }
 
 .card-body {
@@ -300,24 +321,10 @@ canvas {
 }
 
 .card-bodyTotal {
-  padding: 1.9rem;
+  padding: 1.8rem;
 }
 /* Color Shadows for Top Cards */
-.colored-shadow-pending {
-  box-shadow: 0 4px 16px 0 #B89B00; /* Yellowish for pending */
-}
 
-.colored-shadow-in-progress {
-  box-shadow: 0 4px 16px 0 #600484; /* Purple for in progress */
-}
-
-.colored-shadow-closed {
-  box-shadow: 0 4px 16px 0 #000000; /* Green for closed */
-}
-
-.colored-shadow-total {
-  box-shadow: 0 4px 16px 0 #FFFFFF; /* Blue for total */
-}
 
 .text-sm {
   font-size: 0.875rem;
@@ -346,21 +353,21 @@ canvas {
 }
 
 .ticket-priority-bar {
-  width: 4px;
-  border-radius: 2px;
+  width: 6px;
+  border-radius: 4px;
   margin-right: 1rem;
 }
 
 .ticket-priority-bar.alta {
-  background-color: #dc3545;
+  background-color: #FF4D4D;
 }
 
 .ticket-priority-bar.media {
-  background-color: #ffc107;
+  background-color: #DEB614;
 }
 
 .ticket-priority-bar.baja {
-  background-color: #198754;
+  background-color: #57C200;
 }
 
 .ticket-content {
@@ -434,8 +441,13 @@ canvas {
 
 .total-h2 {
   color: #FFFFFF;
-  
+  font-size: 70px;
 }
-
-
+  
+.ticketsabiertos h6{
+  color: black;
+}
+.abiertos-h3{
+  color: rgba(116, 116, 116, 1);
+}
 </style>

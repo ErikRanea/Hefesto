@@ -24,20 +24,20 @@
 </div>
   <div class="dashboard min-vh-100">
     <!-- Sidebar -->
-    <div class="sidebar p-4 d-flex flex-column">
-      <div class="logo mb-5">
+    <div class="sidebar p-0 d-flex flex-column">  <!-- Removed p-4-->
+      <div class="logo mb-5 p-4"> <!-- Added p-4 to logo -->
         <img src="../assets/images/icons/logos.png" alt="Logo" class="img-fluid mb-4" style="max-width: 150px;">
       </div>
 
       <nav class="nav flex-column">
-        <router-link v-for="item in filteredMenuItems"
-                     :key="item.name"
-                     :to="item.to"
-                     :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
-                     @click.prevent="setActiveItem(item.name)">
+        <a v-for="item in filteredMenuItems"
+             :key="item.name"
+             href="#"
+             :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
+             @click.prevent="setActiveItem(item.name)">
           <img :src="item.icon" class="me-3" alt="" aria-hidden="true">
           {{ item.name }}
-        </router-link>
+        </a>
       </nav>
 
       <button @click="logout" class="nav-link mt-auto d-flex align-items-center">
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content d-flex flex-column"> <!-- Added d-flex flex-column -->
       <!-- Header -->
       <header class="header px-4 py-3 d-flex justify-content-between align-items-center">
         <h1 class="h4 mb-0"></h1>
@@ -66,9 +66,9 @@
       </header>
 
       <!-- Content Area -->
-      <div class="content p-4">
-        <div class="content-panel p-4">
-          <Panel />
+      <div class="content flex-grow-1 d-flex flex-column"> <!-- Added d-flex flex-column and flex-grow-1-->
+        <div class="content-panel p-4 d-flex flex-column">
+          <component :is="componenteActual" />
         </div>
       </div>
     </div>
@@ -76,10 +76,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, defineAsyncComponent , onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import Panel from '../components/Panel.vue';
+
 
 const router = useRouter();
 const userRole = ref(null);
@@ -91,6 +91,13 @@ const activeItem = ref('Panel');
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
 const LOGOUT_URL = `${API_AUTH_URL}/v1/auth/logout`;
+
+const Panel = defineAsyncComponent(() => import('../components/Panel.vue'));
+const Tickets = defineAsyncComponent(() => import('../components/Tickets.vue'));
+const Maquinas = defineAsyncComponent(() => import('../components/Maquinas.vue'));  
+const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'));
+const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'));
+
 
 const baseMenuItems = [
   { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
@@ -106,12 +113,14 @@ const allMenuItems = {
     { name: 'Administracion', icon: '../src/assets/images/icons/administracion.svg', to: '/administracion' },
   ],
   operario: [
+    { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
     { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
     { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
   ],
   tecnico: [
+    { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
     { name: 'Mis tickets', icon: '../src/assets/images/icons/mistickets.svg', to: '/mis-tickets' },
     { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
@@ -124,8 +133,26 @@ const filteredMenuItems = computed(() => {
   return allMenuItems[userRole.value] || [];
 });
 
+const componenteActual = computed(() => {
+  switch (activeItem.value) {
+    case 'Panel':
+      return Panel;
+    case 'Tickets':
+      return Tickets;
+    case 'Maquinas':
+      return Maquinas;
+    case 'Mantenimiento':
+      return Mantenimiento;
+    case 'Ajustes':
+      return Ajustes;
+    default:
+      return Panel; // Default to Panel component if none of the above match
+  }
+});
+
 const setActiveItem = (itemName) => {
   activeItem.value = itemName;
+  console.log('Active item:', itemName);
 };
 
 // Computed property to construct the image path
@@ -192,13 +219,13 @@ const logout = async () => {
 
 /* Glassmorphic Sidebar */
 .sidebar {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .nav-link {
@@ -261,8 +288,7 @@ const logout = async () => {
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  min-height: calc(100vh - 160px);
+  flex-grow: 1; /* Allow content panel to grow to fill available space */
 }
 
 /* Animated Background */
@@ -288,9 +314,12 @@ const logout = async () => {
 .main-content {
   overflow-y: auto;
   height: 100vh;
+  display: flex; /* Added display flex for main content */
+  flex-direction: column; /* Added flex-direction for main content */
 }
 
 .logo img {
   max-width: 100px;
 }
+
 </style>
