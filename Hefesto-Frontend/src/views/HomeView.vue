@@ -24,8 +24,8 @@
 </div>
   <div class="dashboard min-vh-100">
     <!-- Sidebar -->
-    <div class="sidebar p-4 d-flex flex-column">
-      <div class="logo mb-5">
+    <div class="sidebar p-0 d-flex flex-column">  <!-- Removed p-4-->
+      <div class="logo mb-5 p-4"> <!-- Added p-4 to logo -->
         <img src="../assets/images/icons/logos.png" alt="Logo" class="img-fluid mb-4" style="max-width: 150px;">
       </div>
 
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content d-flex flex-column"> <!-- Added d-flex flex-column -->
       <!-- Header -->
       <header class="header px-4 py-3 d-flex justify-content-between align-items-center">
         <h1 class="h4 mb-0"></h1>
@@ -66,8 +66,8 @@
       </header>
 
       <!-- Content Area -->
-      <div class="content p-4">
-        <div class="content-panel p-4">
+      <div class="content flex-grow-1 d-flex flex-column"> <!-- Added d-flex flex-column and flex-grow-1-->
+        <div class="content-panel p-4 d-flex flex-column">
           <component :is="componenteActual" />
         </div>
       </div>
@@ -219,13 +219,13 @@ const logout = async () => {
 
 /* Glassmorphic Sidebar */
 .sidebar {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .nav-link {
@@ -288,8 +288,7 @@ const logout = async () => {
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  min-height: calc(100vh - 160px);
+  flex-grow: 1; /* Allow content panel to grow to fill available space */
 }
 
 /* Animated Background */
@@ -315,9 +314,12 @@ const logout = async () => {
 .main-content {
   overflow-y: auto;
   height: 100vh;
+  display: flex; /* Added display flex for main content */
+  flex-direction: column; /* Added flex-direction for main content */
 }
 
 .logo img {
   max-width: 100px;
 }
+
 </style>
