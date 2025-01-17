@@ -4,6 +4,7 @@ import axios from 'axios';
 import HomeView from '../views/HomeView.vue';
 import MaquinasView from '../views/MaquinasView.vue';
 import AdminView from '../views/AdminView.vue';
+//import comprobarToken from './authManager';
 
 const urlBack = import.meta.env.VITE_API_AUTH_URL;
 
