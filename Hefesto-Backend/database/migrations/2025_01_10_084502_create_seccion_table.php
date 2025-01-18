@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('seccion', function (Blueprint $table) {
-            $table->bigIncrements('id_seccion');
+        Schema::create('secciones', function (Blueprint $table) {
+            $table->id();
             $table->string('nombre_seccion');
             $table->unsignedBigInteger('id_campus');
             $table->boolean('habilitado')->default(true);
             $table->timestamps();
 
-            $table->foreign('id_campus')->references('id_campus')->on('campus');
+            $table->foreign('id_campus')->references('id')->on('campuses');
             $table->unique(['nombre_seccion', 'id_campus']);
         });
     }

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('campus', function (Blueprint $table) {
-            $table->bigIncrements('id_campus');
+        Schema::create('campuses', function (Blueprint $table) {
+            $table->id();
             $table->string('nombre_campus')->unique();
             $table->boolean('habilitado')->default(true);
             $table->timestamps();
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campus');
+        Schema::dropIfExists('campuses');
     }
 };
