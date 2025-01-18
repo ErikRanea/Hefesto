@@ -12,18 +12,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('maquinas', function (Blueprint $table) {
-            $table->bigIncrements('id_maquina');
+            $table->id();
             $table->string('nombre_maquina');
             $table->string('numero_interno');
             $table->string('tipo_maquina')->nullable();
-            $table->unsignedBigInteger('id_campus')->nullable();
             $table->unsignedBigInteger('id_seccion')->nullable();
             $table->integer('prioridad')->default(0);
             $table->boolean('habilitado')->default(true);
             $table->timestamps();
 
-            $table->foreign('id_campus')->references('id_campus')->on('campus');
-            $table->foreign('id_seccion')->references('id_seccion')->on('seccion');
+            $table->foreign('id_seccion')->references('id')->on('secciones');
         });
     }
 

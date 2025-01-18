@@ -85,6 +85,49 @@ class AuthController extends Controller
         }
     }
 
+
+    public function registerTecnico(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:100', 'min:2'],
+            'password' => ['required', 'string', 'min:8'],
+            'email' => ['required', 'email', 'unique:users,email'],
+        ], [
+            'name.required' => 'El campo nombre es obligatorio.',
+            'name.min' => 'El nombre debe tener al menos :min caracteres.',
+            'name.max' => 'El nombre no puede tener más de :max caracteres.',
+            'email.required' => 'El campo correo es obligatorio.',
+            'email.unique' => 'El correo ya está registrado.',
+            'email.email' => 'El correo no tiene el formato correcto.',
+            'password.required' => 'El campo contraseña es obligatorio.',
+            'password.min' => 'El campo contraseña debe tener un minimo :min caracteres.',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        $exists = User::where('email', htmlspecialchars($request->input('email')))->first();
+        if (!$exists) {
+            $new = User::create([
+                'name' => htmlspecialchars($request->input('name')),
+                'primer_apellido' => htmlspecialchars($request->input('primer_apellido')),
+                'segundo_apellido' => htmlspecialchars($request->input('segundo_apellido')),
+                'foto_perfil' => htmlspecialchars($request->input('foto_perfil')),
+                'email' => htmlspecialchars($request->input('email')),
+                'password' => Hash::make($request->input('password')),//haseo de la contraseña
+                'rol' => 'tecnico',
+                'habilitado' => true,
+                
+            ]);
+            if (!$new) {
+                return response()->json(['error' => 'No se logró crear'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+            return response()->json($new, Response::HTTP_CREATED);
+        }else{
+            return response()->json(['error' => 'Ya existe un usuario con ese email'], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
     /**
      * Valida si el token es válido
      */

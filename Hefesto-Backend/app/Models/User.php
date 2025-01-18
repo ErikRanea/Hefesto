@@ -71,4 +71,10 @@ class User extends Authenticatable implements JWTSubject // Implement the interf
     {
         return [];
     }
+
+
+    public function incindencias(){
+        return $this->hasMany(Incidencia::class, 'id_usuario_reporta', 'id_usuario');
+    }
+
 }
