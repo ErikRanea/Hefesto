@@ -16,7 +16,7 @@ class Incidencia extends Model
         'id_maquina',
         'fecha_cierre',
         'prioridad',
-        'tipo_incidencia',
+        'id_tipo_incidencia',
        'id_mantenimiento_preventivo'
     ];
 
@@ -24,26 +24,34 @@ class Incidencia extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'id_usuario_reporta', 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario_reporta', 'id');
     }
 
      public function maquina()
     {
-        return $this->belongsTo(Maquina::class, 'id_maquina', 'id_maquina');
+        return $this->belongsTo(Maquina::class, 'id_maquina', 'id');
     }
 
 
      public function mantenimientoPreventivo()
     {
-        return $this->belongsTo(MantenimientoPreventivo::class, 'id_mantenimiento_preventivo', 'id_mantenimiento');
+        return $this->belongsTo(MantenimientoPreventivo::class, 'id_mantenimiento_preventivo', 'id');
     }
 
         /**
      * Get all of the tecnicos_incidencias for the Incidencia.
      */
-    public function tecnicosIncidencias()
+
+    public function tipoIncidencia()
     {
-        return $this->hasMany(TecnicoIncidencia::class, 'id_incidencia', 'id_incidencia');
+        return $this->belongsTo(TipoIncidencia::class, 'id_tipo_incidencia', 'id');
     }
     
+    public function tecnicosIncidencias()
+    {
+        return $this->hasMany(TecnicoIncidencia::class, 'id_incidencia', 'id');
+    }
+
+
+
 }
