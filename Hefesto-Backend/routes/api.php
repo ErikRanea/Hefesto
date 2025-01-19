@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampusController;
-use App\Http\Controllers\IncidenciaController;
 use App\Http\Controllers\MaquinaController;
 use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TipoIncidenciaController;
+use App\Http\Controllers\IncidenciaController;
+
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -21,13 +23,13 @@ Route::prefix('v1')->group(function () {
             Route::get('logout', [AuthController::class, 'logout'])->name('logout');
         });
     });
-    Route::prefix('ticket')->group(function () {
+    Route::prefix('incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
-            Route::get('all', [IncidenciaController::class, 'index']);
+            Route::get('all', [IncidenciaController::class, 'all']);
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
             Route::post('store', [IncidenciaController::class, 'store']);
-            Route::put('update/{id}', [IncidenciaController::class, 'update']);
-            Route::delete('delete/{id}', [IncidenciaController::class, 'destroy']);
+            Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado']);
+            Route::delete('delete/{id}', [IncidenciaController::class, 'delete']);
         });
     });
 
@@ -62,6 +64,17 @@ Route::prefix('v1')->group(function () {
             Route::get('show/{maquina}',[MaquinaController::class, 'show']);
             Route::put('update/{maquina}',[MaquinaController::class, 'update'])->middleware('admin');
             Route::delete('delete/{maquina}',[MaquinaController::class,'delete'])->middleware('admin');
+        });
+    });
+
+    Route::prefix('tipo_incidencia')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::post('create', [TipoIncidenciaController::class, 'create'])->middleware('admin');
+            Route::post('store', [TipoIncidenciaController::class, 'store'])->middleware('admin');
+            Route::get('all',[TipoIncidenciaController::class, 'all']);
+            Route::get('show/{tipo_incidencia}',[TipoIncidenciaController::class, 'show']);
+            Route::put('update/{tipo_incidencia}',[TipoIncidenciaController::class, 'update'])->middleware('admin');
+            Route::delete('delete/{tipo_incidencia}',[TipoIncidenciaController::class,'delete'])->middleware('admin');
         });
     });
 
