@@ -14,15 +14,15 @@ class Maquina extends Model
 
     public function seccion()
     {
-        return $this->belongsTo(Seccion::class, 'id_seccion', 'id_seccion');
+        return $this->belongsTo(Seccion::class,'id_seccion');
     }
 
     public function incidencias()
     {
-       return $this->hasMany(Incidencia::class, 'id_maquina', 'id_maquina');
+       return $this->hasMany(Incidencia::class, 'id_maquina');
     }
 
    public function mantenimientosPreventivos(){
-        return $this->hasMany(MantenimientoPreventivo::class, 'id_maquina', 'id_maquina');
+        return $this->hasMany(MantenimientoPreventivo::class, 'id_maquina');
     }
 }

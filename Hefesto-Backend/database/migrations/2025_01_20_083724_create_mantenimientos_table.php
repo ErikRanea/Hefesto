@@ -9,9 +9,9 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('incidencias', function (Blueprint $table) {
+        Schema::create('mantenimientos', function (Blueprint $table) {
             $table->id();; // Identificador único de la incidencia
             $table->dateTime('fecha_apertura'); // Fecha y hora en que se reportó la incidencia
             $table->text('descripcion'); // Descripción detallada de la incidencia
@@ -26,10 +26,10 @@ return new class extends Migration
             $table->unsignedBigInteger('id_maquina'); // Identificador de la máquina relacionada
             $table->dateTime('fecha_cierre')->nullable(); // Fecha y hora en que se cerró la incidencia (nullable)
             $table->boolean('habilitado')->default(true);
-            $table->unsignedBigInteger('id_tipo_incidencia')->nullable(); // Tipo de incidencia
+            $table->unsignedBigInteger('id_mantenimiento_preventivo')->nullable(); // Tipo de incidencia
             $table->foreign('id_usuario_reporta')->references('id')->on('users');
             $table->foreign('id_maquina')->references('id')->on('maquinas');
-            $table->foreign('id_tipo_incidencia')->references('id')->on('tipos_incidencia');
+            $table->foreign('id_mantenimiento_preventivo')->references('id')->on('mantenimientos_preventivos');
             $table->timestamps();
         });
     }
@@ -39,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('incidencias');
+        Schema::dropIfExists('mantenimientos');
     }
 };

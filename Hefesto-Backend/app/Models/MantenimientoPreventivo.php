@@ -7,7 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class MantenimientoPreventivo extends Model
 {
     //
-    protected $fillable = ['nombre', 'descripcion', 'periodicidad', 'id_maquina', 'fecha_inicio_proximo_mant','estado'];
+    protected $table = 'mantenimientos_preventivos';
+    protected $fillable = [
+        'nombre',
+        'descripcion', 
+        'periodicidad', 
+        'id_maquina', 
+        'fecha_ultimo_mantenimiento',
+        'estado'
+    ];
 
 
     public function maquina()
@@ -15,8 +23,14 @@ class MantenimientoPreventivo extends Model
         return $this->belongsTo(Maquina::class, 'id_maquina', 'id_maquina');
     }
 
-     public function incidencias()
+     public function mantenimiento()
      {
-        return $this->hasMany(Incidencia::class, 'id_mantenimiento_preventivo', 'id_mantenimiento');
+        return $this->hasMany(Mantenimiento::class, 'id_mantenimiento_preventivo', 'id_mantenimiento');
     }
+
+    public function tecnicosMantenimientos()
+    {
+        return $this->hasMany(TecnicoMantenimiento::class, 'id_incidencia', 'id');
+    }
+
 }

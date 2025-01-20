@@ -48,26 +48,37 @@ class MaquinaController extends Controller
         try {
             $query = Maquina::query();
 
-            // Filtro por sección
-            if ($request->has('nombre_seccion') && $request->get('nombre_seccion') != null) {
-                $query->where('nombre_seccion', $request->get('nombre_seccion'));
+
+            // Filtrar por sección si se proporciona
+            if ($request->has('id_seccion')) {
+                $query->where('id_seccion', $request->get('id_seccion'));
             }
 
-            // Filtro por campus
-            if ($request->has('nombre_campus') && $request->get('nombre_campus') != null) {
-                $query->where('nombre_campus', $request->get('nombre_campus'));
+            // Filtrar por campus si se proporciona
+            if ($request->has('id_campus')) {
+                $query->whereHas('seccion', function ($q) use ($request) {
+                    $q->where('id_campus', $request->get('id_campus'));
+                });
             }
 
-            // Filtro por nombre de máquina
-            if ($request->has('nombre_maquina') && $request->get('nombre_maquina') != null ) {
-                $query->where('nombre_maquina', 'like', '%' . $request->get('nombre_maquina') . '%');
-            }
+            $maquinas = $query->get();
+
+            return response()->json(['message' => 'Lista de máquinas', 'data' => $maquinas], Response::HTTP_OK);} 
+        catch (Exception $e) {
+            return response()->json([
+                'error' => 'Error al crear la máquina.',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);}
 
             $maquinas = $query->get();
             return response()->json(['message' => 'Lista de todas las máquinas', 'data' => $maquinas], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(['error' => 'Ha habido un error al solicitar las máquinas', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
     }
     
     public function show(Maquina $maquina)
