@@ -1,22 +1,33 @@
 <template>
-        <div class="container-fluid">
-            <div class="card">
-                <span>Sección:</span>
-                <select name="" id=""></select>
-                <span>Campus:</span>
-                <select name="" id=""></select>
-                <span>Buscar maquina:</span>
-                <input type="text">
+        <div class="card filtro-card">
+            <div class="row text-center align-items-center">
+                <div class="col">
+                    <p>Sección</p>
+                    <select class="filtro-maquina" name="seccion" id="nombre_seccion" v-model="selectedSeccion">
+                        <option v-for="seccion in seccionList" :key="seccion.nombre_seccion" :value="seccion.nombre_seccion">{{ seccion.nombre_seccion }}</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <p>Campus</p>
+                    <select class="filtro-maquina" name="campus" id="nombre_campus" v-model="selectedCampus">
+                        <option v-for="campus in campusList" :key="campus.nombre_campus" :value="campus.nombre_campus">{{ campus.nombre_campus }}</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <p>Buscar maquina</p>
+                    <input class="filtro-maquina" type="text" v-model="searchName">
+                </div>
+                <div class="col">
+                    <button class="filtro-maquina" @click="searchMachines">Buscar</button>
+                </div>
             </div>
-            
         </div>
-        
 
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
-            <div v-for="maquina in maquinas.slice(0,8)" :key="maquina.id_maquina" class="col d-flex justify-content-center">
+            <div v-for="maquina in maquinas" :key="maquina.id_maquina" class="col d-flex justify-content-center">
                 <div class="card glassmorphic-card mb-4">
-                    <div class="d-flex justify-content-between">
-                        <h5>MAQUINA {{ maquina.nombre_maquina }}</h5>
+                    <div class="d-flex justify-content-center">
+                        <h5>{{ maquina.nombre_maquina }}</h5>
                     </div>
                     <div class="d-flex flex-column">
                         <div class="d-flex justify-content-between">
@@ -47,46 +58,101 @@
 </template>
 
 <script>
+
 import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_AUTH_URL + '/v1';
+
 export default {
-  data() {
-    return {
-      maquinas: [],
-      loading: false,
-      error: null,
-    };
-  },
-  mounted() {
-      this.fetchMaquinas();
-  },
-  methods: {
-    async fetchMaquinas(){
-      this.loading = true;
-      this.error = null;
-      try {
-        const response = await axios.get('/api/maquinas');
-        this.maquinas = response.data;
-      } catch(error) {
-          console.error('Error fetching maquinas', error);
-          this.error = 'Error al cargar las máquinas. Intenta nuevamente.'
-      } finally{
-          this.loading = false;
-      }
+    data() {
+        return {
+            maquinas: [],
+            campusList: [],
+            seccionList: [],
+            selectedCampus: null,
+            selectedSeccion: null,
+            searchName: '',
+            token: null
+        };
     },
-    getStatusClass(habilitado, parada) {
-          if (parada) {
-              return "btn-warning"
-          }
-        return habilitado ? "btn-success" : "btn-danger";
-      },
-      getStatusText(habilitado, parada) {
-           if (parada) {
-             return "Parada"
-         }
-        return habilitado ? "Disponible" : "No disponible";
-      },
-  },
+    mounted() {
+        this.token = localStorage.getItem('token');
+        this.fetchMaquinas();
+        this.fetchCampus();
+        this.fetchSeccion();
+    },
+    methods: {
+        async fetchMaquinas() {
+            try {
+                const response = await axios.get(`${apiUrl}/maquina/all`, {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                    }
+                });
+                this.maquinas = response.data.data;
+                console.log(this.maquinas);
+            } catch (error) {
+                console.error('Error al obtener las máquinas:', error);
+            }
+        },
+        async fetchCampus() {
+            try {
+                const response = await axios.get(`${apiUrl}/campus/all`, {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                    }
+                });
+                this.campusList = response.data.data;
+                console.log(this.campusList);
+            } catch (error) {
+                console.error('Error al obtener los campus:', error);
+            }
+        },
+        async fetchSeccion() {
+            try {
+                const response = await axios.get(`${apiUrl}/seccion/all`, {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                    }
+                });
+                this.seccionList = response.data.data;
+                console.log(this.seccionList);
+            } catch (error) {
+                console.error('Error al obtener los campus:', error);
+            }
+        },
+        async searchMachines() {
+    const selectedSeccionObject = this.seccionList.find(seccion => seccion.nombre_seccion === this.selectedSeccion);
+    const selectedCampusObject = this.campusList.find(campus => campus.nombre_campus === this.selectedCampus);
+
+    const filters = {
+        id_seccion: selectedSeccionObject ? selectedSeccionObject.id_seccion : null,
+        id_campus: selectedCampusObject ? selectedCampusObject.id_campus : null,
+        nombre_maquina: this.searchName
+    };
+    this.fetchMaquinas(filters);
+},
+        getStatusClass(habilitado, parada) {
+            if (parada) {
+                return 'btn-danger';
+            } else if (habilitado) {
+                return 'btn-success';
+            } else {
+                return 'btn-warning';
+            }
+        },
+        getStatusText(habilitado, parada) {
+            if (parada) {
+                return 'Parada';
+            } else if (habilitado) {
+                return 'Habilitada';
+            } else {
+                return 'Deshabilitada';
+            }
+        }
+    }
 };
+
 </script>
 
 <style scoped>
@@ -98,20 +164,6 @@ export default {
         font-family: 'Poppins', sans-serif;
     }
 
-    /*
-    .machine-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        padding: 20px;
-        width: 270px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        transition: .4s ease-in-out;
-        margin: 10px;
-    }
-    */
-
     .glassmorphic-card {
         background: rgba(255, 255, 255, 0.7) !important;
         backdrop-filter: blur(8px);
@@ -120,6 +172,22 @@ export default {
         border: 1px solid rgba(255, 255, 255, 0.05) !important;
         box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
         margin: 10px;
+    }
+
+    .filtro-card {
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(8px);
+        padding: 20px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
+        margin: 10px;
+    }
+
+    .filtro-maquina {
+        width: 200px;
+        height: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
 
 </style>
