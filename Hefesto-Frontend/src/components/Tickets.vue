@@ -42,31 +42,8 @@
               </div>
           </div>
       </div>
-      <div class="ticket-list">
-          <div class="ticket-list-header">
-              <span>Fecha</span>
-              <div class="priority-legend">
-                  <span class="priority-dot alta"></span><span class="priority-text">Alta</span>
-                  <span class="priority-dot media"></span><span class="priority-text">Media</span>
-                  <span class="priority-dot baja"></span><span class="priority-text">Baja</span>
-              </div>
-          </div>
-          <div v-for="(ticket, index) in tickets" :key="index" class="ticket-item">
-              <div class="ticket-date">
-                  <span>{{ ticket.date }}</span>
-                  <span>{{ ticket.time }}</span>
-              </div>
-              <div class="ticket-content">
-                  <div :class="['priority-marker', ticket.priority]"></div>
-                  <div class="ticket-text">
-                      <p>{{ ticket.description }}</p>
-                      <p>{{ ticket.extraInfo }}</p>
-                  </div>
-              </div>
-              <div class="ticket-status-box">
-                  <span :class="['ticket-status',ticket.status.toLowerCase()]">{{ ticket.status }}</span>
-              </div>
-          </div>
+      <div class="col-1 ticket-list">
+
       </div>
   </div>
 </template>
@@ -210,7 +187,7 @@ const createTicket = () => {
   font-size: 1.2rem;
 }
 .ticket-list{
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.7) !important;;
   border-radius: 5px;
   padding: 10px;
   margin-top: 20px;
@@ -322,11 +299,28 @@ const createTicket = () => {
 }
 
 .glassmorphic-card {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background:  rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
 }
+
+
+/*Estilos para poner las sombras a los elementos */
+.colored-shadow-pending {
+  box-shadow: 0 4px 16px 0 #B89B00; /* Yellowish for pending */
+}
+
+.colored-shadow-in-progress {
+  box-shadow: 0 4px 16px 0 #600484; /* Purple for in progress */
+}
+
+.colored-shadow-closed {
+  box-shadow: 0 4px 16px 0 #000000; /* Green for closed */
+}
+
+
+
 
 .text-muted {
   color: rgba(255, 255, 255, 0.6) !important;
