@@ -2,56 +2,87 @@
   <div class="row g-4 mb-4">
       <!-- Header con los paneles -->
       <div class="col-sm-6 col-md-3">
-          <div class="card glassmorphic-card colored-shadow-pending create-ticket-card" @click="createTicket">
+          <div class="card glassmorphic-card colored-shadow-pending create-incidencia-card" @click="createIncidencia">
             <div class="card-bodytotal card-body-same-height d-flex justify-content-between align-items-center">
-               <h6 class="mb-0">Crear ticket</h6>
+               <h6 class="mb-0">Crear incidencia</h6>
               <img src="../assets/images/icons/crear.svg">
             </div>
          </div>
       </div>
       <div class="col-sm-6 col-md-3">
-          <div class="card glassmorphic-card colored-shadow-pending">
-              <div class="card-body card-body-same-height">
-                <h6>Tickets pendientes</h6>
-                  <div class="d-flex justify-content-between align-items-center">
-                      <h2>10</h2>
-                      <img src="../assets/images/icons/pendientes.svg">
-                  </div>
-              </div>
+      <div class="card glassmorphic-card colored-shadow-pending">
+        <div class="card-body">
+          <h6>Incidencias pendientes</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="pendiente-h2">10</h2>
+            <img src="../assets/images/icons/pendientes.svg">
           </div>
+        </div>
       </div>
-      <div class="col-sm-6 col-md-3">
-          <div class="card glassmorphic-card colored-shadow-in-progress">
-              <div class="card-body card-body-same-height">
-                  <h6>Tickets en curso</h6>
-                  <div class="d-flex justify-content-between align-items-center">
-                      <h2>10</h2>
-                      <img src="../assets/images/icons/curso.svg">
-                  </div>
-              </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="card glassmorphic-card colored-shadow-in-progress">
+        <div class="card-body">
+          <h6>Incidencias en curso</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="curso-h2">10</h2>
+            <img src="../assets/images/icons/curso.svg">
           </div>
+        </div>
       </div>
-      <div class="col-sm-6 col-md-3">
-          <div class="card glassmorphic-card colored-shadow-closed">
-              <div class="card-body card-body-same-height">
-                  <h6>Tickets cerrados</h6>
-                  <div class="d-flex justify-content-between align-items-center">
-                      <h2>10</h2>
-                      <img src="../assets/images/icons/cerrados.svg">
-                  </div>
-              </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+      <div class="card glassmorphic-card colored-shadow-closed">
+        <div class="card-body">
+          <h6>Incidencias cerradas</h6>
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="cerrado-h2">10</h2>
+            <img src="../assets/images/icons/cerrados.svg">
           </div>
+        </div>
       </div>
-      <div class="col-1 ticket-list">
-
+    </div>
+    <div class="col-12">
+    <div class="incidencia-list glassmorphic-card">
+      <div class="incidencia-list-header">
+        <div>Incidencias</div>
+        <div class="priority-legend">
+          <span><span class="priority-dot alta"></span> Alta</span>
+          <span><span class="priority-dot media"></span> Media</span>
+          <span><span class="priority-dot baja"></span> Baja</span>
+        </div>
       </div>
+      
+      <div class="incidencias-container">
+        <div v-for="incidencia in incidencias" :key="incidencia.date + incidencia.time" class="incidencia-item">
+          <!-- Restructured layout to match the image -->
+          <div class="priority-marker" :class="incidencia.priority"></div>
+          <div class="incidencia-content">
+            <div class="incidencia-date">
+              <span>{{ incidencia.date }}</span>
+              <span>{{ incidencia.time }}</span>
+            </div>
+            <div class="incidencia-text">
+              <div>{{ incidencia.description }}</div>
+              <small class="text-muted">{{ incidencia.extraInfo }}</small>
+            </div>
+            <div class="incidencia-status-box">
+              <span class="incidencia-status" :class="incidencia.status.toLowerCase().replace(' ', '-')">
+                {{ incidencia.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
-const tickets = ref([
+const incidencias = ref([
 {
   date: 'Enero 16, 2025',
   time: '8:45',
@@ -118,27 +149,29 @@ const tickets = ref([
 },
 ])
 
-const createTicket = () => {
+const createIncidencia = () => {
   alert('create ticket')
   // Logic to handle ticket creation (e.g., open a modal)
 }
 </script>
 
 <style scoped>
-.ticket-panel {
+.incidencia-panel {
   width: 100%;
   padding: 20px;
   background-color: #f8f8f8;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.ticket-header {
+
+.incidencia-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
-.create-ticket-btn {
+
+.create-incidencia-btn {
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -150,18 +183,22 @@ const createTicket = () => {
   align-items: center;
   gap: 8px;
 }
-.create-ticket-btn:hover {
+
+.create-incidencia-btn:hover {
   background-color: #f0f0f0;
 }
+
 .plus-icon {
   font-size: 1.5rem;
   margin-top: -4px;
 }
-.ticket-stats {
+
+.incidencia-stats {
   display: flex;
   gap: 10px;
 }
-.ticket-stat-box {
+
+.incidencia-stat-box {
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -172,40 +209,48 @@ const createTicket = () => {
   gap: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.ticket-stat-box.active {
+
+.incidencia-stat-box.active {
   background-color: #e3fae8;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
-.title{
+
+.title {
   font-size: 0.8rem;
 }
-.count{
+
+.count {
   font-size: 1.4rem;
   font-weight: bold;
 }
-.icon{
+
+.icon {
   font-size: 1.2rem;
 }
-.ticket-list{
-  background-color: rgba(255, 255, 255, 0.7) !important;;
+
+.incidencia-list {
+  background-color: rgba(255, 255, 255, 0.7) !important;
   border-radius: 5px;
-  padding: 10px;
+  padding: 20px;
   margin-top: 20px;
 }
-.ticket-list-header{
+
+.incidencia-list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0 10px 15px 10px;
+  margin-bottom: 15px;
   font-size: 0.8rem;
   color: #666;
 }
-.priority-legend{
+
+.priority-legend {
   display: flex;
-  gap: 5px;
+  gap: 20px;
 }
+
 .priority-dot {
   display: inline-block;
   width: 8px;
@@ -213,114 +258,135 @@ const createTicket = () => {
   border-radius: 50%;
   margin-right: 2px;
 }
+
 .alta {
-  background-color: red;
+  background-color: #FF5252;
 }
+
 .media {
   background-color: #FFCA28;
 }
+
 .baja {
-  background-color: green;
+  background-color: #4CAF50;
 }
-.ticket-item {
+
+.incidencia-item {
   display: flex;
-  padding: 10px;
-  gap: 10px;
-  align-items: center;
-  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  gap: 15px;
+  align-items: flex-start;
 }
-.ticket-item:hover {
-  background-color: #f0f0f0;
+
+.incidencia-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
-.ticket-date{
+
+.incidencia-date {
   display: flex;
   flex-direction: column;
   font-size: 0.8rem;
   color: #666;
   min-width: 100px;
+  flex-shrink: 0;
 }
-.ticket-date span:first-child {
+
+.incidencia-date span:first-child {
   font-weight: 500;
 }
-.ticket-content{
+
+.incidencia-content {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 20px;
   flex: 1;
-  min-width: 300px;
 }
+
 .priority-marker {
-  width: 4px;
+  width: 5px;
   height: 40px;
   border-radius: 2px;
+  flex-shrink: 0;
+  margin-right: 5px;
 }
-.ticket-text{
+
+.incidencia-text {
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
   line-height: 1.3;
+  flex: 1;
+  margin-left: 10px;
 }
-.ticket-status-box{
+
+.incidencia-status-box {
   display: flex;
   align-items: center;
 }
-.ticket-status{
+
+.incidencia-status {
   padding: 6px 10px;
   border-radius: 5px;
   font-size: 0.8rem;
   font-weight: 500;
 }
-.nueva{
-  background-color: #e3fae8;
-  color: #27ae60;
+
+.nueva {
+  background-color: #E8F5E9;
+  color: #2E7D32;
 }
+
 .cerrada {
-  background-color: #ffeaea;
-  color: #c0392b;
+  background-color: #FFEBEE;
+  color: #C62828;
 }
-.en.curso{
-  background-color: #f0e6ff;
-  color: #8e44ad;
+
+.en-curso {
+  background-color: #E8EAF6;
+  color: #3F51B5;
 }
-.create-ticket-card{
+
+.create-incidencia-card {
   cursor: pointer;
-    transition: all 0.3s;
+  transition: all 0.3s;
 }
-.create-ticket-card:hover {
+
+.create-incidencia-card:hover {
   transform: scale(1.02);
-    box-shadow: 0 4px 16px 0 rgba(255, 193, 7, 0.7); /* Yellowish for pending */
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
 }
-/* Estilos para igualar las alturas de las tarjetas */
-.card-body-same-height{
- min-height: 100px;
-   display: flex;
+
+.card-body-same-height {
+  min-height: 100px;
+  display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .glassmorphic-card {
-  background:  rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
 }
 
-
-/*Estilos para poner las sombras a los elementos */
-.colored-shadow-pending {
-  box-shadow: 0 4px 16px 0 #B89B00; /* Yellowish for pending */
+.pendiente-h2 {
+  color: #B89B00;
+  font-size: 70px;
 }
 
-.colored-shadow-in-progress {
-  box-shadow: 0 4px 16px 0 #600484; /* Purple for in progress */
+.curso-h2 {
+  color: #600484;
+  font-size: 70px;
 }
 
-.colored-shadow-closed {
-  box-shadow: 0 4px 16px 0 #000000; /* Green for closed */
+.cerrado-h2 {
+  color: #000000;
+  font-size: 70px;
 }
-
-
-
 
 .text-muted {
   color: rgba(255, 255, 255, 0.6) !important;
@@ -331,7 +397,6 @@ const createTicket = () => {
 }
 
 table {
-
   background-color: transparent !important;
 }
 
@@ -364,8 +429,33 @@ canvas {
   padding: 1.5rem;
 }
 
-.card-bodytotal{
+.card-bodytotal {
   padding: 1.7rem;
+}
+
+.incidencias-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 0 10px;
+}
+
+/* Add smooth scrollbar for the tickets container */
+.incidencias-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.incidencias-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.incidencias-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.incidencias-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 </style>

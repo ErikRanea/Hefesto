@@ -93,7 +93,7 @@ const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
 const LOGOUT_URL = `${API_AUTH_URL}/v1/auth/logout`;
 
 const Panel = defineAsyncComponent(() => import('../components/Panel.vue'));
-const Tickets = defineAsyncComponent(() => import('../components/Tickets.vue'));
+const Incidencias = defineAsyncComponent(() => import('../components/Incidencias.vue'));
 const Maquinas = defineAsyncComponent(() => import('../components/Maquinas.vue'));  
 const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'));
 const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'));
@@ -101,7 +101,7 @@ const Administracion = defineAsyncComponent(() => import('../components/Administ
 
 
 const baseMenuItems = [
-  { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
+  { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
   { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
   { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
   { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
@@ -115,15 +115,15 @@ const allMenuItems = {
   ],
   operario: [
     { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
-    { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
+    { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
     { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
     { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
   ],
   tecnico: [
     { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
-    { name: 'Tickets', icon: '../src/assets/images/icons/tickets.svg', to: '/tickets' },
-    { name: 'Mis tickets', icon: '../src/assets/images/icons/mistickets.svg', to: '/mis-tickets' },
+    { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
+    { name: 'Mis incidencias', icon: '../src/assets/images/icons/mistickets.svg', to: '/mis-incidencias' },
     { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
     { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
@@ -138,8 +138,8 @@ const componenteActual = computed(() => {
   switch (activeItem.value) {
     case 'Panel':
       return Panel;
-    case 'Tickets':
-      return Tickets;
+    case 'Incidencias':
+      return Incidencias;
     case 'Maquinas':
       return Maquinas;
     case 'Mantenimiento':
@@ -212,100 +212,110 @@ const logout = async () => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$white-01: rgba(255, 255, 255, 0.1);
+$white-03: rgba(255, 255, 255, 0.3);
+$white-05: rgba(255, 255, 255, 0.5);
+$white-06: rgba(255, 255, 255, 0.6);
+$white-07: rgba(255, 255, 255, 0.7);
+$white-08: rgba(255, 255, 255, 0.8);
+$white-09: rgba(255, 255, 255, 0.9);
+
+
 .dashboard {
   display: grid;
   grid-template-columns: 280px 1fr;
   position: relative;
   overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, $white-01 0%, transparent 50%);
+    animation: pulse 15s infinite;
+    z-index: 0;
+  }
 }
+
 
 /* Glassmorphic Sidebar */
 .sidebar {
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+  background: $white-05;
+  backdrop-filter: blur(10px);
+  border-right: 1px solid $white-01;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.7);
+  color: $white-07;
   padding: 0.8rem 1rem;
   margin-bottom: 0.5rem;
   border-radius: 8px;
   transition: all 0.3s;
   font-size: 0.95rem;
-  text-decoration: none; /* Remove default link underline */
-}
+  text-decoration: none;
 
-.nav-link:hover, .nav-link.active {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
+  &:hover, &.active {
+    background: $white-01;
+    color: white;
+  }
 
-.nav-link img {
-  margin-right: 10px;
-  vertical-align: middle;
+  img {
+    margin-right: 10px;
+    vertical-align: middle;
+  }
 }
 
 /* Header */
 .header {
-  background: rgba(255, 255, 255, 0.5);
+  background: $white-05;
   backdrop-filter: blur(10px);
   color: white;
 }
 
 .user-name {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: $white-09;
 }
 
 .user-role {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: $white-06;
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.1);
+  background: $white-01;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-}
+  color: $white-08;
 
-.user-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 /* Content Area */
 .content-panel {
-  background: rgba(255, 255, 255, 0.3);
+  background: $white-03;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  flex-grow: 1; /* Allow content panel to grow to fill available space */
+  border: 1px solid $white-01;
+  flex-grow: 1;
 }
 
-/* Animated Background */
-.dashboard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-  animation: pulse 15s infinite;
-  z-index: 0;
-}
 
 @keyframes pulse {
   0% { transform: scale(1); opacity: 0.5; }
@@ -317,8 +327,8 @@ const logout = async () => {
 .main-content {
   overflow-y: auto;
   height: 100vh;
-  display: flex; /* Added display flex for main content */
-  flex-direction: column; /* Added flex-direction for main content */
+  display: flex;
+  flex-direction: column;
 }
 
 .logo img {
