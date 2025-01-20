@@ -4,7 +4,7 @@
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-pending">
         <div class="card-body">
-          <h6>Tickets pendientes</h6>
+          <h6>Incidencias pendientes</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="pendiente-h2">10</h2>
             <img src="../assets/images/icons/pendientes.svg">
@@ -15,7 +15,7 @@
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-in-progress">
         <div class="card-body">
-          <h6>Tickets en curso</h6>
+          <h6>Incidencias en curso</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="curso-h2">10</h2>
             <img src="../assets/images/icons/curso.svg">
@@ -26,7 +26,7 @@
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-closed">
         <div class="card-body">
-          <h6>Tickets cerrados</h6>
+          <h6>Incidencias cerradas</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="cerrado-h2">10</h2>
             <img src="../assets/images/icons/cerrados.svg">
@@ -37,7 +37,7 @@
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-total">
         <div class="card-bodyTotal">
-          <h6>Total de tickets</h6>
+          <h6>Total de incidencias</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="total-h2">10</h2>
             <img src="../assets/images/icons/total.svg">
@@ -54,8 +54,8 @@
       <div class="card glassmorphic-card mb-4">
         <div class="card-body">
           <div class="d-flex justify-content-between mb-4">
-            <div class="ticketsabiertos">
-              <h6 class="text-muted mb-1">Tickets abiertos</h6>
+            <div class="incidenciasabiertos">
+              <h6 class="text-muted mb-1">Incidencias abiertas</h6>
               <div class="d-flex align-items-baseline">
                 <span class="abiertos-h3 mb-0">20</span>
                 <span class="text-muted ms-2" style="color: rgba(116, 116, 116, 1) !important;">hoy</span>
@@ -73,12 +73,12 @@
       </div>
     </div>
 
-    <!-- Right Column - Tickets List -->
+    <!-- Right Column - Incidencias List -->
     <div class="col-md-8">
       <div class="card glassmorphic-card h-100">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="card-title mb-0">Últimos tickets</h5>
+            <h5 class="card-title mb-0">Últimas incidencias</h5>
             <div class="d-flex align-items-center gap-4">
               <div class="d-flex align-items-center gap-3">
                 <div class="d-flex align-items-center">
@@ -100,22 +100,22 @@
             </div>
           </div>
 
-          <div class="tickets-list">
-            <div v-for="(ticket, index) in tickets" :key="index"
-                 class="ticket-row">
-              <div class="ticket-priority-bar" :class="ticket.priority"></div>
-              <div class="ticket-content">
-                <div class="ticket-date">
-                  <div>{{ ticket.date }}</div>
-                  <div>{{ ticket.time }}</div>
+          <div class="incidencias-list">
+            <div v-for="(incidencia, index) in incidencias" :key="index"
+                 class="incidencia-row">
+              <div class="incidencia-priority-bar" :class="incidencia.priority"></div>
+              <div class="incidencia-content">
+                <div class="incidencia-date">
+                  <div>{{ incidencia.date }}</div>
+                  <div>{{ incidencia.time }}</div>
                 </div>
-                <div class="ticket-description">
-                  <div class="ticket-title">{{ ticket.title }}</div>
-                  <div class="ticket-subtitle">{{ ticket.subtitle }}</div>
+                <div class="incidencia-description">
+                  <div class="incidencia-title">{{ incidencia.title }}</div>
+                  <div class="incidencia-subtitle">{{ incidencia.subtitle }}</div>
                 </div>
-                <div class="ticket-status">
-                  <span class="status-badge" :class="ticket.status.toLowerCase()">
-                    {{ ticket.status }}
+                <div class="incidencia-status">
+                  <span class="status-badge" :class="incidencia.status.toLowerCase()">
+                    {{ incidencia.status }}
                   </span>
                 </div>
               </div>
@@ -134,7 +134,7 @@ import { Chart } from 'chart.js/auto'
 const lineChart = ref(null)
 const barChart = ref(null)
 
-const tickets = [
+const incidencias = [
   {
     priority: 'alta',
     date: 'Enero 16, 2025',
@@ -176,7 +176,7 @@ onMounted(() => {
     data: {
       labels: ['8:00', '12:00', '15:00', '20:00', '00:00'],
       datasets: [{
-        label: 'Tickets',
+        label: 'Incidencias',
         data: [5, 15, 8, 12, 7],
         borderColor: '#600484',
         backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -225,14 +225,14 @@ onMounted(() => {
       labels: ['16/01', '17/01', '18/01', '19/01', '20/01', '21/01', '22/01'],
       datasets: [
         {
-          label: 'Promedio tickets resueltos',
+          label: 'Promedio incidencias resueltas',
           data: [15, 12, 16, 16, 20, 13, 16],
           backgroundColor: '#600484',
            borderRadius: 10, 
            stack: 'combined',
         },
         {
-          label: 'Promedio tickets abiertos',
+          label: 'Promedio incidencias abiertas',
           data: [19, 10, 8, 16, 19, 9, 11],
           backgroundColor: '#a470c2',
            borderRadius: 10, 
@@ -341,36 +341,36 @@ canvas {
   padding: 0;
 }
 
-.tickets-list {
+.incidencias-list {
   margin-top: 1rem;
 }
 
-.ticket-row {
+.incidencia-row {
   display: flex;
   align-items: stretch;
   margin-bottom: 0.5rem;
   min-height: 60px;
 }
 
-.ticket-priority-bar {
+.incidencia-priority-bar {
   width: 6px;
   border-radius: 4px;
   margin-right: 1rem;
 }
 
-.ticket-priority-bar.alta {
+.incidencia-priority-bar.alta {
   background-color: #FF4D4D;
 }
 
-.ticket-priority-bar.media {
+.incidencia-priority-bar.media {
   background-color: #DEB614;
 }
 
-.ticket-priority-bar.baja {
+.incidencia-priority-bar.baja {
   background-color: #57C200;
 }
 
-.ticket-content {
+.incidencia-content {
   flex: 1;
   display: flex;
   align-items: center;
@@ -378,48 +378,48 @@ canvas {
   padding: 0.5rem 0;
 }
 
-.ticket-date {
+.incidencia-date {
   min-width: 100px;
   font-size: 0.875rem;
   color: #000000;
 }
 
-.ticket-description {
+.incidencia-description {
   flex: 1;
 }
 
-.ticket-title {
+.incidencia-title {
   color: #000000;
   margin-bottom: 0.25rem;
 }
 
-.ticket-subtitle {
+.incidencia-subtitle {
   color: #747474;
   font-size: 0.875rem;
 }
 
-.status-badge {
+.incidencia-status {
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.875rem;
 }
 
-.status-badge.pendiente {
+.incidencia-status.pendiente {
   background-color: rgba(255, 193, 7, 0.2);
   color: #ffc107;
 }
 
-.status-badge.cerrada {
+.incidencia-status.cerrada {
   background-color: rgba(108, 117, 125, 0.2);
   color: #6c757d;
 }
 
-.status-badge.abierta {
+.incidencia-status.abierta {
   background-color: rgba(139, 92, 246, 0.2);
   color: #8b5cf6;
 }
 
-.status-badge.nueva {
+.incidencia-status.nueva {
   background-color: rgba(255, 193, 7, 0.2);
   color: #ffc107;
 }
@@ -444,7 +444,7 @@ canvas {
   font-size: 70px;
 }
   
-.ticketsabiertos h6{
+.incidenciasabiertos h6{
   color: black;
 }
 .abiertos-h3{

@@ -48,6 +48,7 @@ class MaquinaController extends Controller
         try {
             $query = Maquina::query();
 
+
             // Filtrar por sección si se proporciona
             if ($request->has('id_seccion')) {
                 $query->where('id_seccion', $request->get('id_seccion'));
@@ -71,6 +72,13 @@ class MaquinaController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);}
+
+            $maquinas = $query->get();
+            return response()->json(['message' => 'Lista de todas las máquinas', 'data' => $maquinas], Response::HTTP_ACCEPTED);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Ha habido un error al solicitar las máquinas', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
     }
     
     public function show(Maquina $maquina)
