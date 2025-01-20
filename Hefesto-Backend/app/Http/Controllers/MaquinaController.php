@@ -62,18 +62,6 @@ class MaquinaController extends Controller
             }
 
             $maquinas = $query->get();
-
-            return response()->json(['message' => 'Lista de máquinas', 'data' => $maquinas], Response::HTTP_OK);} 
-        catch (Exception $e) {
-            return response()->json([
-                'error' => 'Error al crear la máquina.',
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);}
-
-            $maquinas = $query->get();
             return response()->json(['message' => 'Lista de todas las máquinas', 'data' => $maquinas], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(['error' => 'Ha habido un error al solicitar las máquinas', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
