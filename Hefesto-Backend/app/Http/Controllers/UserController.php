@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -174,4 +175,17 @@ class UserController extends Controller
             return response()->json(['error' => 'No tienes permisos para eliminar usuarios'], Response::HTTP_UNAUTHORIZED);
         }
     }
+
+    public function all(){
+        try {
+            $users = User::all();
+            return response()->json(['data' => $users], Response::HTTP_ACCEPTED);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error al obtener los usuarios.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+
+
 }

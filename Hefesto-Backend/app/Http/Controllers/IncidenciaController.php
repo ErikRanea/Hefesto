@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
 use App\Models\TipoIncidencia;
 use Exception;
+use Carbon\Carbon;
 
 class IncidenciaController extends Controller
 {
@@ -42,6 +43,7 @@ class IncidenciaController extends Controller
             $incidencia->id_tipo_incidencia = $tipoIncidencia->id;
             $incidencia->descripcion = $request->get('descripcion');
             $incidencia->id_usuario_reporta = auth()->user()->id;
+            $incidencia->estado = 0;
             $incidencia->save();
 
             return response()->json(['message' => 'Incidencia creada con éxito!', 'data' => $incidencia], Response::HTTP_CREATED);
@@ -61,21 +63,6 @@ class IncidenciaController extends Controller
         }
     }
 
-    public function update_estado($id)
-    {
-        try {
-
-            $incidencia = Incidencia::findOrFail($id);
-
-            $incidencia->estado = !$incidencia->estado;
-            $incidencia->save();
-
-            return response()->json(['message' => 'Estado de la incidencia actualizado con éxito!', 'data' => $incidencia], Response::HTTP_OK);
-        }
-        catch (Exception $e) {
-            return response()->json(['error' => 'Error al actualizar el estado de la incidencia.', 'data' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 
     public function delete($id){
         try {
@@ -86,20 +73,41 @@ class IncidenciaController extends Controller
         catch (\Throwable $th) {
             return response()->json(['error' => 'Error al eliminar la incidencia.'], Response::HTTP_INTERNAL_SERVER_ERROR);    
         }
-    }
+    }    
+    
 
+    //Metodos internos
 
-    public function asignarIncidencia($id){
-        try {
-            $incidencia = Incidencia::findOrFail($id);
-            $incidencia->id_usuario_asignado = auth()->user()->id;
-            $incidencia->save();
-            //trigger 
-            return response()->json(['message' => 'Incidencia asignada con éxito!', 'data' => $incidencia], Response::HTTP_OK);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => 'Error al asignar la incidencia.'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+    /*
+        Estados de las incidencias
+        0-> nuevo
+        1-> pendiente
+        2-> en curso
+        3-> cerrado
+    */
+
+    /*
+        Estos metodos serás static debido a que quiero llamarlos desde otros controladores
+        sin tener que instanciarlos
+
+        @author: Erik
+
+    */
+
+    public static function estadoEnCurso(Incidencia $incidencia){
+        $incidencia->estado = 2;
+        $incidencia->save();
     }
     
+    public static function estadoEnEspera(Incidencia $incidencia){
+        $incidencia->estado = 1;
+        $incidencia->save();
+    }
+
+    public static function estadoCerrado(Incidencia $incidencia){
+        $incidencia->estado = 3;
+        $incidencia->fecha_cerrado = Date::now();
+        $incidencia->save();
+    }
 
 }

@@ -4,10 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Incidencia extends Model
+class Mantenimiento extends Model
 {
     //
-
     protected $fillable = [
         'fecha_apertura',
         'descripcion',
@@ -15,8 +14,8 @@ class Incidencia extends Model
         'id_usuario_reporta',
         'id_maquina',
         'fecha_cierre',
-        'prioridad',
-        'id_tipo_incidencia'
+        'id_tipo_incidencia',
+       'id_mantenimiento_preventivo'
     ];
 
 
@@ -31,26 +30,15 @@ class Incidencia extends Model
         return $this->belongsTo(Maquina::class, 'id_maquina', 'id');
     }
 
-
-     public function mantenimientoPreventivo()
+    public function mantenimientoPreventivo()
     {
         return $this->belongsTo(MantenimientoPreventivo::class, 'id_mantenimiento_preventivo', 'id');
     }
 
-        /**
-     * Get all of the tecnicos_incidencias for the Incidencia.
-     */
-
-    public function tipoIncidencia()
+    public function tecnicosMantenimientos()
     {
-        return $this->belongsTo(TipoIncidencia::class, 'id_tipo_incidencia', 'id');
+        return $this->hasMany(TecnicoMantenimiento::class, 'id_mantenimiento', 'id');
     }
-    
-    public function tecnicosIncidencias()
-    {
-        return $this->hasMany(TecnicoIncidencia::class, 'id_incidencia', 'id');
-    }
-
 
 
 }

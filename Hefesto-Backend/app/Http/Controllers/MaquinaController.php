@@ -43,14 +43,34 @@ class MaquinaController extends Controller
         }
     }
 
-    public function all()
+    public function all(Request $request)
     {
         try {
-            $maquinas = Maquina::all();
-            return response()->json(['message' => 'Lista de todas las máquinas', 'data' => $maquinas], Response::HTTP_ACCEPTED);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'Ha habido un error al solicitar las máquinas'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+            $query = Maquina::query();
+
+            // Filtrar por sección si se proporciona
+            if ($request->has('id_seccion')) {
+                $query->where('id_seccion', $request->get('id_seccion'));
+            }
+
+            // Filtrar por campus si se proporciona
+            if ($request->has('id_campus')) {
+                $query->whereHas('seccion', function ($q) use ($request) {
+                    $q->where('id_campus', $request->get('id_campus'));
+                });
+            }
+
+            $maquinas = $query->get();
+
+            return response()->json(['message' => 'Lista de máquinas', 'data' => $maquinas], Response::HTTP_OK);} 
+        catch (Exception $e) {
+            return response()->json([
+                'error' => 'Error al crear la máquina.',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);}
     }
     
     public function show(Maquina $maquina)

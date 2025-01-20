@@ -8,14 +8,26 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TipoIncidenciaController;
 use App\Http\Controllers\IncidenciaController;
+use App\Http\Controllers\TecnicoIncidenciaController;
+use App\Http\Controllers\TecnicoMantenimientoController;
+use App\Http\Controllers\MainController;
+use App\Http\Controllers\MantenimientoPreventivoController;
+use App\Http\Controllers\MantenimientoController;
+
 
 
 Route::prefix('v1')->group(function () {
+
+    Route::prefix('main')->group(function () {
+        Route::get('carga-inicial', [MainController::class, 'cargaInicial']);
+    });
+
+
     Route::prefix('auth')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
         //Route::post('register', [AuthController::class, 'register']);
         Route::middleware('auth:api')->group(function () {
-            Route::post('register', [AuthController::class, 'register'])->middleware('admin');
+           Route::post('register', [AuthController::class, 'register'])->middleware('admin');
             Route::post('register_tecnico', [AuthController::class, 'registerTecnico'])->middleware('admin');
             Route::get('me', [AuthController::class, 'me']);
             Route::post('refresh', [AuthController::class, 'refresh']);
@@ -27,9 +39,25 @@ Route::prefix('v1')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::get('all', [IncidenciaController::class, 'all']);
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
-            Route::post('store', [IncidenciaController::class, 'store']);
-            Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado']);
-            Route::delete('delete/{id}', [IncidenciaController::class, 'delete']);
+            Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
+            Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
+            Route::delete('delete/{id}', [IncidenciaController::class, 'delete'])->middleware('admin');
+        });
+    });
+    
+    Route::prefix('tecnico_incidencia')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::post('reclamar_incidencia/', [TecnicoIncidenciaController::class, 'reclamarIncidencia'])->middleware('tecnico');
+            Route::put('salir_incidencia/', [TecnicoIncidenciaController::class, 'salirIncidencia'])->middleware('tecnico');
+            Route::put('cerrar_incidencia/', [TecnicoIncidenciaController::class, 'cerrarIncidencia'])->middleware('tecnico');
+        });
+    });
+
+    Route::prefix('tecnico_mantenimiento')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::post('reclamar_mantenimiento/', [TecnicoMantenimientoController::class, 'reclamarMantenimiento'])->middleware('tecnico'); 
+            Route::put('salir_mantenimiento/', [TecnicoMantenimientoController::class, 'salirMantenimiento'])->middleware('tecnico');
+            Route::put('cerrar_mantenimiento/', [TecnicoMantenimientoController::class, 'cerrarMantenimiento'])->middleware('tecnico');
         });
     });
 
@@ -60,10 +88,30 @@ Route::prefix('v1')->group(function () {
     Route::prefix('maquina')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('store', [MaquinaController::class, 'store'])->middleware('admin');
-            Route::get('all',[MaquinaController::class, 'all']);
+            Route::post('all',[MaquinaController::class, 'all']);
             Route::get('show/{maquina}',[MaquinaController::class, 'show']);
             Route::put('update/{maquina}',[MaquinaController::class, 'update'])->middleware('admin');
             Route::delete('delete/{maquina}',[MaquinaController::class,'delete'])->middleware('admin');
+        });
+    });
+
+    Route::prefix('mantenimiento-preventivo')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::post('create', [MantenimientoPreventivoController::class, 'create'])->middleware('admin');
+            Route::post('store', [MantenimientoPreventivoController::class, 'store'])->middleware('admin');
+            Route::get('all',[MantenimientoPreventivoController::class, 'all']);
+            Route::get('show/{mantenimiento_preventivo}',[MantenimientoPreventivoController::class, 'show']);
+            Route::put('update/{mantenimiento_preventivo}',[MantenimientoPreventivoController::class, 'update'])->middleware('admin');
+            Route::delete('delete/{mantenimiento_preventivo}',[MantenimientoPreventivoController::class,'delete'])->middleware('admin');
+        });
+    });
+
+    Route::prefix('mantenimiento')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::post('store', [MantenimientoController::class, 'store']);
+            Route::get('all',[MantenimientoController::class, 'all']);
+            Route::get('show/{mantenimiento}',[MantenimientoController::class, 'show']);
+            Route::delete('delete/{mantenimiento}',[MantenimientoController::class,'delete']);
         });
     });
 
@@ -78,6 +126,14 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    Route::prefix('usuario')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::get('all',[UserController::class, 'all'])->middleware('admin');
+            Route::get('show/{usuario}',[UserController::class, 'show'])->middleware('admin');
+            Route::put('update/{usuario}',[UserController::class, 'update'])->middleware('admin');
+            Route::delete('delete/{usuario}',[UserController::class,'delete'])->middleware('admin');
+        });
+    });
 
 });
 

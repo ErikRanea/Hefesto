@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TecnicoIncidencia extends Model
+class TecnicoMantenimiento extends Model
 {
     //
-    protected $table = 'tecnicos_incidencias';
+    protected $table = 'tecnicos_mantenimientos';
     protected $fillable = [
-        'id_incidencia',
+        'id_mantenimiento',
         'id_tecnico',
         'fecha_entrada',
         'fecha_salida',
@@ -19,10 +19,12 @@ class TecnicoIncidencia extends Model
 
     ];
 
-
-    public function incidencia()
+    public function mantenimiento()
     {
-        return $this->belongsTo(Incidencia::class, 'id_incidencia', 'id_incidencia');
+        return $this->belongsTo(Mantenimiento::class, 'id', 'id_mantenimiento');
     }
+
+
+
 
 }
