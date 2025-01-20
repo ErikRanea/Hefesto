@@ -97,6 +97,7 @@ const Tickets = defineAsyncComponent(() => import('../components/Tickets.vue'));
 const Maquinas = defineAsyncComponent(() => import('../components/Maquinas.vue'));  
 const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'));
 const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'));
+const Administracion = defineAsyncComponent(() => import('../components/Administracion.vue'));
 
 
 const baseMenuItems = [
@@ -145,6 +146,8 @@ const componenteActual = computed(() => {
       return Mantenimiento;
     case 'Ajustes':
       return Ajustes;
+    case 'Administracion':
+      return Administracion;
     default:
       return Panel; // Default to Panel component if none of the above match
   }
