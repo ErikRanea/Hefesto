@@ -26,27 +26,26 @@
                </button>
           </div>
       </div>
-  
         <GlassmorphicPopup
             :visible="popupVisible"
             :title="popupTitle"
             :subtitle="popupSubtitle"
             :closeButtonText="popupCloseButtonText"
             :actionButtonText="popupActionButtonText"
+             :imageUrl="userImagePath"
             @close="closePopup"
             @action="handleAction"
+            @image-changed="updateProfileImage"
         >
-            <div v-if="popupType === 'perfil'" >
-              <label for="nombre">Nombre:</label>
-              <input type="text" id="nombre" class="form-control" placeholder="Tu nombre">
-            </div>
-          <div v-else-if="popupType === 'contraseña'">
+        <template #popup-content v-if="popupType !== 'perfil'">
+          <div v-if="popupType === 'contraseña'">
               <label for="password">Contraseña:</label>
                <input type="password" id="password" class="form-control" placeholder="Tu contraseña">
           </div>
           <div v-else-if="popupType === 'fondo'">
               <textarea id="descripcion" class="form-control" placeholder="Descripción"></textarea>
           </div>
+        </template>
         </GlassmorphicPopup>
     </div>
   </template>
@@ -55,7 +54,12 @@
   import GlassmorphicPopup from './GlassmorphicPopup.vue';
   import 'bootstrap/dist/css/bootstrap.css';
   import 'bootstrap/dist/js/bootstrap.js';
-  import { ref } from 'vue';
+  import { ref, onMounted, computed } from 'vue';
+  import axios from 'axios';
+  
+  const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
+  const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
+  const UPDATE_PROFILE_IMAGE_URL = `${API_AUTH_URL}/v1/auth/update-profile-image`;
   
   const popupVisible = ref(false);
   const popupType = ref(null)
@@ -63,7 +67,9 @@
   const popupSubtitle = ref(null)
   const popupCloseButtonText = ref(null)
   const popupActionButtonText = ref(null)
-  
+  const userPicture = ref(null);
+  const userName = ref(null);
+  const userLastName = ref(null);
   
   const openPopup = (type) => {
       popupVisible.value = true;
@@ -93,10 +99,64 @@
     popupVisible.value = false;
   };
   
-  const handleAction = () => {
-      alert(`Action clicked on ${popupType.value}`)
+  
+  const handleAction = async() => {
+      if(popupType.value === 'perfil'){
+          // Handle profile picture update logic here
+      } else{
+        alert(`Action clicked on ${popupType.value}`)
+      }
       closePopup();
-  }
+  };
+  
+    const updateProfileImage = async (imageURL) => {
+        if (!imageURL) return;
+          const token = localStorage.getItem('token');
+        try {
+          const formData = new FormData();
+           const response = await fetch(imageURL);
+            const blob = await response.blob();
+  
+          const file = new File([blob], 'profile-image', {type: 'image/*'});
+              formData.append('profile_image', file);
+            const response_upload = await axios.post(UPDATE_PROFILE_IMAGE_URL, formData,{
+                      headers: {
+                          Authorization: `Bearer ${token}`,
+                          'Content-Type': 'multipart/form-data',
+                      },
+                  }
+          );
+  
+            userPicture.value = response_upload.data.foto_perfil
+            alert('Profile image uploaded successfully!');
+        } catch (error) {
+          console.error('Error updating profile image:', error);
+          alert('Failed to upload profile image!');
+        }
+      };
+  
+  
+      const userImagePath = computed(() => {
+        return userPicture.value ? `../src/assets/images/userpicture/${userPicture.value}` : null;
+      });
+  
+  onMounted(async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await axios.get(ME_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        userName.value = response.data.name;
+        userLastName.value = response.data.primer_apellido;
+        userPicture.value = response.data.foto_perfil;
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
+  });
   </script>
   
   <style scoped>
@@ -156,5 +216,4 @@
   .huge-text {
     font-size: 1.8rem;
   }
-  
   </style>
