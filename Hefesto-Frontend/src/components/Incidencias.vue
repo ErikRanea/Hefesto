@@ -1,20 +1,20 @@
 <template>
   <div class="row g-4 mb-4">
-      <!-- Header con los paneles -->
-      <div class="col-sm-6 col-md-3">
-          <div class="card glassmorphic-card colored-shadow-pending create-incidencia-card" @click="createIncidencia">
-            <div class="card-bodytotal card-body-same-height d-flex justify-content-between align-items-center">
-               <h6 class="mb-0">Crear incidencia</h6>
-              <img src="../assets/images/icons/crear.svg">
-            </div>
-         </div>
+    <!-- Header con los paneles -->
+    <div class="col-sm-6 col-md-3">
+      <div class="card glassmorphic-card colored-shadow-pending create-incidencia-card" @click="createIncidencia">
+        <div class="card-bodytotal card-body-same-height d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Crear incidencia</h6>
+          <img src="../assets/images/icons/crear.svg">
+        </div>
       </div>
-      <div class="col-sm-6 col-md-3">
+    </div>
+    <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-pending">
         <div class="card-body">
           <h6>Incidencias pendientes</h6>
           <div class="d-flex justify-content-between align-items-center">
-            <h2 class="pendiente-h2">10</h2>
+            <h2 class="pendiente-h2">{{ incidenciasPendientesCount }}</h2>
             <img src="../assets/images/icons/pendientes.svg">
           </div>
         </div>
@@ -25,7 +25,7 @@
         <div class="card-body">
           <h6>Incidencias en curso</h6>
           <div class="d-flex justify-content-between align-items-center">
-            <h2 class="curso-h2">10</h2>
+            <h2 class="curso-h2">{{ incidenciasEnCursoCount }}</h2>
             <img src="../assets/images/icons/curso.svg">
           </div>
         </div>
@@ -36,123 +36,164 @@
         <div class="card-body">
           <h6>Incidencias cerradas</h6>
           <div class="d-flex justify-content-between align-items-center">
-            <h2 class="cerrado-h2">10</h2>
+            <h2 class="cerrado-h2">{{ incidenciasCerradasCount }}</h2>
             <img src="../assets/images/icons/cerrados.svg">
           </div>
         </div>
       </div>
     </div>
     <div class="col-12">
-    <div class="incidencia-list glassmorphic-card">
-      <div class="incidencia-list-header">
-        <div>Incidencias</div>
-        <div class="priority-legend">
-          <span><span class="priority-dot alta"></span> Alta</span>
-          <span><span class="priority-dot media"></span> Media</span>
-          <span><span class="priority-dot baja"></span> Baja</span>
+      <div class="incidencia-list glassmorphic-card">
+        <div class="incidencia-list-header">
+          <div>Incidencias</div>
+          <div class="priority-legend">
+            <span><span class="priority-dot alta"></span> Alta</span>
+            <span><span class="priority-dot media"></span> Media</span>
+            <span><span class="priority-dot baja"></span> Baja</span>
+          </div>
         </div>
-      </div>
-      
-      <div class="incidencias-container">
-        <div v-for="incidencia in incidencias" :key="incidencia.date + incidencia.time" class="incidencia-item">
-          <!-- Restructured layout to match the image -->
-          <div class="priority-marker" :class="incidencia.priority"></div>
-          <div class="incidencia-content">
-            <div class="incidencia-date">
-              <span>{{ incidencia.date }}</span>
-              <span>{{ incidencia.time }}</span>
-            </div>
-            <div class="incidencia-text">
-              <div>{{ incidencia.description }}</div>
-              <small class="text-muted">{{ incidencia.extraInfo }}</small>
-            </div>
-            <div class="incidencia-status-box">
-              <span class="incidencia-status" :class="incidencia.status.toLowerCase().replace(' ', '-')">
-                {{ incidencia.status }}
-              </span>
+        <div v-if="loading">Cargando incidencias...</div>
+        <div v-else-if="error">Error al cargar las incidencias.</div>
+        <div v-else class="incidencias-container">
+          <div v-for="incidencia in incidencias" :key="incidencia.date + incidencia.time" class="incidencia-item">
+            <!-- Restructured layout to match the image -->
+            <div class="priority-marker" :class="incidencia.priority"></div>
+            <div class="incidencia-content">
+              <div class="incidencia-date">
+                <span>{{ incidencia.date }}</span>
+                <span>{{ incidencia.time }}</span>
+              </div>
+              <div class="incidencia-text">
+                <div>{{ incidencia.titulo }}</div>
+                <small class="text-muted">{{ incidencia.subtitulo }}</small>
+              </div>
+              <div class="incidencia-status-box">
+                <span class="incidencia-status" :class="incidencia.status.toLowerCase().replace(' ', '-')">
+                  {{ incidencia.status }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 
-const incidencias = ref([
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'alta',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'Nueva',
-},
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'alta',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'Cerrada',
-},
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'media',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'En curso',
-},
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'baja',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'Nueva',
-},
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'baja',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'En curso',
-},
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'media',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'En curso',
-},
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'alta',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'En curso',
-},
-{
-  date: 'Enero 16, 2025',
-  time: '8:45',
-  priority: 'baja',
-  description: 'La fresadora tiene ruidos raros pero funciona...',
-  extraInfo: 'Ayer a la mañana no tenia ningún ruido extra...',
-  status: 'Nueva',
-},
-])
+// Estado para manejar la carga de datos y errores
+const loading = ref(true);
+const error = ref(null);
+const incidencias = ref([]);
+const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
+const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/v1/incidencia/all`;
 
+
+// Función para obtener la prioridad de una incidencia
+const obtenerPrioridad = (id_tipo_incidencia) => {
+  switch (id_tipo_incidencia) {
+    case 1:
+      return 'alta';
+    case 2:
+      return 'media';
+    case 3:
+      return 'baja';
+    default:
+      return 'baja';
+  }
+};
+
+// Función para obtener el estado de una incidencia
+const obtenerEstado = (estado) => {
+  switch (estado) {
+    case 0:
+      return 'Nueva';
+    case 1:
+      return 'Pendiente';
+    case 2:
+      return 'En curso';
+    case 3:
+      return 'Cerrada';
+    case 4:
+      return 'Mantenimiento';
+  }
+};
+
+// Función para formatear la fecha
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+};
+
+// Función para formatear la hora
+const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    const options = { hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleTimeString(undefined, options);
+};
+
+
+// Función para cargar datos de la API
+const fetchData = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No token found');
+    }
+    try {
+      const response = await axios.get(ALL_INCIDENCIAS_URL, {
+        headers: {
+           Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (err) {
+       throw new Error('Error al obtener los datos de las incidencias');
+    }
+};
+
+// Cálculo de incidencias pendientes
+const incidenciasPendientesCount = computed(() => {
+  return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Nueva').length;
+});
+
+// Cálculo de incidencias en curso
+const incidenciasEnCursoCount = computed(() => {
+    return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'En curso').length;
+});
+
+// Cálculo de incidencias cerradas
+const incidenciasCerradasCount = computed(() => {
+    return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Cerrada').length;
+});
+
+// Hook onMounted para realizar la lógica al montar el componente
+onMounted(async () => {
+  try {
+    const data = await fetchData();
+     incidencias.value = data.map(incidencia => ({
+        ...incidencia,
+        priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
+        status: obtenerEstado(incidencia.estado),
+        date: formatDate(incidencia.fecha_apertura),
+        time: formatTime(incidencia.fecha_apertura),
+      }));
+
+  } catch (err) {
+    error.value = err;
+  } finally {
+      loading.value = false;
+  }
+});
+
+// Función para manejar la creación de incidencias
 const createIncidencia = () => {
-  alert('create ticket')
+    alert('create ticket')
   // Logic to handle ticket creation (e.g., open a modal)
-}
+};
 </script>
 
 <style scoped>
@@ -329,24 +370,34 @@ const createIncidencia = () => {
 
 .incidencia-status {
   padding: 6px 10px;
-  border-radius: 5px;
+  border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
 }
 
 .nueva {
-  background-color: #E8F5E9;
-  color: #2E7D32;
+  background-color: rgba(184, 155, 0, 0.17);
+  color: #B89B00;
+}
+
+.pendiente {
+  background-color: rgba(184, 155, 0, 0.17);
+  color: #B89B00;
+}
+
+.mantenimiento {
+  background-color: rgba(0, 0, 0, 0.17);
+  color: #000000;
 }
 
 .cerrada {
-  background-color: #FFEBEE;
-  color: #C62828;
+  background-color: rgba(0, 0, 0, 0.17);
+  color: #000000;
 }
 
 .en-curso {
-  background-color: #E8EAF6;
-  color: #3F51B5;
+  background-color: rgba(96, 4, 132, 0.17);
+  color: #600484;
 }
 
 .create-incidencia-card {
@@ -389,7 +440,7 @@ const createIncidencia = () => {
 }
 
 .text-muted {
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: rgba(54, 54, 54, 0.6) !important;
 }
 
 .h3 {
@@ -457,5 +508,4 @@ canvas {
 .incidencias-container::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
 }
-
 </style>
