@@ -58,8 +58,8 @@
   import axios from 'axios';
   
   const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
-  const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
-  const UPDATE_PROFILE_IMAGE_URL = `${API_AUTH_URL}/v1/auth/update-profile-image`;
+  const ME_URL = `${API_AUTH_URL}/auth/me`;
+  const UPDATE_PROFILE_IMAGE_URL = `${API_AUTH_URL}/auth/update-profile-image`;
   
   const popupVisible = ref(false);
   const popupType = ref(null)

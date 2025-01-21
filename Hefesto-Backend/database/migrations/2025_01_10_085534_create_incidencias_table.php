@@ -14,22 +14,27 @@ return new class extends Migration
         Schema::create('incidencias', function (Blueprint $table) {
             $table->id();; // Identificador único de la incidencia
             $table->dateTime('fecha_apertura'); // Fecha y hora en que se reportó la incidencia
-            $table->text('descripcion'); // Descripción detallada de la incidencia
+            $table->text('titulo'); // Título de la incidencia
+            $table->text('subtitulo')->nullable(); // Subtítulo de la incidencia (nullable)
+            $table->text('descripcion')->nullable(); // Descripción detallada de la incidencia
             /**
              * 0-> nuevo
              * 1-> pediente
              * 2-> en curso
              * 3-> cerrado
+             * 4-> mantenimiento
              */
             $table->integer('estado')->default(0); // Estado actual de la incidencia
-            $table->unsignedBigInteger('id_usuario_reporta')->nullable(); // Identificador del usuario que reportó la incidencia (puede ser null)
+            $table->unsignedBigInteger('id_creador')->nullable(); // Identificador del usuario que reportó la incidencia (puede ser null)
             $table->unsignedBigInteger('id_maquina'); // Identificador de la máquina relacionada
             $table->dateTime('fecha_cierre')->nullable(); // Fecha y hora en que se cerró la incidencia (nullable)
             $table->boolean('habilitado')->default(true);
-            $table->unsignedBigInteger('id_tipo_incidencia')->nullable(); // Tipo de incidencia
-            $table->foreign('id_usuario_reporta')->references('id')->on('users');
+            $table->unsignedBigInteger('id_tipo_incidencia'); // Tipo de incidencia
+            $table->unsignedBigInteger('id_mantenimiento')->nullable();
+            $table->foreign('id_creador')->references('id')->on('users');
             $table->foreign('id_maquina')->references('id')->on('maquinas');
             $table->foreign('id_tipo_incidencia')->references('id')->on('tipos_incidencia');
+            $table->foreign('id_mantenimiento')->references('id')->on('mantenimientos_preventivos');
             $table->timestamps();
         });
     }
