@@ -123,7 +123,7 @@ const incidencias = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
-const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/v1/incidencia/all`;
+const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
 
 // Función para obtener la prioridad de una incidencia
 const obtenerPrioridad = (id_tipo_incidencia) => {
@@ -279,6 +279,7 @@ onMounted(async () => {
     const token = localStorage.getItem('token');
     if (token) {
         try {
+          
             const response = await axios.get(ALL_INCIDENCIAS_URL, {
                 headers: {
                     Authorization: `Bearer ${token}`

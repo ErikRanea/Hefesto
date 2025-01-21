@@ -36,7 +36,7 @@ const comprobarToken = async () => {
   const token = localStorage.getItem('token');
   if (token) {
     try {
-      const response = await axios.get(urlBack + '/v1/auth/validate-token', {
+      const response = await axios.get(urlBack + '/auth/validate-token', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

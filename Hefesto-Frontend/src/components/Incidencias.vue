@@ -89,7 +89,7 @@ const loading = ref(true);
 const error = ref(null);
 const incidencias = ref([]);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
-const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/v1/incidencia/all`;
+const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
 
 
 // Función para obtener la prioridad de una incidencia
