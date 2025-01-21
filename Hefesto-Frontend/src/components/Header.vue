@@ -45,7 +45,7 @@
     setup() {
        const router = useRouter();
       const userRole = ref(null);
-      const meUrl = import.meta.env.VITE_API_AUTH_URL + '/v1/auth/me';
+      const meUrl = import.meta.env.VITE_API_AUTH_URL + '/auth/me';
       const isLoggingOut = ref(false);
   
       onMounted(async () => {
@@ -72,7 +72,7 @@
         const token = localStorage.getItem('token');
         if (token) {
           try {
-            const logoutUrl = import.meta.env.VITE_API_AUTH_URL + '/v1/auth/logout';
+            const logoutUrl = import.meta.env.VITE_API_AUTH_URL + '/auth/logout';
             await axios.get(logoutUrl, {
               headers: {
                 Authorization: `Bearer ${token}`,

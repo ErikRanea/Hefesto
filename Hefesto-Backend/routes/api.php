@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TipoIncidenciaController;
 use App\Http\Controllers\IncidenciaController;
 use App\Http\Controllers\TecnicoIncidenciaController;
-use App\Http\Controllers\TecnicoMantenimientoController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MantenimientoPreventivoController;
-use App\Http\Controllers\MantenimientoController;
+
 
 
 
@@ -37,7 +36,7 @@ Route::prefix('v1')->group(function () {
     });
     Route::prefix('incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
-            Route::get('all', [IncidenciaController::class, 'all']);
+            Route::post('all', [IncidenciaController::class, 'all']);
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
             Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
@@ -53,13 +52,6 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::prefix('tecnico_mantenimiento')->group(function () {
-        Route::middleware('auth:api')->group(function () {
-            Route::post('reclamar_mantenimiento/', [TecnicoMantenimientoController::class, 'reclamarMantenimiento'])->middleware('tecnico'); 
-            Route::put('salir_mantenimiento/', [TecnicoMantenimientoController::class, 'salirMantenimiento'])->middleware('tecnico');
-            Route::put('cerrar_mantenimiento/', [TecnicoMantenimientoController::class, 'cerrarMantenimiento'])->middleware('tecnico');
-        });
-    });
 
     Route::middleware('auth:api')->group(function () {
         Route::resource('users', UserController::class);
@@ -78,7 +70,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('seccion')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('store', [SeccionController::class, 'store'])->middleware('admin');
-            Route::get('all',[SeccionController::class, 'all']);
+            Route::post('all',[SeccionController::class, 'all']);
             Route::get('show/{seccion}',[SeccionController::class, 'show']);
             Route::put('update/{seccion}',[SeccionController::class, 'update'])->middleware('admin');
             Route::delete('delete/{seccion}',[SeccionController::class,'delete'])->middleware('admin');
@@ -106,14 +98,6 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::prefix('mantenimiento')->group(function () {
-        Route::middleware('auth:api')->group(function () {
-            Route::post('store', [MantenimientoController::class, 'store']);
-            Route::get('all',[MantenimientoController::class, 'all']);
-            Route::get('show/{mantenimiento}',[MantenimientoController::class, 'show']);
-            Route::delete('delete/{mantenimiento}',[MantenimientoController::class,'delete']);
-        });
-    });
 
     Route::prefix('tipo_incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {

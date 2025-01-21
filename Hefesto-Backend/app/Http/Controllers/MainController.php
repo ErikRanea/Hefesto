@@ -8,6 +8,7 @@ use App\Models\Campus;
 use App\Models\Seccion;
 use App\Models\Maquina;
 use App\Models\Incidencia;
+use App\Models\MantenimientoPreventivo;
 use App\Models\TipoIncidencia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Response;
@@ -53,13 +54,22 @@ class MainController extends Controller
 
             TipoIncidenciaController::crearTipos();
 
+            $mantenimiento = new MantenimientoPreventivo();
+            $mantenimiento->nombre = 'Mantenimiento preventivo';
+            $mantenimiento->descripcion = 'Mantenimiento preventivo';
+            $mantenimiento->id_maquina = $maquina->id;
+            $mantenimiento->periodicidad = 1;
+            $mantenimiento->fecha_ultimo_mantenimiento = now();
+            $mantenimiento->save();
 
             $incidencia = new Incidencia();
+            $incidencia->titulo = 'Máquina no arranca';
+            $incidencia->subtitulo = 'Máquina no arranca ibai';
             $incidencia->descripcion = 'La máquina no arranca';
             $incidencia->id_maquina = $maquina->id;
             $incidencia->id_tipo_incidencia = 10;
             $incidencia->estado = 0;
-            $incidencia->id_usuario_reporta = $user->id;
+            $incidencia->id_creador = $user->id;
             $incidencia->fecha_apertura = now();
             $incidencia->save();
 

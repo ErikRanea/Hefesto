@@ -2,15 +2,15 @@
         <div class="card filtro-card">
             <div class="row text-center align-items-center">
                 <div class="col">
-                    <p>Sección</p>
-                    <select class="filtro-maquina" name="seccion" id="nombre_seccion" v-model="selectedSeccion">
-                        <option v-for="seccion in seccionList" :key="seccion.nombre_seccion" :value="seccion.nombre_seccion">{{ seccion.nombre_seccion }}</option>
-                    </select>
-                </div>
-                <div class="col">
                     <p>Campus</p>
                     <select class="filtro-maquina" name="campus" id="nombre_campus" v-model="selectedCampus">
                         <option v-for="campus in campusList" :key="campus.nombre_campus" :value="campus.nombre_campus">{{ campus.nombre_campus }}</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <p>Sección</p>
+                    <select class="filtro-maquina" name="seccion" id="nombre_seccion" v-model="selectedSeccion">
+                        <option v-for="seccion in seccionList" :key="seccion.nombre_seccion" :value="seccion.nombre_seccion">{{ seccion.nombre_seccion }}</option>
                     </select>
                 </div>
                 <div class="col">
@@ -61,7 +61,7 @@
 
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_AUTH_URL + '/v1';
+const apiUrl = import.meta.env.VITE_API_AUTH_URL;
 
 export default {
     data() {
@@ -84,7 +84,7 @@ export default {
     methods: {
         async fetchMaquinas() {
             try {
-                const response = await axios.get(`${apiUrl}/maquina/all`, {
+                const response = await axios.post(`${apiUrl}/maquina/all`, {
                     headers: {
                         Authorization: `Bearer ${this.token}`,
                     }
@@ -110,15 +110,20 @@ export default {
         },
         async fetchSeccion() {
             try {
-                const response = await axios.get(`${apiUrl}/seccion/all`, {
+                const selectedCampusObject = this.campusList.find(campus => campus.nombre_campus === this.selectedCampus);
+                const id_campus = selectedCampusObject ? selectedCampusObject.id_campus : null;
+                console.log('ID Campus:', id_campus+'\nToken:', this.token);
+                const response = await axios.post(`${apiUrl}/seccion/all`, {
+                    id_campus: id_campus,
                     headers: {
                         Authorization: `Bearer ${this.token}`,
                     }
+                    
                 });
                 this.seccionList = response.data.data;
                 console.log(this.seccionList);
             } catch (error) {
-                console.error('Error al obtener los campus:', error);
+                console.error('Error al obtener las secciones:', error);
             }
         },
         async searchMachines() {

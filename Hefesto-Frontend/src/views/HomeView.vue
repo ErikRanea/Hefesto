@@ -89,8 +89,8 @@ const userPicture = ref(null);
 const isLoggingOut = ref(false);
 const activeItem = ref('Panel');
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
-const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
-const LOGOUT_URL = `${API_AUTH_URL}/v1/auth/logout`;
+const ME_URL = `${API_AUTH_URL}/auth/me`;
+const LOGOUT_URL = `${API_AUTH_URL}/auth/logout`;
 
 const Panel = defineAsyncComponent(() => import('../components/Panel.vue'));
 const Incidencias = defineAsyncComponent(() => import('../components/Incidencias.vue'));
