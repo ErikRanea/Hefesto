@@ -37,11 +37,18 @@ class SeccionController extends Controller
         }
     }
 
-    public function all()
+    public function all(Request $request)
     {
-        try {
-            $secciones = Seccion::all();
-            return response()->json(['message' => 'Lista de todas las secciones','data'=>$secciones],Response::HTTP_ACCEPTED);
+        try {$query = Seccion::query();
+
+            // Filtrar por campus si se proporciona
+            if ($request->has('id_campus')) {
+                $query->where('id_campus', $request->input('id_campus'));
+            }
+
+            $secciones = $query->get();
+
+            return response()->json(['message' => 'Lista de todas las secciones', 'data' => $secciones], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(['error' => 'Ha habido un error al solicitar las secciones'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
