@@ -93,8 +93,7 @@ const ME_URL = `${API_AUTH_URL}/v1/auth/me`;
 const LOGOUT_URL = `${API_AUTH_URL}/v1/auth/logout`;
 
 const Panel = defineAsyncComponent(() => import('../components/Panel.vue'));
-const Incidencias = defineAsyncComponent(() => import('../components/Incidencias.vue'));
-const Maquinas = defineAsyncComponent(() => import('../components/Maquinas.vue'));  
+const Incidencias = defineAsyncComponent(() => import('../components/Incidencias.vue')); 
 const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'));
 const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'));
 const Administracion = defineAsyncComponent(() => import('../components/Administracion.vue'));
@@ -116,7 +115,6 @@ const allMenuItems = {
   operario: [
     { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
-    { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
     { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
   ],
@@ -124,7 +122,6 @@ const allMenuItems = {
     { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
     { name: 'Mis incidencias', icon: '../src/assets/images/icons/mistickets.svg', to: '/mis-incidencias' },
-    { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
     { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
   ],
@@ -140,8 +137,6 @@ const componenteActual = computed(() => {
       return Panel;
     case 'Incidencias':
       return Incidencias;
-    case 'Maquinas':
-      return Maquinas;
     case 'Mantenimiento':
       return Mantenimiento;
     case 'Ajustes':
