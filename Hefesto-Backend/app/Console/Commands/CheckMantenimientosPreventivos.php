@@ -2,9 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Incidencia;
 use Illuminate\Console\Command;
 use App\Models\MantenimientoPreventivo;
-use App\Models\Mantenimiento;
+
 use Carbon\Carbon;
 
 class CheckMantenimientosPreventivos extends Command
@@ -23,7 +24,7 @@ class CheckMantenimientosPreventivos extends Command
 
             $fechaLimite = Carbon::parse($mantenimientoPreventivo->fecha_ultimo_mantenimiento)->addDays($mantenimientoPreventivo->periodicidad);
             if ($fechaLimite->isPast()) {
-                Mantenimiento::create([
+                Incidencia::create([
                     'fecha_apertura' => now(),
                     'descripcion' => 'Mantenimiento preventivo ' . $mantenimientoPreventivo->nombre . ' por periodicidad.'.$mantenimientoPreventivo->descripcion,
                     'id_maquina' => $mantenimientoPreventivo->id_maquina,

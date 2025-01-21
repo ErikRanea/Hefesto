@@ -10,6 +10,8 @@ class Incidencia extends Model
 
     protected $fillable = [
         'fecha_apertura',
+        'titulo',
+        'subtitulo',
         'descripcion',
         'estado',
         'id_usuario_reporta',

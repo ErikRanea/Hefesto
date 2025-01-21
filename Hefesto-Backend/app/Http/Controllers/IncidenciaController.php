@@ -11,12 +11,49 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\TipoIncidencia;
 use Exception;
 use Carbon\Carbon;
+use App\Models\Seccion;
+use App\Models\Campus;
 
 class IncidenciaController extends Controller
 {
-    public function all(){
+    public function all(Request $request){
         try{
-            $incidencias = Incidencia::all();
+            
+            $query = Incidencia::query();
+
+            
+            if($request->has('id_campus')){
+                
+                $id_campus = $request->get('id_campus');
+                $campusExists = Campus::where('id', $id_campus)->exists();
+    
+                if ($campusExists) {
+                    $query->whereHas('maquina', function($q) use ($request){
+                        $q->whereHas('seccion', function($q) use ($request){
+                            $q->where('id_campus', $request->get('id_campus'));
+                        });
+                    });
+                } else {
+                    return response()->json(["El campus ".$request->get('id_campus').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+
+            if($request->has('id_seccion')){
+                $id_seccion = $request->get('id_seccion');
+                $seccionExists = Seccion::where('id', $id_seccion)->exists();
+    
+                if ($seccionExists) {
+                    $query->whereHas('maquina', function($q) use ($request){
+                        $q->where('id_seccion', $request->get('id_seccion'));
+                    });
+                } else {
+                    return response()->json(["La seccion ".$request->get('id_seccion').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+    
+
+    
+            $incidencias = $query->get();
             return response()->json($incidencias, Response::HTTP_OK);
         }
         catch(Exception $e){
@@ -27,9 +64,12 @@ class IncidenciaController extends Controller
     public function store(Request $request){
         try{
             $validator = Validator::make($request->all(), [
+                'titulo' => 'required',
+                'subtitulo' => 'required',
                 'descripcion' => 'required',
                 'id_maquina' => 'required',
                 'tipo_incidencia' => 'required',
+                'id_mantenimiento'
             ]);
 
             if ($validator->fails()) {
@@ -41,9 +81,15 @@ class IncidenciaController extends Controller
             $incidencia->id_maquina = $request->get('id_maquina');
             $tipoIncidencia = TipoIncidencia::find($request->get('tipo_incidencia'));
             $incidencia->id_tipo_incidencia = $tipoIncidencia->id;
+            $incidencia->titulo = $request->get('titulo');
+            $incidencia->subtitulo = $request->get('subtitulo');
             $incidencia->descripcion = $request->get('descripcion');
-            $incidencia->id_usuario_reporta = auth()->user()->id;
+            $incidencia->id_creador = auth()->user()->id;
             $incidencia->estado = 0;
+            if($request->get('id_mantenimiento') != null){
+                $incidencia->id_mantenimiento = $request->get('id_mantenimiento');
+
+            }
             $incidencia->save();
 
             return response()->json(['message' => 'Incidencia creada con éxito!', 'data' => $incidencia], Response::HTTP_CREATED);
@@ -107,6 +153,11 @@ class IncidenciaController extends Controller
     public static function estadoCerrado(Incidencia $incidencia){
         $incidencia->estado = 3;
         $incidencia->fecha_cerrado = Date::now();
+        $incidencia->save();
+    }
+
+    public static function estadoMantenimiento(Incidencia $incidencia){
+        $incidencia->estado = 4;
         $incidencia->save();
     }
 

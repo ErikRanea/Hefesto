@@ -113,7 +113,7 @@ const popupErrorMessage = ref('');
 const showPasswordRecoveryPopup = ref(false)
 const passwordRecoveryMessage = ref('Por favor contacta con un administrador para recuperar tu contraseña.')
 
-const loginUrl = import.meta.env.VITE_API_AUTH_URL + '/v1/auth/login';
+const loginUrl = import.meta.env.VITE_API_AUTH_URL + '/auth/login';
 
 const openErrorPopup = (message) => {
     popupErrorMessage.value = message;
