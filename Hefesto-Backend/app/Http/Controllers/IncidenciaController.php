@@ -130,6 +130,7 @@ class IncidenciaController extends Controller
         1-> pendiente
         2-> en curso
         3-> cerrado
+        4-> mantenimiento
     */
 
     /*
