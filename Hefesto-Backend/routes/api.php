@@ -36,7 +36,7 @@ Route::prefix('v1')->group(function () {
     });
     Route::prefix('incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
-            Route::get('all', [IncidenciaController::class, 'all']);
+            Route::post('all', [IncidenciaController::class, 'all']);
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
             Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');

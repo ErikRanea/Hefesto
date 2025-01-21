@@ -144,7 +144,7 @@ const fetchData = async () => {
       throw new Error('No token found');
     }
     try {
-      const response = await axios.get(ALL_INCIDENCIAS_URL, {
+      const response = await axios.post(ALL_INCIDENCIAS_URL,{}, {
         headers: {
            Authorization: `Bearer ${token}`
         }

@@ -279,8 +279,9 @@ onMounted(async () => {
     const token = localStorage.getItem('token');
     if (token) {
         try {
-          
-            const response = await axios.get(ALL_INCIDENCIAS_URL, {
+          /* Super importante fijarse que en post hay que enviarlo fuera del body
+                                                                este corchete vacio es el body  */
+            const response = await axios.post(ALL_INCIDENCIAS_URL,{}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
