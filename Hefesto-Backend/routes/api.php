@@ -11,7 +11,7 @@ use App\Http\Controllers\IncidenciaController;
 use App\Http\Controllers\TecnicoIncidenciaController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MantenimientoPreventivoController;
-
+use App\Http\Controllers\ImageController;
 
 
 
@@ -34,6 +34,13 @@ Route::prefix('v1')->group(function () {
             Route::get('logout', [AuthController::class, 'logout'])->name('logout');
         });
     });
+
+
+
+    Route::prefix('image')->group(function () {
+        Route::post('upload', [ImageController::class, 'upload']);
+    });
+
     Route::prefix('incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('all', [IncidenciaController::class, 'all']);

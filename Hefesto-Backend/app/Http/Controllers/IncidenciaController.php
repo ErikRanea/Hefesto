@@ -83,11 +83,11 @@ class IncidenciaController extends Controller
             $incidencia->id_tipo_incidencia = $tipoIncidencia->id;
             $incidencia->titulo = $request->get('titulo');
             $incidencia->subtitulo = $request->get('subtitulo');
-            $incidencia->descripcion = $request->get('descripcion');
+            $request->get('descripcion') != null ? $incidencia->descripcion = $request->get('descripcion'): null;
             $incidencia->id_creador = auth()->user()->id;
             $incidencia->estado = 0;
             if($request->get('id_mantenimiento') != null){
-                $incidencia->id_mantenimiento = $request->get('id_mantenimiento');
+                $incidencia->id_mantenimiento = $request->get('id_mantenimiento');  
 
             }
             $incidencia->save();
