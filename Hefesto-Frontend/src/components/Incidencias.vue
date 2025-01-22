@@ -2,10 +2,15 @@
   <div class="row g-4 mb-4">
     <!-- Header con los paneles -->
     <div class="col-sm-6 col-md-3">
-      <div class="card glassmorphic-card colored-shadow-pending create-incidencia-card" @click="createIncidencia">
-        <div class="card-bodytotal card-body-same-height d-flex justify-content-between align-items-center">
+      <div
+        class="card glassmorphic-card colored-shadow-pending create-incidencia-card"
+        @click="openCreateIncidenciaPopup"
+      >
+        <div
+          class="card-bodytotal card-body-same-height d-flex justify-content-between align-items-center"
+        >
           <h6 class="mb-0">Crear incidencia</h6>
-          <img src="../assets/images/icons/crear.svg">
+          <img src="../assets/images/icons/crear.svg" />
         </div>
       </div>
     </div>
@@ -15,7 +20,7 @@
           <h6>Incidencias pendientes</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="pendiente-h2">{{ incidenciasPendientesCount }}</h2>
-            <img src="../assets/images/icons/pendientes.svg">
+            <img src="../assets/images/icons/pendientes.svg" />
           </div>
         </div>
       </div>
@@ -26,7 +31,7 @@
           <h6>Incidencias en curso</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="curso-h2">{{ incidenciasEnCursoCount }}</h2>
-            <img src="../assets/images/icons/curso.svg">
+            <img src="../assets/images/icons/curso.svg" />
           </div>
         </div>
       </div>
@@ -37,7 +42,7 @@
           <h6>Incidencias cerradas</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="cerrado-h2">{{ incidenciasCerradasCount }}</h2>
-            <img src="../assets/images/icons/cerrados.svg">
+            <img src="../assets/images/icons/cerrados.svg" />
           </div>
         </div>
       </div>
@@ -55,7 +60,11 @@
         <div v-if="loading">Cargando incidencias...</div>
         <div v-else-if="error">Error al cargar las incidencias.</div>
         <div v-else class="incidencias-container">
-          <div v-for="incidencia in incidencias" :key="incidencia.date + incidencia.time" class="incidencia-item">
+          <div
+            v-for="incidencia in incidencias"
+            :key="incidencia.date + incidencia.time"
+            class="incidencia-item"
+          >
             <!-- Restructured layout to match the image -->
             <div class="priority-marker" :class="incidencia.priority"></div>
             <div class="incidencia-content">
@@ -68,7 +77,10 @@
                 <small class="text-muted">{{ incidencia.subtitulo }}</small>
               </div>
               <div class="incidencia-status-box">
-                <span class="incidencia-status" :class="incidencia.status.toLowerCase().replace(' ', '-')">
+                <span
+                  class="incidencia-status"
+                  :class="incidencia.status.toLowerCase().replace(' ', '-')"
+                >
                   {{ incidencia.status }}
                 </span>
               </div>
@@ -77,22 +89,68 @@
         </div>
       </div>
     </div>
+    <GlassmorphicPopup
+      :visible="showCreateIncidenciaPopup"
+      title="Crear Nueva Incidencia"
+      closeButtonText="Cancelar"
+      actionButtonText="Crear Incidencia"
+      @close="closeCreateIncidenciaPopup"
+      @action="handleCreateIncidencia"
+    >
+      <template #popup-content>
+          <div class="form-group mb-3">
+              <label for="titulo">Título:</label>
+              <CustomInput placeholder="Ingrese el título" v-model="newIncidencia.titulo"/>
+          </div>
+          <div class="form-group mb-3">
+              <label for="subtitulo">Subtítulo:</label>
+              <CustomInput placeholder="Ingrese el subtítulo" v-model="newIncidencia.subtitulo"/>
+          </div>
+        <div class="form-group mb-3">
+          <label for="tipoIncidencia">Tipo de Incidencia:</label>
+          <CustomSelect
+            :options="tiposIncidencia"
+            v-model="newIncidencia.id_tipo_incidencia"
+          />
+        </div>
+        <div class="form-group mb-3">
+          <label for="maquina">Máquina:</label>
+          <CustomSelect
+            :options="maquinas"
+            v-model="newIncidencia.id_maquina"
+          />
+        </div>
+      </template>
+    </GlassmorphicPopup>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
+import GlassmorphicPopup from './GlassmorphicPopup.vue';
+import CustomSelect from './CustomSelect.vue';
+import CustomInput from './CustomInput.vue';
 
-// Estado para manejar la carga de datos y errores
 const loading = ref(true);
 const error = ref(null);
 const incidencias = ref([]);
+const tiposIncidencia = ref([]);
+const maquinas = ref([]);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
+const ALL_TIPO_INCIDENCIAS_URL = `${API_AUTH_URL}/tipo_incidencia/all`;
+const ALL_MAQUINAS_URL = `${API_AUTH_URL}/maquina/all`;
 
+const showCreateIncidenciaPopup = ref(false);
 
-// Función para obtener la prioridad de una incidencia
+const newIncidencia = ref({
+  titulo: '',
+  subtitulo: '',
+  id_tipo_incidencia: null,
+  id_maquina: null,
+});
+
 const obtenerPrioridad = (id_tipo_incidencia) => {
   switch (id_tipo_incidencia) {
     case 1:
@@ -106,7 +164,6 @@ const obtenerPrioridad = (id_tipo_incidencia) => {
   }
 };
 
-// Función para obtener el estado de una incidencia
 const obtenerEstado = (estado) => {
   switch (estado) {
     case 0:
@@ -119,80 +176,195 @@ const obtenerEstado = (estado) => {
       return 'Cerrada';
     case 4:
       return 'Mantenimiento';
+    default:
+      return '';
   }
 };
 
-// Función para formatear la fecha
 const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString(undefined, options);
+  const date = new Date(dateString);
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return date.toLocaleDateString(undefined, options);
 };
 
-// Función para formatear la hora
 const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    const options = { hour: '2-digit', minute: '2-digit' };
-    return date.toLocaleTimeString(undefined, options);
+  const date = new Date(dateString);
+  const options = { hour: '2-digit', minute: '2-digit' };
+  return date.toLocaleTimeString(undefined, options);
 };
 
-
-// Función para cargar datos de la API
 const fetchData = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No token found');
+  }
+  try {
+    const response = await axios.post(
+      ALL_INCIDENCIAS_URL,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error al obtener los datos de las incidencias:', err);
+    throw new Error('Error al obtener los datos de las incidencias');
+  }
+};
+
+const fetchTipoIncidencias = async () => {
+  try {
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('No token found');
     }
-    try {
-      const response = await axios.post(ALL_INCIDENCIAS_URL,{}, {
-        headers: {
-           Authorization: `Bearer ${token}`
-        }
-      });
-      return response.data;
-    } catch (err) {
-       throw new Error('Error al obtener los datos de las incidencias');
-    }
+    const response = await axios.get(ALL_TIPO_INCIDENCIAS_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener los tipos de incidencia:', error);
+    throw new Error('Error al obtener los tipos de incidencia');
+  }
 };
 
-// Cálculo de incidencias pendientes
+const fetchMaquinas = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No token found');
+    }
+    const response = await axios.post(ALL_MAQUINAS_URL, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data && Array.isArray(response.data.data)) {
+      return response.data.data;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Error al obtener las maquinas:', error);
+    throw new Error('Error al obtener las maquinas');
+  }
+};
+
 const incidenciasPendientesCount = computed(() => {
-  return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Nueva').length;
+  return incidencias.value.filter(
+    (incidencia) => obtenerEstado(incidencia.estado) === 'Nueva'
+  ).length;
 });
 
-// Cálculo de incidencias en curso
 const incidenciasEnCursoCount = computed(() => {
-    return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'En curso').length;
+  return incidencias.value.filter(
+    (incidencia) => obtenerEstado(incidencia.estado) === 'En curso'
+  ).length;
 });
 
-// Cálculo de incidencias cerradas
 const incidenciasCerradasCount = computed(() => {
-    return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Cerrada').length;
+  return incidencias.value.filter(
+    (incidencia) => obtenerEstado(incidencia.estado) === 'Cerrada'
+  ).length;
 });
 
-// Hook onMounted para realizar la lógica al montar el componente
 onMounted(async () => {
   try {
-    const data = await fetchData();
-     incidencias.value = data.map(incidencia => ({
-        ...incidencia,
-        priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
-        status: obtenerEstado(incidencia.estado),
-        date: formatDate(incidencia.fecha_apertura),
-        time: formatTime(incidencia.fecha_apertura),
-      }));
+    loading.value = true;
+    const [incidenciasData, tiposData, maquinasData] = await Promise.all([
+      fetchData(),
+      fetchTipoIncidencias(),
+      fetchMaquinas(),
+    ]);
 
+    incidencias.value = incidenciasData.map((incidencia) => ({
+      ...incidencia,
+      priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
+      status: obtenerEstado(incidencia.estado),
+      date: formatDate(incidencia.fecha_apertura),
+      time: formatTime(incidencia.fecha_apertura),
+    }));
+
+    tiposIncidencia.value = tiposData.map((tipo) => ({
+      id: tipo.id,
+      label: tipo.tipo,
+    }));
+
+    maquinas.value = maquinasData.map((maquina) => ({
+      id: maquina.id,
+      label: maquina.nombre_maquina,
+    }));
   } catch (err) {
     error.value = err;
   } finally {
-      loading.value = false;
+    loading.value = false;
   }
 });
 
-// Función para manejar la creación de incidencias
-const createIncidencia = () => {
-    alert('create ticket')
-  // Logic to handle ticket creation (e.g., open a modal)
+const openCreateIncidenciaPopup = () => {
+  showCreateIncidenciaPopup.value = true;
+};
+
+const closeCreateIncidenciaPopup = () => {
+  showCreateIncidenciaPopup.value = false;
+  newIncidencia.value = {
+    titulo: '',
+    subtitulo: '',
+    id_tipo_incidencia: null,
+    id_maquina: null,
+  };
+};
+const validateIncidenciaData = () => {
+  if (!newIncidencia.value.titulo || !newIncidencia.value.subtitulo || !newIncidencia.value.id_tipo_incidencia || !newIncidencia.value.id_maquina) {
+      alert('Por favor, complete el título, el subtítulo, el tipo de incidencia y la máquina.');
+      return false;
+  }
+  return true;
+};
+
+const handleCreateIncidencia = async () => {
+  if (!validateIncidenciaData()) {
+      return;
+  }
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No token found');
+  }
+  try {
+      const apiUrl = `${API_AUTH_URL}/incidencia/store`;
+      const fecha_apertura = new Date();
+      const formattedDate = fecha_apertura.toISOString().slice(0, 19).replace('T', ' ');
+
+      const requestData = {
+          titulo: newIncidencia.value.titulo,
+          subtitulo: newIncidencia.value.subtitulo,
+          estado: 0,
+          id_maquina: Number(newIncidencia.value.id_maquina),
+          tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia),
+          id_creador: 1,
+          id_mantenimiento: 1,
+      };
+
+
+      const response = await axios.post(apiUrl, requestData, {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+      });
+
+      if (response.status === 201) {
+          closeCreateIncidenciaPopup();
+          location.reload();
+      }
+  } catch (error) {
+      console.error('Error al crear la incidencia:', error);
+  }
 };
 </script>
 
@@ -381,7 +553,7 @@ const createIncidencia = () => {
 }
 
 .pendiente {
-  background-color: rgba(184, 155, 0, 0.17);
+    background-color: rgba(184, 155, 0, 0.17);
   color: #B89B00;
 }
 
@@ -507,5 +679,13 @@ canvas {
 
 .incidencias-container::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+    color: #666;
 }
 </style>
