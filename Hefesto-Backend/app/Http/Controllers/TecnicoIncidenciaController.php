@@ -34,8 +34,7 @@ class TecnicoIncidenciaController extends Controller
             $incidencia = Incidencia::find($request->get('id_incidencia'));
             $idtecnico = auth()->user()->id;
 
-            $tecnicoIncidencia = TecnicoIncidencia::where('id_incidencia', $request->get('id_incidencia'))
-                ->where('id_tecnico', $idtecnico)
+            $tecnicoIncidencia = TecnicoIncidencia::where('id_tecnico', $idtecnico)
                 ->whereNull('fecha_salida')
                 ->first();
 
