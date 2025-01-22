@@ -38,7 +38,9 @@ Route::prefix('v1')->group(function () {
 
 
     Route::prefix('image')->group(function () {
-        Route::post('upload', [ImageController::class, 'upload']);
+        Route::middleware('auth:api')->group(function () {
+            Route::post('upload', [ImageController::class, 'upload']);
+        });
     });
 
     Route::prefix('incidencia')->group(function () {

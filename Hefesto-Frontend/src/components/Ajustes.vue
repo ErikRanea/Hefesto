@@ -37,17 +37,20 @@
       @action="handleAction"
       @image-changed="updateProfileImage"
     >
-      <template #popup-content v-if="popupType !== 'perfil'">
-        <div v-if="popupType === 'contraseña'">
-          <label for="password">Contraseña:</label>
-          <input type="password" id="password" class="form-control" placeholder="Tu contraseña">
-        </div>
-        <div v-else-if="popupType === 'fondo'">
-          <textarea id="descripcion" class="form-control" placeholder="Descripción"></textarea>
-        </div>
-      </template>
+    <template #popup-content v-if="popupType === 'perfil'">
+      <label for="profile-image">Foto de perfil:</label>
+      <input type="file" id="profile-image" @change="onFileChange">
+    </template>
+    <template #popup-content v-else-if="popupType === 'contraseña'">
+      <label for="password">Contraseña:</label>
+      <input type="password" id="password" class="form-control" placeholder="Tu contraseña">
+    </template>
+    <template #popup-content v-else-if="popupType === 'fondo'">
+      <textarea id="descripcion" class="form-control" placeholder="Descripción"></textarea>
+    </template>
     </GlassmorphicPopup>
   </div>
+  
 </template>
 
 <script setup>
@@ -69,6 +72,7 @@ const popupCloseButtonText = ref(null);
 const popupActionButtonText = ref(null);
 const userPicture = ref(null);
 const userName = ref(null);
+const selectedFile = ref(null);
 const userLastName = ref(null);
 
 const openPopup = (type) => {
@@ -100,30 +104,34 @@ const closePopup = () => {
 const handleAction = async () => {
   if (popupType.value === 'perfil') {
     // Handle profile picture update logic here
+    await updateProfileImage();
   } else {
     alert(`Action clicked on ${popupType.value}`);
   }
   closePopup();
 };
 
-const updateProfileImage = async (imageURL) => {
-  if (!imageURL) return;
+const onFileChange = (event) => {
+  selectedFile.value = event.target.files[0];
+};
+
+
+
+const updateProfileImage = async () => {
+  if (!selectedFile.value) return;
   const token = localStorage.getItem('token');
   try {
     const formData = new FormData();
-    const response = await fetch(imageURL);
-    const blob = await response.blob();
-
-    const file = new File([blob], 'profile-image', { type: 'image/*' });
-    formData.append('image', file);
+    formData.append('image', selectedFile.value);
     const response_upload = await axios.post(UPDATE_PROFILE_IMAGE_URL, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'multipart/form-data'
       },
     });
 
     if (response_upload.status !== 200) {
+      console.log(response);
       throw new Error(response_upload.error);
     }
 
