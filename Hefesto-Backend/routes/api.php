@@ -59,6 +59,7 @@ Route::prefix('v1')->group(function () {
             Route::post('reclamar_incidencia/', [TecnicoIncidenciaController::class, 'reclamarIncidencia'])->middleware('tecnico');
             Route::put('salir_incidencia/', [TecnicoIncidenciaController::class, 'salirIncidencia'])->middleware('tecnico');
             Route::put('cerrar_incidencia/', [TecnicoIncidenciaController::class, 'cerrarIncidencia'])->middleware('tecnico');
+            Route::get('incidencia_asignada', [TecnicoIncidenciaController::class, 'getIncidenciasAsignadas'])->middleware('tecnico');
         });
     });
 

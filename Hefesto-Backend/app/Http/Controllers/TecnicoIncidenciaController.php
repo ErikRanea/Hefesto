@@ -164,4 +164,20 @@ class TecnicoIncidenciaController extends Controller
 
     }
 
+
+    public function getIncidenciasAsignadas()
+    {
+        try {
+            $idtecnico = auth()->user()->id;
+            $incidencias = TecnicoIncidencia::where('id_tecnico', $idtecnico)
+                ->whereNull('fecha_salida')
+                ->get();
+
+            return response()->json(['data' => $incidencias], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Error al obtener las incidencias asignadas.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
