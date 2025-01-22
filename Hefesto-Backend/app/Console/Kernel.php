@@ -12,6 +12,12 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
+
+    protected $middleware = [
+        // ...
+        \App\Http\Middleware\Cors::class,
+    ];
+
     protected $commands = [
         //
     ];
@@ -39,4 +45,10 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+
+    protected $routeMiddleware = [
+        // ...
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'auth:api' => \App\Http\Middleware\Authenticate::class,
+    ];
 }

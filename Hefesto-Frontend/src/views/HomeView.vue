@@ -93,7 +93,7 @@ const ME_URL = `${API_AUTH_URL}/auth/me`;
 const LOGOUT_URL = `${API_AUTH_URL}/auth/logout`;
 
 const Panel = defineAsyncComponent(() => import('../components/Panel.vue'));
-const Incidencias = defineAsyncComponent(() => import('../components/Incidencias.vue')); 
+const Incidencias = defineAsyncComponent(() => import('../components/Incidencias.vue'));
 const Mantenimiento = defineAsyncComponent(() => import('../components/Mantenimiento.vue'));
 const Ajustes = defineAsyncComponent(() => import('../components/Ajustes.vue'));
 const Administracion = defineAsyncComponent(() => import('../components/Administracion.vue'));
@@ -101,7 +101,6 @@ const Administracion = defineAsyncComponent(() => import('../components/Administ
 
 const baseMenuItems = [
   { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
-  { name: 'Maquinas', icon: '../src/assets/images/icons/maquinas.svg', to: '/maquinas' },
   { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
   { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
 ];
