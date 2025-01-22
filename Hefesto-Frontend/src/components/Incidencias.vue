@@ -64,6 +64,7 @@
             v-for="incidencia in incidencias"
             :key="incidencia.date + incidencia.time"
             class="incidencia-item"
+            @click="handleIncidenciaClick(incidencia)"
           >
             <!-- Restructured layout to match the image -->
             <div class="priority-marker" :class="incidencia.priority"></div>
@@ -98,14 +99,17 @@
       @action="handleCreateIncidencia"
     >
       <template #popup-content>
-          <div class="form-group mb-3">
-              <label for="titulo">Título:</label>
-              <CustomInput placeholder="Ingrese el título" v-model="newIncidencia.titulo"/>
-          </div>
-          <div class="form-group mb-3">
-              <label for="subtitulo">Subtítulo:</label>
-              <CustomInput placeholder="Ingrese el subtítulo" v-model="newIncidencia.subtitulo"/>
-          </div>
+        <div class="form-group mb-3">
+          <label for="titulo">Título:</label>
+          <CustomInput placeholder="Ingrese el título" v-model="newIncidencia.titulo" />
+        </div>
+        <div class="form-group mb-3">
+          <label for="subtitulo">Subtítulo:</label>
+          <CustomInput
+            placeholder="Ingrese el subtítulo"
+            v-model="newIncidencia.subtitulo"
+          />
+        </div>
         <div class="form-group mb-3">
           <label for="tipoIncidencia">Tipo de Incidencia:</label>
           <CustomSelect
@@ -115,10 +119,83 @@
         </div>
         <div class="form-group mb-3">
           <label for="maquina">Máquina:</label>
-          <CustomSelect
-            :options="maquinas"
-            v-model="newIncidencia.id_maquina"
-          />
+          <CustomSelect :options="maquinas" v-model="newIncidencia.id_maquina" />
+        </div>
+      </template>
+    </GlassmorphicPopup>
+    <GlassmorphicPopup
+      :visible="showIncidenciaDetailsPopup"
+      title="Detalles de la Incidencia"
+      closeButtonText="Cerrar"
+      @close="closeIncidenciaDetailsPopup"
+    >
+      <template #popup-content>
+        <div v-if="selectedIncidencia">
+          <p><strong>Título:</strong> {{ selectedIncidencia.titulo }}</p>
+          <p><strong>Subtítulo:</strong> {{ selectedIncidencia.subtitulo }}</p>
+          <p><strong>Fecha:</strong> {{ selectedIncidencia.date }}</p>
+          <p><strong>Hora:</strong> {{ selectedIncidencia.time }}</p>
+          <p><strong>Estado:</strong> {{ selectedIncidencia.status }}</p>
+
+          <div v-if="!isOperario">
+            <label for="comment">Comentario:</label>
+            <textarea
+              id="comment"
+              v-model="commentText"
+              class="form-control"
+              rows="3"
+              placeholder="Agrega un comentario"
+            ></textarea>
+            <button
+              class="btn btn-primary mt-2"
+              @click="handleUpdateDescription"
+              :disabled="guardandoComentario"
+            >
+              {{ guardandoComentario ? 'Guardando...' : 'Guardar Comentario' }}
+            </button>
+          </div>
+          <div v-else-if="selectedIncidencia.descripcion">
+            <p><strong>Comentario:</strong> {{ selectedIncidencia.descripcion }}</p>
+          </div>
+          <div v-else>
+            <p>No hay comentarios para mostrar</p>
+          </div>
+          <div class="action-buttons">
+            <button
+             v-if="isTecnico"
+              class="btn btn-primary"
+              @click="handleReclamarIncidencia"
+              :disabled="reclamandoIncidencia"
+            >
+              {{ reclamandoIncidencia ? 'Reclamando...' : 'Reclamar Incidencia' }}
+            </button>
+            <div v-if="isTecnico && selectedIncidencia.status === 'En curso'">
+              <button class="btn btn-danger me-2" @click="openMotivoSalidaPopup">Salir de
+                Incidencia
+              </button>
+              <button class="btn btn-success" @click="handleCerrarIncidencia">Cerrar Incidencia
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <p>No hay detalles de incidencia para mostrar</p>
+        </div>
+      </template>
+    </GlassmorphicPopup>
+    <GlassmorphicPopup
+      :visible="showMotivoSalidaPopup"
+      title="Motivo de Salida de Incidencia"
+      closeButtonText="Cancelar"
+      actionButtonText="Confirmar Salida"
+      @close="closeMotivoSalidaPopup"
+      @action="handleSalirIncidencia"
+    >
+      <template #popup-content>
+        <div class="form-group mb-3">
+          <label for="motivoSalida">Motivo:</label>
+          <textarea id="motivoSalida" v-model="motivoSalida" class="form-control" rows="3"
+            placeholder="Indique el motivo de su salida"></textarea>
         </div>
       </template>
     </GlassmorphicPopup>
@@ -141,15 +218,27 @@ const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
 const ALL_TIPO_INCIDENCIAS_URL = `${API_AUTH_URL}/tipo_incidencia/all`;
 const ALL_MAQUINAS_URL = `${API_AUTH_URL}/maquina/all`;
-
+const ME_URL = `${API_AUTH_URL}/auth/me`;
+const userPicture = localStorage.getItem('picture');
+const userId = localStorage.getItem('id');
+const userRole = ref(null);
+const isTecnico = computed(() => userRole.value === 'tecnico');
+const isAdmin = computed(() => userRole.value === 'administrador');
+const isOperario = computed(() => userRole.value === 'operario');
+const userImagePath = computed(() => {
+  return userPicture ? `${IMAGE_URL}${userPicture}` : null;
+});
+const showMotivoSalidaPopup = ref(false);
+const motivoSalida = ref('');
 const showCreateIncidenciaPopup = ref(false);
-
+const guardandoComentario = ref(false);
 const newIncidencia = ref({
   titulo: '',
   subtitulo: '',
   id_tipo_incidencia: null,
   id_maquina: null,
 });
+const reclamandoIncidencia = ref(false);
 
 const obtenerPrioridad = (id_tipo_incidencia) => {
   switch (id_tipo_incidencia) {
@@ -274,22 +363,50 @@ const incidenciasCerradasCount = computed(() => {
   ).length;
 });
 
-onMounted(async () => {
+const loadIncidencias = async () => {
   try {
     loading.value = true;
-    const [incidenciasData, tiposData, maquinasData] = await Promise.all([
-      fetchData(),
-      fetchTipoIncidencias(),
-      fetchMaquinas(),
-    ]);
+    const incidenciasData = await fetchData();
 
     incidencias.value = incidenciasData.map((incidencia) => ({
       ...incidencia,
+      id: incidencia.id,
       priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
       status: obtenerEstado(incidencia.estado),
       date: formatDate(incidencia.fecha_apertura),
       time: formatTime(incidencia.fecha_apertura),
+      descripcion: incidencia.descripcion
     }));
+  } catch (err) {
+    error.value = err;
+  } finally {
+    loading.value = false;
+  }
+}
+const fetchUserData = async () => {
+    const token = localStorage.getItem('token');
+  if (token) {
+      try {
+          const response = await axios.get(ME_URL, {
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+          });
+          userRole.value = response.data.rol;
+
+      } catch (error) {
+          console.error('Error fetching user data:', error);
+      }
+  }
+};
+
+onMounted(async () => {
+  try {
+        await fetchUserData()
+    const [tiposData, maquinasData] = await Promise.all([
+      fetchTipoIncidencias(),
+      fetchMaquinas(),
+    ]);
 
     tiposIncidencia.value = tiposData.map((tipo) => ({
       id: tipo.id,
@@ -300,10 +417,11 @@ onMounted(async () => {
       id: maquina.id,
       label: maquina.nombre_maquina,
     }));
+
+      await loadIncidencias();
   } catch (err) {
     error.value = err;
-  } finally {
-    loading.value = false;
+      loading.value = false;
   }
 });
 
@@ -351,7 +469,6 @@ const handleCreateIncidencia = async () => {
           id_mantenimiento: 1,
       };
 
-
       const response = await axios.post(apiUrl, requestData, {
           headers: {
               Authorization: `Bearer ${token}`,
@@ -360,332 +477,475 @@ const handleCreateIncidencia = async () => {
 
       if (response.status === 201) {
           closeCreateIncidenciaPopup();
-          location.reload();
+          await loadIncidencias();
       }
   } catch (error) {
       console.error('Error al crear la incidencia:', error);
   }
 };
+
+const showIncidenciaDetailsPopup = ref(false);
+const selectedIncidencia = ref(null);
+const commentText = ref('');
+
+const handleIncidenciaClick = (incidencia) => {
+  selectedIncidencia.value = incidencia;
+  commentText.value = incidencia.descripcion || '';
+  showIncidenciaDetailsPopup.value = true;
+};
+
+const closeIncidenciaDetailsPopup = () => {
+  showIncidenciaDetailsPopup.value = false;
+  selectedIncidencia.value = null;
+  commentText.value = '';
+    motivoSalida.value = '';
+};
+
+const handleUpdateDescription = async () => {
+  if (!selectedIncidencia.value) return;
+  guardandoComentario.value = true;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No token found');
+  }
+  try {
+    const apiUrl = `${API_AUTH_URL}/incidencia/update_description/${selectedIncidencia.value.id}`;
+    const requestData = {
+        descripcion: commentText.value,
+    };
+
+    const response = await axios.put(apiUrl,requestData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    if (response.status === 200) {
+      selectedIncidencia.value.descripcion = commentText.value;
+      closeIncidenciaDetailsPopup();
+    }
+  } catch (error) {
+    console.error("Error al actualizar el comentario:", error);
+  }finally{
+    guardandoComentario.value = false;
+  }
+};
+const handleReclamarIncidencia = async () => {
+    if(!selectedIncidencia.value) return;
+    reclamandoIncidencia.value = true;
+    const token = localStorage.getItem('token');
+    if(!token){
+        throw new Error('No token found');
+    }
+    try{
+        const apiUrl = `${API_AUTH_URL}/tecnico_incidencia/reclamar_incidencia`;
+        const requestData = {
+            id_incidencia: selectedIncidencia.value.id
+        };
+
+        const response = await axios.post(apiUrl,requestData,{
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
+        if(response.status === 200 || response.status === 201){
+           console.log('Incidencia reclamada con éxito');
+            await loadIncidencias();
+            selectedIncidencia.value.status = 'En curso';
+        }
+        else {
+           console.error('Error al reclamar la incidencia, respuesta no exitosa', response);
+           alert("Error al reclamar la incidencia: " + (response.data.message || "Compruebe la consola para más información"));
+        }
+    }catch(error){
+       console.error('Error al reclamar la incidencia:', error);
+          alert("Error al reclamar la incidencia: " + (error.message || "Compruebe la consola para más información"));
+    }finally{
+        reclamandoIncidencia.value = false;
+    }
+}
+const openMotivoSalidaPopup = () => {
+    showMotivoSalidaPopup.value = true;
+};
+
+const closeMotivoSalidaPopup = () => {
+    showMotivoSalidaPopup.value = false;
+    motivoSalida.value = '';
+};
+const handleSalirIncidencia = async () => {
+    if(!selectedIncidencia.value) return;
+    const token = localStorage.getItem('token');
+    if(!token){
+        throw new Error('No token found');
+    }
+    try{
+        const apiUrl = `${API_AUTH_URL}/tecnico_incidencia/salir_incidencia`;
+        const requestData = {
+            id_incidencia: selectedIncidencia.value.id,
+            motivo_salida: motivoSalida.value
+        };
+
+        const response = await axios.put(apiUrl,requestData,{
+           headers:{
+               Authorization: `Bearer ${token}`
+           }
+        });
+        if(response.status === 200){
+            closeMotivoSalidaPopup();
+            closeIncidenciaDetailsPopup();
+           await loadIncidencias();
+        }
+    }catch (error){
+        console.error('Error al salir de la incidencia:',error);
+    }
+}
+
+const handleCerrarIncidencia = async () => {
+    if(!selectedIncidencia.value) return;
+    const token = localStorage.getItem('token');
+    if(!token){
+        throw new Error('No token found');
+    }
+    try{
+        const apiUrl = `${API_AUTH_URL}/tecnico_incidencia/cerrar_incidencia`;
+        console.log('selectedIncidencia',selectedIncidencia.value.id);
+        const requestData = {
+            id_incidencia: selectedIncidencia.value.id,
+            motivo_salida: "Incidencia cerrada por el técnico"
+        };
+
+        const response = await axios.put(apiUrl,requestData,{
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        });
+        if(response.status === 200){
+            await loadIncidencias();
+             selectedIncidencia.value.status = 'Cerrada';
+             closeIncidenciaDetailsPopup();
+        }
+    }catch (error){
+        console.error('Error al cerrar la incidencia', error);
+    }
+}
 </script>
 
 <style scoped>
 .incidencia-panel {
-  width: 100%;
-  padding: 20px;
-  background-color: #f8f8f8;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+width: 100%;
+padding: 20px;
+background-color: #f8f8f8;
+border-radius: 10px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .incidencia-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 20px;
 }
 
 .create-incidencia-btn {
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 12px 20px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+background-color: white;
+border: 1px solid #ddd;
+border-radius: 5px;
+padding: 12px 20px;
+cursor: pointer;
+font-size: 1rem;
+font-weight: 500;
+display: flex;
+align-items: center;
+gap: 8px;
 }
 
 .create-incidencia-btn:hover {
-  background-color: #f0f0f0;
+background-color: #f0f0f0;
 }
 
 .plus-icon {
-  font-size: 1.5rem;
-  margin-top: -4px;
+font-size: 1.5rem;
+margin-top: -4px;
 }
 
 .incidencia-stats {
-  display: flex;
-  gap: 10px;
+display: flex;
+gap: 10px;
 }
 
 .incidencia-stat-box {
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 15px;
-  border-radius: 5px;
-  min-width: 140px;
-  gap: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+background-color: white;
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 15px;
+border-radius: 5px;
+min-width: 140px;
+gap: 5px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .incidencia-stat-box.active {
-  background-color: #e3fae8;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+background-color: #e3fae8;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .title {
-  font-size: 0.8rem;
+font-size: 0.8rem;
 }
 
 .count {
-  font-size: 1.4rem;
-  font-weight: bold;
+font-size: 1.4rem;
+font-weight: bold;
 }
 
 .icon {
-  font-size: 1.2rem;
+font-size: 1.2rem;
 }
 
 .incidencia-list {
-  background-color: rgba(255, 255, 255, 0.7) !important;
-  border-radius: 5px;
-  padding: 20px;
-  margin-top: 20px;
+background-color: rgba(255, 255, 255, 0.7) !important;
+border-radius: 5px;
+padding: 20px;
+margin-top: 20px;
 }
 
 .incidencia-list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0 10px 15px 10px;
-  margin-bottom: 15px;
-  font-size: 0.8rem;
-  color: #666;
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+padding: 0 10px 15px 10px;
+margin-bottom: 15px;
+font-size: 0.8rem;
+color: #666;
 }
 
 .priority-legend {
-  display: flex;
-  gap: 20px;
+display: flex;
+gap: 20px;
 }
 
 .priority-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 2px;
+display: inline-block;
+width: 8px;
+height: 8px;
+border-radius: 50%;
+margin-right: 2px;
 }
 
 .alta {
-  background-color: #FF5252;
+background-color: #FF5252;
 }
 
 .media {
-  background-color: #FFCA28;
+background-color: #FFCA28;
 }
 
 .baja {
-  background-color: #4CAF50;
+background-color: #4CAF50;
 }
 
 .incidencia-item {
-  display: flex;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  gap: 15px;
-  align-items: flex-start;
+display: flex;
+padding: 15px;
+margin-bottom: 10px;
+border-radius: 8px;
+transition: all 0.2s ease;
+gap: 15px;
+align-items: flex-start;
+cursor: pointer;
 }
 
 .incidencia-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+background-color: rgba(255, 255, 255, 0.1);
 }
 
 .incidencia-date {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.8rem;
-  color: #666;
-  min-width: 100px;
-  flex-shrink: 0;
+display: flex;
+flex-direction: column;
+font-size: 0.8rem;
+color: #666;
+min-width: 100px;
+flex-shrink: 0;
 }
 
 .incidencia-date span:first-child {
-  font-weight: 500;
+font-weight: 500;
 }
 
 .incidencia-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  flex: 1;
+display: flex;
+align-items: flex-start;
+gap: 20px;
+flex: 1;
 }
 
 .priority-marker {
-  width: 5px;
-  height: 40px;
-  border-radius: 2px;
-  flex-shrink: 0;
-  margin-right: 5px;
+width: 5px;
+height: 40px;
+border-radius: 2px;
+flex-shrink: 0;
+margin-right: 5px;
 }
 
 .incidencia-text {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
-  line-height: 1.3;
-  flex: 1;
-  margin-left: 10px;
+display: flex;
+flex-direction: column;
+font-size: 0.9rem;
+line-height: 1.3;
+flex: 1;
+margin-left: 10px;
 }
 
 .incidencia-status-box {
-  display: flex;
-  align-items: center;
+display: flex;
+align-items: center;
 }
 
 .incidencia-status {
-  padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
+padding: 6px 10px;
+border-radius: 20px;
+font-size: 0.8rem;
+font-weight: 500;
 }
 
 .nueva {
-  background-color: rgba(184, 155, 0, 0.17);
-  color: #B89B00;
+background-color: rgba(184, 155, 0, 0.17);
+color: #B89B00;
 }
 
 .pendiente {
-    background-color: rgba(184, 155, 0, 0.17);
-  color: #B89B00;
+  background-color: rgba(184, 155, 0, 0.17);
+color: #B89B00;
 }
-
 .mantenimiento {
-  background-color: rgba(0, 0, 0, 0.17);
-  color: #000000;
+background-color: rgba(0, 0, 0, 0.17);
+color: #000000;
 }
-
 .cerrada {
-  background-color: rgba(0, 0, 0, 0.17);
-  color: #000000;
+background-color: rgba(0, 0, 0, 0.17);
+color: #000000;
 }
 
 .en-curso {
-  background-color: rgba(96, 4, 132, 0.17);
-  color: #600484;
+background-color: rgba(96, 4, 132, 0.17);
+color: #600484;
 }
 
 .create-incidencia-card {
-  cursor: pointer;
-  transition: all 0.3s;
+cursor: pointer;
+transition: all 0.3s;
 }
 
 .create-incidencia-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+transform: scale(1.02);
+box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
 }
 
 .card-body-same-height {
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+min-height: 100px;
+display: flex;
+flex-direction: column;
+justify-content: center;
 }
 
 .glassmorphic-card {
-  background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
+background: rgba(255, 255, 255, 0.7) !important;
+backdrop-filter: blur(8px);
+border: 1px solid rgba(255, 255, 255, 0.05) !important;
+box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
 }
 
 .pendiente-h2 {
-  color: #B89B00;
-  font-size: 70px;
+color: #B89B00;
+font-size: 70px;
 }
 
 .curso-h2 {
-  color: #600484;
-  font-size: 70px;
+color: #600484;
+font-size: 70px;
 }
 
 .cerrado-h2 {
-  color: #000000;
-  font-size: 70px;
+color: #000000;
+font-size: 70px;
 }
 
 .text-muted {
-  color: rgba(54, 54, 54, 0.6) !important;
+color: rgba(54, 54, 54, 0.6) !important;
 }
 
 .h3 {
-  color: rgba(255, 255, 255, 0.9);
+color: rgba(255, 255, 255, 0.9);
 }
 
 table {
-  background-color: transparent !important;
+background-color: transparent !important;
 }
 
 .table-responsive {
-  max-height: calc(100vh - 300px);
-  overflow-y: auto;
-  background-color: transparent !important;
+max-height: calc(100vh - 300px);
+overflow-y: auto;
+background-color: transparent !important;
 }
 
 .table > :not(caption) > * > * {
-  background-color: transparent !important;
+background-color: transparent !important;
 }
 
 canvas {
-  max-height: 300px;
+max-height: 300px;
 }
 
 .status-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+display: inline-block;
+width: 10px;
+height: 10px;
+border-radius: 50%;
 }
 
 .card.h-100 {
-  height: calc(100vh - 200px) !important;
+height: calc(100vh - 200px) !important;
 }
 
 .card-body {
-  padding: 1.5rem;
+padding: 1.5rem;
 }
 
 .card-bodytotal {
-  padding: 1.7rem;
+padding: 1.7rem;
 }
 
 .incidencias-container {
-  max-height: 600px;
-  overflow-y: auto;
-  padding: 0 10px;
+max-height: 600px;
+overflow-y: auto;
+padding: 0 10px;
 }
 
 /* Add smooth scrollbar for the tickets container */
 .incidencias-container::-webkit-scrollbar {
-  width: 8px;
+width: 8px;
 }
 
 .incidencias-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+background: rgba(255, 255, 255, 0.1);
+border-radius: 4px;
 }
 
 .incidencias-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+background: rgba(0, 0, 0, 0.2);
+border-radius: 4px;
 }
 
 .incidencias-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+background: rgba(0, 0, 0, 0.3);
 }
 .form-group {
-  margin-bottom: 1rem;
+margin-bottom: 1rem;
 }
 .form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-    color: #666;
+display: block;
+margin-bottom: 0.5rem;
+  color: #666;
 }
 </style>
