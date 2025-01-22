@@ -48,6 +48,7 @@ Route::prefix('v1')->group(function () {
             Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
             Route::delete('delete/{id}', [IncidenciaController::class, 'delete'])->middleware('admin');
+            Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
         });
     });
     
