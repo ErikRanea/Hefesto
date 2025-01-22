@@ -2,7 +2,7 @@
     <div class="container-fluid h-100">
         <div class="row">
             <div class="col-md-6 h-100">
-                <button class="glass-card mb-4">
+                <button class="glass-card mb-4" @click="openPopup('usuarios')">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="card-body text-center">
                             <h2 class="card-text">Usuarios</h2>
@@ -12,7 +12,7 @@
                         </div>
                     </div>
                 </button>
-                <button class="glass-card mb-4">
+                <button class="glass-card mb-4" @click="openPopup('campuses')">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="card-body text-center">
                             <h2 class="card-text">Campuses</h2>
@@ -24,7 +24,7 @@
                 </button>
             </div>
             <div class="col-md-6">
-                <button class="glass-card mb-4">
+                <button class="glass-card mb-4" @click="openPopup('secciones')">
                     <div class="justify-content-center align-items-center text-center">
                         <div class="card-body justify-content-center align-items-center mb-3">
                             <h2 class="card-text">Secciones</h2>
@@ -50,10 +50,10 @@
                 </button>
             </div>
             <div class="col">
-                <button class="glass-card mb-4">
+                <button class="glass-card mb-4" @click="openPopup('mantenimientos')">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="card-body text-center">
-                            <h2 class="card-text">Mantenimiento</h2>
+                        <div class="card-body-3 text-center">
+                            <h2 class="card-text">Mantenimiento preventivo</h2>
                         </div>
                         <div class="card-body text-center">
                             <img width="177" src="../assets/images/icons/mantenimiento.svg">
@@ -82,7 +82,18 @@
             <div v-else-if="popupType === 'fondo'">
                 <textarea id="descripcion" class="form-control" placeholder="Descripción"></textarea>
             </div>
+            <div v-else-if="popupType === 'usuarios'">
+            </div>
+            <div v-else-if="popupType === 'campuses'">
+            </div>
+            <div v-else-if="popupType === 'secciones'">
+            </div>
             <div v-else-if="popupType === 'maquinas'">
+
+                
+
+            </div>
+            <div v-else-if="popupType === 'mantenimientos'">
             </div>
         </template>
     </GlassmorphicPopup>
@@ -233,6 +244,11 @@
 
     .card-body-2 {
         padding: 77px;
+    }
+
+    .card-body-3 {
+        padding: 32px;
+        width: 330px;
     }
 
 </style>
