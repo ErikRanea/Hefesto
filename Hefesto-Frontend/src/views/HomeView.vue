@@ -91,6 +91,7 @@ const activeItem = ref('Panel');
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ME_URL = `${API_AUTH_URL}/auth/me`;
 const LOGOUT_URL = `${API_AUTH_URL}/auth/logout`;
+const IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
 
 const Panel = defineAsyncComponent(() => import('../components/Panel.vue'));
 const Incidencias = defineAsyncComponent(() => import('../components/Incidencias.vue'));
@@ -136,8 +137,6 @@ const componenteActual = computed(() => {
       return Panel;
     case 'Incidencias':
       return Incidencias;
-    case 'Maquinas':
-      return Maquinas;
     case 'Mantenimiento':
       return Mantenimiento;
     case 'Ajustes':
@@ -156,7 +155,7 @@ const setActiveItem = (itemName) => {
 
 // Computed property to construct the image path
 const userImagePath = computed(() => {
-  return userPicture.value ? `../src/assets/images/userpicture/${userPicture.value}` : null;
+  return userPicture.value ? `${IMAGE_URL}${userPicture.value}` : null;
 });
 
 onMounted(async () => {
