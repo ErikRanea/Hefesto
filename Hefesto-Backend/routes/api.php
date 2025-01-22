@@ -34,6 +34,16 @@ Route::prefix('v1')->group(function () {
             Route::get('logout', [AuthController::class, 'logout'])->name('logout');
         });
     });
+
+    Route::prefix('userts')->group(function (){
+        Route::middleware('auth:api')->group(function () {
+            Route::get('all', [UserController::class, 'index']);
+            Route::get('show/{id}', [UserController::class, 'show']);
+            Route::put('update/{id}', [UserController::class, 'update']);
+            Route::delete('delete/{id}', [UserController::class, 'destroy']);
+        });
+    });
+
     Route::prefix('incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('all', [IncidenciaController::class, 'all']);
