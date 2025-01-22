@@ -11,7 +11,7 @@ use App\Http\Controllers\IncidenciaController;
 use App\Http\Controllers\TecnicoIncidenciaController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MantenimientoPreventivoController;
-
+use App\Http\Controllers\ImageController;
 
 
 
@@ -35,13 +35,10 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::prefix('userts')->group(function (){
-        Route::middleware('auth:api')->group(function () {
-            Route::get('all', [UserController::class, 'index']);
-            Route::get('show/{id}', [UserController::class, 'show']);
-            Route::put('update/{id}', [UserController::class, 'update']);
-            Route::delete('delete/{id}', [UserController::class, 'destroy']);
-        });
+
+
+    Route::prefix('image')->group(function () {
+        Route::post('upload', [ImageController::class, 'upload']);
     });
 
     Route::prefix('incidencia')->group(function () {
