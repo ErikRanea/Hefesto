@@ -33,6 +33,20 @@ class TecnicoIncidenciaController extends Controller
 
             $incidencia = Incidencia::find($request->get('id_incidencia'));
             $idtecnico = auth()->user()->id;
+
+            $tecnicoIncidencia = TecnicoIncidencia::where('id_incidencia', $request->get('id_incidencia'))
+                ->where('id_tecnico', $idtecnico)
+                ->whereNull('fecha_salida')
+                ->first();
+
+
+
+            if ($tecnicoIncidencia != null) {
+                return response()->json(['error' => 'No puedes reclamar más incidencias.'], Response::HTTP_BAD_REQUEST);
+            }
+            
+
+
             $tecnicoIncidencia = new TecnicoIncidencia();
             $tecnicoIncidencia->id_tecnico = $idtecnico;
             $tecnicoIncidencia->id_incidencia = $incidencia->id;

@@ -154,6 +154,7 @@ class IncidenciaController extends Controller
     public static function estadoCerrado(Incidencia $incidencia){
         $incidencia->estado = 3;
         $incidencia->fecha_cerrado = Date::now();
+        $incidencia->habilitado = 0;
         $incidencia->save();
     }
 
