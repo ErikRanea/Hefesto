@@ -136,8 +136,6 @@ const componenteActual = computed(() => {
       return Panel;
     case 'Incidencias':
       return Incidencias;
-    case 'Maquinas':
-      return Maquinas;
     case 'Mantenimiento':
       return Mantenimiento;
     case 'Ajustes':
