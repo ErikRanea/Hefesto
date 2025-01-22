@@ -40,6 +40,9 @@ class TecnicoIncidenciaController extends Controller
                 ->first();
 
 
+            /*
+            En caso de que el técnico ya tenga una incidencia asignada, no podrá reclamar más incidencias
+            */
 
             if ($tecnicoIncidencia != null) {
                 return response()->json(['error' => 'No puedes reclamar más incidencias.'], Response::HTTP_BAD_REQUEST);
