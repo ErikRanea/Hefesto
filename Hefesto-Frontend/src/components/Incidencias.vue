@@ -64,6 +64,7 @@
             v-for="incidencia in incidencias"
             :key="incidencia.date + incidencia.time"
             class="incidencia-item"
+            @click="handleIncidenciaClick(incidencia)"
           >
             <!-- Restructured layout to match the image -->
             <div class="priority-marker" :class="incidencia.priority"></div>
@@ -98,14 +99,17 @@
       @action="handleCreateIncidencia"
     >
       <template #popup-content>
-          <div class="form-group mb-3">
-              <label for="titulo">Título:</label>
-              <CustomInput placeholder="Ingrese el título" v-model="newIncidencia.titulo"/>
-          </div>
-          <div class="form-group mb-3">
-              <label for="subtitulo">Subtítulo:</label>
-              <CustomInput placeholder="Ingrese el subtítulo" v-model="newIncidencia.subtitulo"/>
-          </div>
+        <div class="form-group mb-3">
+          <label for="titulo">Título:</label>
+          <CustomInput placeholder="Ingrese el título" v-model="newIncidencia.titulo" />
+        </div>
+        <div class="form-group mb-3">
+          <label for="subtitulo">Subtítulo:</label>
+          <CustomInput
+            placeholder="Ingrese el subtítulo"
+            v-model="newIncidencia.subtitulo"
+          />
+        </div>
         <div class="form-group mb-3">
           <label for="tipoIncidencia">Tipo de Incidencia:</label>
           <CustomSelect
@@ -115,11 +119,34 @@
         </div>
         <div class="form-group mb-3">
           <label for="maquina">Máquina:</label>
-          <CustomSelect
-            :options="maquinas"
-            v-model="newIncidencia.id_maquina"
-          />
+          <CustomSelect :options="maquinas" v-model="newIncidencia.id_maquina" />
         </div>
+      </template>
+    </GlassmorphicPopup>
+    <GlassmorphicPopup
+      :visible="showIncidenciaDetailPopup"
+      :title="selectedIncidencia ? `Detalles de Incidencia: ${selectedIncidencia.titulo}` : 'Detalles de Incidencia'"
+      closeButtonText="Cerrar"
+      @close="closeIncidenciaDetailPopup"
+       v-if="selectedIncidencia"
+    >
+      <template #popup-content>
+         <div class="form-group">
+            <label for="descripcion">Descripción:</label>
+            <textarea class="form-control" v-model="selectedIncidencia.descripcion" rows="4"></textarea>
+          </div>
+           <div class="form-group">
+            <label for="maquina">Máquina:</label>
+             <p>{{ selectedIncidencia.maquina_nombre }}</p>
+          </div>
+           <div class="form-group">
+            <label for="tipo_incidencia">Tipo de incidencia:</label>
+              <p>{{ selectedIncidencia.tipo_incidencia_nombre }}</p>
+          </div>
+           <div class="form-group">
+            <label for="fecha_apertura">Fecha de apertura:</label>
+              <p>{{ selectedIncidencia.date }}  {{selectedIncidencia.time}}</p>
+          </div>
       </template>
     </GlassmorphicPopup>
   </div>
@@ -141,6 +168,13 @@ const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
 const ALL_TIPO_INCIDENCIAS_URL = `${API_AUTH_URL}/tipo_incidencia/all`;
 const ALL_MAQUINAS_URL = `${API_AUTH_URL}/maquina/all`;
+const userRole = localStorage.getItem('rol');
+const userPicture = localStorage.getItem('picture');
+const userId = localStorage.getItem('id');
+const isTecnico = computed(() => userRole === 'tecnico');
+const userImagePath = computed(() => {
+  return userPicture ? `${IMAGE_URL}${userPicture}` : null;
+});
 
 const showCreateIncidenciaPopup = ref(false);
 
@@ -150,6 +184,10 @@ const newIncidencia = ref({
   id_tipo_incidencia: null,
   id_maquina: null,
 });
+const showIncidenciaDetailPopup = ref(false);
+const selectedIncidencia = ref(null);
+
+
 
 const obtenerPrioridad = (id_tipo_incidencia) => {
   switch (id_tipo_incidencia) {
@@ -174,8 +212,8 @@ const obtenerEstado = (estado) => {
       return 'En curso';
     case 3:
       return 'Cerrada';
-    case 4:
-      return 'Mantenimiento';
+     case 4:
+        return 'Mantenimiento';
     default:
       return '';
   }
@@ -274,6 +312,7 @@ const incidenciasCerradasCount = computed(() => {
   ).length;
 });
 
+
 onMounted(async () => {
   try {
     loading.value = true;
@@ -284,12 +323,13 @@ onMounted(async () => {
     ]);
 
     incidencias.value = incidenciasData.map((incidencia) => ({
-      ...incidencia,
-      priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
-      status: obtenerEstado(incidencia.estado),
-      date: formatDate(incidencia.fecha_apertura),
-      time: formatTime(incidencia.fecha_apertura),
-    }));
+         ...incidencia,
+         id: incidencia.id,
+         priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
+          status: obtenerEstado(incidencia.estado),
+          date: formatDate(incidencia.fecha_apertura),
+          time: formatTime(incidencia.fecha_apertura),
+        }));
 
     tiposIncidencia.value = tiposData.map((tipo) => ({
       id: tipo.id,
@@ -351,7 +391,6 @@ const handleCreateIncidencia = async () => {
           id_mantenimiento: 1,
       };
 
-
       const response = await axios.post(apiUrl, requestData, {
           headers: {
               Authorization: `Bearer ${token}`,
@@ -365,6 +404,22 @@ const handleCreateIncidencia = async () => {
   } catch (error) {
       console.error('Error al crear la incidencia:', error);
   }
+};
+const handleIncidenciaClick = async (incidencia) => {
+    if (isTecnico.value) {
+      selectedIncidencia.value = {
+        ...incidencia,
+        descripcion: 'Descripcion de la incidencia',
+        maquina_nombre: 'Nombre maquina',
+        tipo_incidencia_nombre: 'Tipo de incidencia',
+      };
+        showIncidenciaDetailPopup.value = true;
+    }
+};
+
+const closeIncidenciaDetailPopup = () => {
+    showIncidenciaDetailPopup.value = false;
+    selectedIncidencia.value = null;
 };
 </script>
 
@@ -492,6 +547,7 @@ const handleCreateIncidencia = async () => {
   transition: all 0.2s ease;
   gap: 15px;
   align-items: flex-start;
+  cursor: pointer;
 }
 
 .incidencia-item:hover {
@@ -556,12 +612,10 @@ const handleCreateIncidencia = async () => {
     background-color: rgba(184, 155, 0, 0.17);
   color: #B89B00;
 }
-
 .mantenimiento {
   background-color: rgba(0, 0, 0, 0.17);
   color: #000000;
 }
-
 .cerrada {
   background-color: rgba(0, 0, 0, 0.17);
   color: #000000;
