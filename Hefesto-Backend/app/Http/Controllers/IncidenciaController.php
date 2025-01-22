@@ -66,7 +66,7 @@ class IncidenciaController extends Controller
             $validator = Validator::make($request->all(), [
                 'titulo' => 'required',
                 'subtitulo' => 'required',
-                'descripcion' => 'required',
+                'descripcion',
                 'id_maquina' => 'required',
                 'tipo_incidencia' => 'required',
                 'id_mantenimiento'
