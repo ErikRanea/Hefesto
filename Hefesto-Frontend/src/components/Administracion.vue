@@ -23,7 +23,7 @@
                             </div>
                         </div>
                     </button>
-                    <button class="glass-card mb-4">
+                    <button class="glass-card">
                         <div class="d-flex justify-content-center align-items-center text-center">
                             <div class="card-body text-center">
                                 <h2 class="card-text">Secciones</h2>
@@ -41,7 +41,7 @@
                         <div class="card-body text-center">
                             <h2 class="card-text">Maquinas</h2>
                         </div>
-                        <div class="card-body text-center">
+                        <div class="card-body-2 text-center">
                             <img width="250" src="../assets/images/icons/maquinas.svg">
                         </div>
                     </div>
@@ -52,62 +52,51 @@
                             <h2 class="card-text">Mantenimientos preventivos</h2>
                         </div>
                         <div class="card-body text-center">
-                            <img width="177" src="../assets/images/icons/mantenimiento.svg">
+                            <img width="180" src="../assets/images/icons/mantenimiento.svg">
                         </div>
                     </div>
                 </button>
             </div>
         </div>
     </div>
-    <GlassmorphicPopup
+     <MaquinasPopup
+        ref="maquinasPopupRef"
         :visible="popupVisible"
         :title="popupTitle"
         :subtitle="popupSubtitle"
         :closeButtonText="popupCloseButtonText"
         :actionButtonText="popupActionButtonText"
-        :imageUrl="userImagePath"
-        @close="closePopup"
-        @action="handleAction"
-        @image-changed="updateProfileImage"
-    >
-        <template #popup-content v-if="popupType !== 'perfil'">
-            <div v-if="popupType === 'contraseña'">
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" class="form-control" placeholder="Tu contraseña">
-            </div>
-            <div v-else-if="popupType === 'fondo'">
-                <textarea id="descripcion" class="form-control" placeholder="Descripción"></textarea>
-            </div>
-            <div v-else-if="popupType === 'maquinas'" class="popup-maquina">
-
-            </div>
-        </template>
-    </GlassmorphicPopup>
+        :token="token"
+        @close-popup="closePopup"
+        />
 </template>
 
 <script setup>
+import GlassmorphicPopup from './GlassmorphicPopup.vue';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap.js';
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
+import MaquinasPopup from './MaquinasPopup.vue';
+const maquinasPopupRef = ref(null);
 
-    import GlassmorphicPopup from './GlassmorphicPopup.vue';
-    import 'bootstrap/dist/css/bootstrap.css';
-    import 'bootstrap/dist/js/bootstrap.js';
-    import { ref, onMounted, computed } from 'vue';
-    import axios from 'axios';
+const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
+const ME_URL = `${API_AUTH_URL}/auth/me`;
 
-    const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
-    const ME_URL = `${API_AUTH_URL}/auth/me`;
-    const UPDATE_PROFILE_IMAGE_URL = `${API_AUTH_URL}/image/upload`;
+// --- Variables del Popup ---
+const popupVisible = ref(false);
+const popupType = ref(null);
+const popupTitle = ref(null);
+const popupSubtitle = ref(null);
+const popupCloseButtonText = ref(null);
+const popupActionButtonText = ref(null);
+const token = ref(null)
+const userPicture = ref(null);
+const userName = ref(null);
 
-    const popupVisible = ref(false);
-    const popupType = ref(null);
-    const popupTitle = ref(null);
-    const popupSubtitle = ref(null);
-    const popupCloseButtonText = ref(null);
-    const popupActionButtonText = ref(null);
-    const userPicture = ref(null);
-    const userName = ref(null);
-    const userLastName = ref(null);
 
-    const openPopup = (type) => {
+// --- Funciones del Popup ---
+const openPopup = (type) => {
     popupVisible.value = true;
     popupType.value = type;
 
@@ -126,89 +115,38 @@
         popupSubtitle.value = 'Añade la descripción de tu fondo';
         popupCloseButtonText.value = 'Cerrar';
         popupActionButtonText.value = 'Aceptar';
-    } else if (type === 'maquinas') {
+    }
+    else if (type === 'maquinas'){
         popupTitle.value = 'Maquinas';
         popupSubtitle.value = 'Listado maquinas';
         popupCloseButtonText.value = 'Cerrar';
         popupActionButtonText.value = 'Aceptar';
+         maquinasPopupRef.value.fetchData();
     }
-    };
+};
 
-    const closePopup = () => {
+const closePopup = () => {
     popupVisible.value = false;
-    };
-
-    const handleAction = async () => {
-    if (popupType.value === 'perfil') {
-        // Handle profile picture update logic here
-    } else {
-        alert(`Action clicked on ${popupType.value}`);
-    }
-    closePopup();
-    };
-
-    const updateProfileImage = async (imageURL) => {
-    if (!imageURL) return;
-    const token = localStorage.getItem('token');
-    try {
-        const formData = new FormData();
-        const response = await fetch(imageURL);
-        const blob = await response.blob();
-
-        const file = new File([blob], 'profile-image', { type: 'image/*' });
-        formData.append('image', file);
-        const response_upload = await axios.post(UPDATE_PROFILE_IMAGE_URL, formData, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-        },
-        });
-
-        if (response_upload.status !== 200) {
-        throw new Error(response_upload.error);
-        }
-
-        userPicture.value = response_upload.data.path;
-        alert('Profile image uploaded successfully!');
-    } catch (error) {
-        if (error.response) {
-        // El servidor respondió con un código de estado fuera del rango 2xx
-        console.error('Error response:', error.response.data);
-        alert(`Failed to upload profile image: ${error.response.data.message || error.response.data}`);
-        } else if (error.request) {
-        // La solicitud fue hecha pero no se recibió respuesta
-        console.error('Error request:', error.request);
-        alert('Failed to upload profile image: No response from server.');
-        } else {
-        // Algo pasó al configurar la solicitud que desencadenó un error
-        console.error('Error message:', error.message);
-        alert(`Failed to upload profile image: ${error.message}`);
-        }
-    }
-    };
-
-    const userImagePath = computed(() => {
-    return userPicture.value ? `../src/assets/images/userpicture/${userPicture.value}` : null;
-    });
-
-    onMounted(async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
+};
+ const userImagePath = computed(() => {
+  return userPicture.value ? `../src/assets/images/userpicture/${userPicture.value}` : null;
+});
+onMounted(async () => {
+    token.value = localStorage.getItem('token');
+    if (token.value) {
         try {
-        const response = await axios.get(ME_URL, {
-            headers: {
-            Authorization: `Bearer ${token}`,
-            },
-        });
-        userName.value = response.data.name;
-        userLastName.value = response.data.primer_apellido;
-        userPicture.value = response.data.foto_perfil;
+            const response = await axios.get(ME_URL, {
+                headers: {
+                    Authorization: `Bearer ${token.value}`,
+                },
+            });
+             userName.value = response.data.name;
+             userPicture.value = response.data.foto_perfil;
         } catch (error) {
-        console.error('Error fetching user data:', error);
+           console.error('Error fetching user data:', error);
         }
     }
-    });
-
+});
 </script>
 
 <style scoped>
@@ -239,9 +177,8 @@
         padding: 32px;
     }
 
-    .popup-maquina {
-        height: 400px;
-        width: 1000px;
+    .card-body-2 {
+        padding: 120px;
     }
 
 </style>
