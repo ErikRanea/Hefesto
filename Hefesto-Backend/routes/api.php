@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
            Route::post('register', [AuthController::class, 'register'])->middleware('admin');
             Route::post('register_tecnico', [AuthController::class, 'registerTecnico'])->middleware('admin');
             Route::get('me', [AuthController::class, 'me']);
+            Route::get('me_data', [AuthController::class, 'meData']);
             Route::post('refresh', [AuthController::class, 'refresh']);
             Route::get('validate-token', [AuthController::class, 'validateToken']); 
             Route::get('logout', [AuthController::class, 'logout'])->name('logout');

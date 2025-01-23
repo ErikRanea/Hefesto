@@ -251,7 +251,7 @@ class IncidenciaController extends Controller
     public function allMantenimientos(Request $request){
         try{
             
-            $query = Incidencia::query()->where('estado', 4);
+            $query = Incidencia::query();
 
             
             if($request->has('id_campus')){
@@ -283,7 +283,7 @@ class IncidenciaController extends Controller
                 }
             }
     
-            
+            $query->whereNotNull('id_mantenimiento');
 
     
             $incidencias = $query->get();
