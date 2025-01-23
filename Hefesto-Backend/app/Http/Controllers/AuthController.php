@@ -145,6 +145,18 @@ class AuthController extends Controller
     }
 
 
+    public function meData(){
+        try {
+            // Si el token es válido, auth()->user() no lanzará una excepción
+            $user = auth()->user();
+            return response()->json(['message' => 'Token válido','data' => auth()->user()->id], Response::HTTP_OK);
+        } catch (TokenInvalidException $e) {
+            return response()->json(['error' => 'Token inválido'], Response::HTTP_UNAUTHORIZED);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al validar el token'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     /**
      * Get the authenticated User.
