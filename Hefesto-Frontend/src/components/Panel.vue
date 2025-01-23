@@ -128,11 +128,11 @@ const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
 // Función para obtener la prioridad de una incidencia
 const obtenerPrioridad = (id_tipo_incidencia) => {
   switch (id_tipo_incidencia) {
-    case 1:
+    case 3:
       return 'alta';
     case 2:
       return 'media';
-    case 3:
+    case 1:
       return 'baja';
     default:
       return 'baja';
@@ -198,7 +198,10 @@ const incidenciasAbiertasHoy = computed(() => {
 
 // Cálculo de incidencias pendientes
 const incidenciasPendientesCount = computed(() => {
-  return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Pendiente').length;
+  return incidencias.value.filter(incidencia => {
+    const estado = obtenerEstado(incidencia.estado);
+    return estado === 'Pendiente' || estado === 'Nueva';
+  }).length;
 });
 
 // Cálculo de incidencias en curso
