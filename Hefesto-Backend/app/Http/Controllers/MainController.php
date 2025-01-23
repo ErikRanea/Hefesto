@@ -57,11 +57,21 @@ class MainController extends Controller
             $campus->habilitado = true;
             $campus->save();
 
+
             $seccion = new Seccion();
             $seccion->nombre_seccion = '142GA';
             $seccion->id_campus = $campus->id;
             $seccion->habilitado = true;
             $seccion->save();
+
+            $seccion = new Seccion();
+            $seccion->nombre_seccion = '141GA';
+            $seccion->id_campus = $campus->id;
+            $seccion->habilitado = true;
+            $seccion->save();
+
+
+
 
             $maquina = new Maquina();
             $maquina->nombre_maquina = 'Torno CNC';
@@ -70,7 +80,26 @@ class MainController extends Controller
             $maquina->tipo_maquina = 'Industrial';
             $maquina->prioridad = 1;
             $maquina->habilitado = true;
-            $maquina->save();
+            $maquina->save();   
+            
+
+            $campus = new Campus();
+            $campus->nombre_campus = 'Jesus Obrero';
+            $campus->habilitado = true;
+            $campus->save();
+
+            $seccion = new Seccion();
+            $seccion->nombre_seccion = 'MA12';
+            $seccion->id_campus = $campus->id;
+            $seccion->habilitado = true;
+            $seccion->save();
+
+            $seccion = new Seccion();
+            $seccion->nombre_seccion = 'MA13';
+            $seccion->id_campus = $campus->id;
+            $seccion->habilitado = true;
+            $seccion->save();
+
 
             $maquina = new Maquina();
             $maquina->nombre_maquina = 'Fresadora';

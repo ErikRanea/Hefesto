@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 
 
 class TecnicoIncidenciaController extends Controller
@@ -70,7 +69,7 @@ class TecnicoIncidenciaController extends Controller
     public function salirIncidencia(Request $request)
     {
         try {
-           $validator = Validator::make($request->all(), [
+            $validator = Validator::make($request->all(), [
                 'id_incidencia' => 'required|int',
                 'motivo_salida' => 'required|string',
             ]);
@@ -85,10 +84,9 @@ class TecnicoIncidenciaController extends Controller
             if($tecnicoIncidencia == null){
                 return response()->json(['error' => 'No se ha encontrado la incidencia.'], Response::HTTP_NOT_FOUND);
             }
-            
-            // Actualizar la información de la asignación del técnico
-           /* $tecnicoIncidencia->fecha_salida = Date::now();
-             $tecnicoIncidencia->motivo_salida = $request->get('motivo_salida');
+
+            $tecnicoIncidencia->fecha_salida = Date::now();
+            $tecnicoIncidencia->motivo_salida = $request->get('motivo_salida');
             $tecnicoIncidencia->estado_tecnico = 'inactivo';
             $tecnicoIncidencia->tiempo_trabajado = Carbon::parse($tecnicoIncidencia->fecha_entrada)->diffInMinutes($tecnicoIncidencia->fecha_salida);
             $tecnicoIncidencia->save();
@@ -180,6 +178,8 @@ class TecnicoIncidenciaController extends Controller
                 'trace' => $e->getTraceAsString()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
+
     }
 
 
