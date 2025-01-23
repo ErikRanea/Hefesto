@@ -45,74 +45,37 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { onBeforeMount, ref } from 'vue';
+  import axios from 'axios';
+  const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
+  const ALL_MANTENIMIENTOS_URL = `${API_AUTH_URL}/incidencia/all_mantenimientos`;
   
-  const mantenimientos = ref([
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'alta',
-      machineName: 'Fresadora 1',
-      internalNumber: '12345',
-      status: 'Nueva',
-    },
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'alta',
-      machineName: 'Torno 2',
-      internalNumber: '67890',
-      status: 'Cerrada',
-    },
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'media',
-      machineName: 'Impresora 3D',
-      internalNumber: '24680',
-      status: 'En curso',
-    },
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'baja',
-      machineName: 'Taladro 4',
-      internalNumber: '13579',
-      status: 'Nueva',
-    },
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'baja',
-      machineName: 'Rectificadora 5',
-      internalNumber: '09876',
-      status: 'En curso',
-    },
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'media',
-      machineName: 'Plegadora 6',
-      internalNumber: '54321',
-      status: 'En curso',
-    },
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'alta',
-      machineName: 'Cortadora Láser',
-      internalNumber: '11223',
-      status: 'En curso',
-    },
-    {
-      date: 'Enero 16, 2025',
-      time: '8:45',
-      priority: 'baja',
-      machineName: 'Soldadora 7',
-      internalNumber: '33445',
-      status: 'Nueva',
-    },
-  ]);
+  const recogerMantenimiento = async () => {
+    try{
+      const token = localStorage.getItem('token');
+      if(!token){
+        throw new Error('No hay token');
+      }
+      const response = await axios.post(ALL_MANTENIMIENTOS_URL,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      console.log(response.data);
+      
+      }
+    catch(error){
+      console.log(error);
+    }
+  }
+
+  onBeforeMount(async () => {
+    await recogerMantenimiento();
+  })
+  
   </script>
   
   <style scoped>

@@ -73,6 +73,8 @@ class MainController extends Controller
             $incidencia->fecha_apertura = now();
             $incidencia->save();
 
+            
+
             return response()->json(['message' => 'Carga inicial completada con éxito!'], Response::HTTP_CREATED);
         } catch (Exception $e) {
             return response()->json([

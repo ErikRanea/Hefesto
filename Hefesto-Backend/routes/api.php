@@ -46,10 +46,12 @@ Route::prefix('v1')->group(function () {
     Route::prefix('incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('all', [IncidenciaController::class, 'all']);
+            Route::post('all_cerradas', [IncidenciaController::class, 'allConCerradas']);
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
             Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
             Route::delete('delete/{id}', [IncidenciaController::class, 'delete'])->middleware('admin');
+            Route::post('all_mantenimientos', [IncidenciaController::class, 'allMantenimientos'])->middleware('tecnico');
             Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
         });
     });
