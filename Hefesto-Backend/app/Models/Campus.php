@@ -17,6 +17,10 @@ class Campus extends Model
        return $this->hasMany(Seccion::class, 'id_campus', 'id_campus');
    }
 
+   public function users(){
+    return $this->hasMany(User::class,'id_campus');
+   }
+
 
 
 

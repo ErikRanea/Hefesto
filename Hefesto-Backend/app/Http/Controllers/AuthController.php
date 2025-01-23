@@ -76,6 +76,7 @@ class AuthController extends Controller
             $new->email = $request->get('email');
             $new->password = Hash::make($request->get('password'));
             $new->rol = 'operario';
+            $new->id_campus = $request->get('id_campus');
             $new->habilitado = 1;
     
             if($request->file('image') != null){
