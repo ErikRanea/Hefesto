@@ -21,7 +21,6 @@ class IncidenciaController extends Controller
     {
         try {
             $query = Incidencia::query()
-                ->with(['tipoIncidencia', 'maquina'])
                 ->where('habilitado', 1);
 
             // Filtro por campus si se proporciona

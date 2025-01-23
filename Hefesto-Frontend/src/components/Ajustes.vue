@@ -48,9 +48,26 @@
     <template #popup-content v-else-if="popupType === 'fondo'">
       <textarea id="descripcion" class="form-control" placeholder="Descripción"></textarea>
     </template>
-    </GlassmorphicPopup>
-  </div>
   
+    </GlassmorphicPopup>
+    <GlassmorphicPopup
+      :visible="popupRespuestaVisible"
+      :title="popupTitle"
+      :subtitle="popupSubtitle"
+      :closeButtonText="popupCloseButtonText"
+      :actionButtonText="popupActionButtonText"
+      :imageUrl="userImagePath"
+      @close="closePopup"
+      @action="handleAction"
+      @image-changed="updateProfileImage">
+      
+      <template #popup-content v-if="popupType === 'imagenCargada'">
+
+      </template>
+    </GlassmorphicPopup>
+
+  </div>
+
 </template>
 
 <script setup>
@@ -65,6 +82,7 @@ const ME_URL = `${API_AUTH_URL}/auth/me`;
 const UPDATE_PROFILE_IMAGE_URL = `${API_AUTH_URL}/image/upload`;
 
 const popupVisible = ref(false);
+const popupRespuestaVisible  = ref(false);
 const popupType = ref(null);
 const popupTitle = ref(null);
 const popupSubtitle = ref(null);
@@ -95,6 +113,11 @@ const openPopup = (type) => {
     popupCloseButtonText.value = 'Cerrar';
     popupActionButtonText.value = 'Aceptar';
   }
+  else if (type === 'imagenCargada'){
+    popupRespuestaVisible.value = true;
+    popupTitle.value = "La imagen ha sido cargada con éxito!";
+    popupActionButtonText.value = "Volver"; 
+  }
 };
 
 const closePopup = () => {
@@ -105,7 +128,11 @@ const handleAction = async () => {
   if (popupType.value === 'perfil') {
     // Handle profile picture update logic here
     await updateProfileImage();
-  } else {
+  } 
+  else if(popupType.value === 'imagenCargada'){
+    location.reload();
+  }
+  else {
     alert(`Action clicked on ${popupType.value}`);
   }
   closePopup();
@@ -136,7 +163,8 @@ const updateProfileImage = async () => {
     }
 
     userPicture.value = response_upload.data.path;
-    alert('Profile image uploaded successfully!');
+    closePopup();
+    openPopup('imagenCargada');
   } catch (error) {
     if (error.response) {
       // El servidor respondió con un código de estado fuera del rango 2xx
