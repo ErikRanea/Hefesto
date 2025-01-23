@@ -31,6 +31,26 @@ class MainController extends Controller
             $user->habilitado = true;
             $user->save();
 
+            $user = new User();
+            $user->name = 'ibai';
+            $user->primer_apellido = 'tecnico';
+            $user->segundo_apellido = 'Hefesto';
+            $user->email = 'i@i.com';
+            $user->password = Hash::make('tecnicoibai');
+            $user->rol = 'tecnico';
+            $user->habilitado = true;
+            $user->save();
+
+            $user = new User();
+            $user->name = 'erik';
+            $user->primer_apellido = 'erik';
+            $user->segundo_apellido = 'Hefesto';
+            $user->email = 'e@e.com';
+            $user->password = Hash::make('tecnicoerik');
+            $user->rol = 'tecnico';
+            $user->habilitado = true;
+            $user->save();
+
         
             $campus = new Campus();
             $campus->nombre_campus = 'Arriaga';
