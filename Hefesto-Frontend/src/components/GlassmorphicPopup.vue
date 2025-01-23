@@ -1,7 +1,10 @@
 <template>
   <div v-if="visible" class="popup-overlay">
     <div class="popup-card">
-      <h1 v-if="title" class="popup-title">{{ title }}</h1>
+      <div class="popup-header">
+        <h1 v-if="title" class="popup-title">{{ title }}</h1>
+        <button class="close-btn" @click="$emit('close')">&times;</button>
+      </div>
       <p v-if="subtitle" class="popup-subtitle">{{ subtitle }}</p>
       <div class="popup-content">
         <slot name="popup-content">
@@ -9,12 +12,12 @@
         </slot>
       </div>
       <div class="popup-actions">
-        <button v-if="closeButtonText" class="popup-btn glassmorphic-btn cancel-btn" @click="$emit('close')">
+        <button v-if="closeButtonText" class="popup-btn cancel-btn" @click="$emit('close')">
           {{ closeButtonText }}
         </button>
         <button
           v-if="actionButtonText"
-          class="popup-btn glassmorphic-btn primary create-btn"
+          class="popup-btn primary-btn"
           @click="$emit('action')"
         >
           {{ actionButtonText }}
@@ -25,9 +28,7 @@
 </template>
 
 <script setup>
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/js/bootstrap.js';
-import { ref, onMounted } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 
 defineProps({
   visible: {
@@ -63,7 +64,7 @@ defineEmits(['close', 'action']);
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,91 +72,107 @@ defineEmits(['close', 'action']);
 }
 
 .popup-card {
-    width: 700px;
-    min-height: 300px;
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 1.5rem;
-    padding: 2rem;
-    z-index: 10;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Asegura que el contenido no se salga del borde */
+  width: 90%;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  color: #333;
+  display: flex;
+  flex-direction: column;
 }
 
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
 
 .popup-title {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  text-align: center;
+  font-size: 2rem;
   color: #222;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #333;
 }
 
 .popup-subtitle {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
   color: #444;
 }
 
 .popup-content {
   margin-bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex: 1;
-  justify-content: center;
-    overflow-y: auto;  /* Añade scroll vertical si el contenido excede el contenedor */
-    padding-right: 10px;
-    gap: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 1rem;
 }
 
+.popup-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.popup-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.popup-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.popup-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
 
 .popup-actions {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: 20px;
 }
 
 .popup-btn {
-  background: none;
-  border: none;
-  text-align: center;
-  font-size: 1rem;
   padding: 0.8rem 1.8rem;
   border-radius: 2rem;
+  font-size: 1rem;
   cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
 }
 
-.glassmorphic-btn {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff; /* Text color */
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.3);
+  color: #333;
 }
 
-.glassmorphic-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
-.popup-btn.primary {
-  background-color: rgba(255, 255, 255, 0.8);
-  color: #000000;
+.primary-btn {
+  background: rgba(0, 123, 255, 0.7);
+  color: white;
 }
 
-.glassmorphic-btn.cancel-btn{
-  color: #000;
-    background: rgba(255, 255, 255, 0.8);
+.primary-btn:hover {
+  background: rgba(0, 123, 255, 0.9);
 }
-.glassmorphic-btn.cancel-btn:hover{
-    background: rgba(255, 255, 255, 0.9);
-}
-
 </style>
