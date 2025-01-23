@@ -91,15 +91,20 @@ class TecnicoIncidenciaController extends Controller
             $tecnicoIncidencia->tiempo_trabajado = Carbon::parse($tecnicoIncidencia->fecha_entrada)->diffInMinutes($tecnicoIncidencia->fecha_salida);
             $tecnicoIncidencia->save();
 
-            $incidencia = Incidencia::find($request->get('id_incidencia'));
 
-            IncidenciaController::estadoEnEspera($incidencia);
+            $hayGente = TecnicoIncidencia::find('id', $tecnicoIncidencia->id)->where('fecha_salida', null)->first();
+            if($hayGente == null){
+                $incidencia = Incidencia::find($request->get('id_incidencia'));
+                IncidenciaController::estadoEnEspera($incidencia);
+            }
+
+
 
             return response()->json(['message' => 'Incidencia desasignada con exitó!', 'data' => $tecnicoIncidencia], Response::HTTP_OK);
 
         } catch (Exception $e) {
             return response()->json([
-                'error' => 'Error al salir de la incidencia.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'error' => 'Error al salir de la incidencia.',$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -176,6 +181,20 @@ class TecnicoIncidenciaController extends Controller
     }
 
 
+    public function getAllTecnicoIncidencias()
+    {
+        try {
+            $tecnicoIncidencias = TecnicoIncidencia::all();
+            return response()->json(['data' => $tecnicoIncidencias], Response::HTTP_OK);
+        } catch (Exception $e) {
+             return response()->json([
+                'error' => 'Error al obtener todos los TecnicoIncidencia.',
+                'message' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     public function getIncidenciasAsignadas()
     {
         try {
@@ -190,5 +209,52 @@ class TecnicoIncidenciaController extends Controller
                 'error' => 'Error al obtener las incidencias asignadas.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function reclamarIncidenciaMultiple(Request $request)
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'id_incidencia' => 'required|int',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
+        }
+
+        $idtecnico = auth()->user()->id;
+
+        // Verificar si el técnico ya tiene una incidencia en curso
+        $tecnicoIncidenciaActiva = TecnicoIncidencia::where('id_tecnico', $idtecnico)
+            ->where('estado_tecnico', 'activo')
+            ->first();
+
+        if ($tecnicoIncidenciaActiva) {
+            return response()->json(['error' => 'Ya tienes una incidencia en curso asignada. Debes salir de esa incidencia para poder reclamar otra.'], Response::HTTP_BAD_REQUEST);
+        }
+
+
+        $incidencia = Incidencia::find($request->get('id_incidencia'));
+
+
+        $tecnicoIncidencia = new TecnicoIncidencia();
+        $tecnicoIncidencia->id_tecnico = $idtecnico;
+        $tecnicoIncidencia->id_incidencia = $incidencia->id;
+        $tecnicoIncidencia->fecha_entrada = Date::now();
+        $tecnicoIncidencia->estado_tecnico = 'activo';
+        $tecnicoIncidencia->save();
+
+         if($incidencia->estado != 2){
+            IncidenciaController::estadoEnCurso($incidencia);
+         }
+
+
+        return response()->json(['message' => 'Incidencia asignada con éxito!', 'data' => $tecnicoIncidencia], Response::HTTP_CREATED);
+    } catch (Exception $e) {
+        return response()->json([
+            'error' => 'Error al asignar la incidencia.'
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+
 
 }

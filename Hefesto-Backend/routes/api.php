@@ -13,29 +13,23 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\MantenimientoPreventivoController;
 use App\Http\Controllers\ImageController;
 
-
-
 Route::prefix('v1')->group(function () {
 
     Route::prefix('main')->group(function () {
         Route::get('carga-inicial', [MainController::class, 'cargaInicial']);
     });
 
-
     Route::prefix('auth')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
-        //Route::post('register', [AuthController::class, 'register']);
         Route::middleware('auth:api')->group(function () {
-           Route::post('register', [AuthController::class, 'register'])->middleware('admin');
+            Route::post('register', [AuthController::class, 'register'])->middleware('admin');
             Route::post('register_tecnico', [AuthController::class, 'registerTecnico'])->middleware('admin');
             Route::get('me', [AuthController::class, 'me']);
             Route::post('refresh', [AuthController::class, 'refresh']);
-            Route::get('validate-token', [AuthController::class, 'validateToken']); 
+            Route::get('validate-token', [AuthController::class, 'validateToken']);
             Route::get('logout', [AuthController::class, 'logout'])->name('logout');
         });
     });
-
-
 
     Route::prefix('image')->group(function () {
         Route::middleware('auth:api')->group(function () {
@@ -55,16 +49,17 @@ Route::prefix('v1')->group(function () {
             Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
         });
     });
-    
+
     Route::prefix('tecnico_incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('reclamar_incidencia/', [TecnicoIncidenciaController::class, 'reclamarIncidencia'])->middleware('tecnico');
+             Route::post('reclamar_incidencia_multiple', [TecnicoIncidenciaController::class, 'reclamarIncidenciaMultiple'])->middleware('tecnico');
             Route::put('salir_incidencia/', [TecnicoIncidenciaController::class, 'salirIncidencia'])->middleware('tecnico');
             Route::put('cerrar_incidencia/', [TecnicoIncidenciaController::class, 'cerrarIncidencia'])->middleware('tecnico');
             Route::get('incidencia_asignada', [TecnicoIncidenciaController::class, 'getIncidenciasAsignadas'])->middleware('tecnico');
+            Route::get('/all', [TecnicoIncidenciaController::class, 'getAllTecnicoIncidencias'])->middleware('tecnico');
         });
     });
-
 
     Route::middleware('auth:api')->group(function () {
         Route::resource('users', UserController::class);
@@ -88,7 +83,7 @@ Route::prefix('v1')->group(function () {
             Route::put('update/{seccion}',[SeccionController::class, 'update'])->middleware('admin');
             Route::delete('delete/{seccion}',[SeccionController::class,'delete'])->middleware('admin');
         });
-    }); 
+    });
 
     Route::prefix('maquina')->group(function () {
         Route::middleware('auth:api')->group(function () {
@@ -100,7 +95,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::prefix('mantenimiento-preventivo')->group(function () {
+     Route::prefix('mantenimiento-preventivo')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('create', [MantenimientoPreventivoController::class, 'create'])->middleware('admin');
             Route::post('store', [MantenimientoPreventivoController::class, 'store'])->middleware('admin');
@@ -110,7 +105,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('delete/{mantenimiento_preventivo}',[MantenimientoPreventivoController::class,'delete'])->middleware('admin');
         });
     });
-
 
     Route::prefix('tipo_incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
@@ -122,7 +116,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('delete/{tipo_incidencia}',[TipoIncidenciaController::class,'delete'])->middleware('admin');
         });
     });
-
     Route::prefix('usuario')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::get('all',[UserController::class, 'all'])->middleware('admin');
@@ -131,7 +124,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('delete/{usuario}',[UserController::class,'delete'])->middleware('admin');
         });
     });
-
 });
 
 Route::get('/', [AuthController::class, 'unauthorized'])->name('login');
