@@ -20,37 +20,23 @@ class MainController extends Controller
     {
         try {
  
-
-            $user = new User();
-            $user->name = 'Hefesto';
-            $user->primer_apellido = 'Admin';
-            $user->segundo_apellido = 'Hefesto';
-            $user->email = 'hefesto@hefesto.com';
-            $user->password = Hash::make('adminhefesto');
-            $user->rol = 'administrador';
-            $user->habilitado = true;
-            $user->save();
-
-        
             $campus = new Campus();
-            $campus->nombre_campus = 'Arriaga';
+            $campus->nombre_campus = 'Jesus Obrero';
             $campus->habilitado = true;
             $campus->save();
 
             $seccion = new Seccion();
-            $seccion->nombre_seccion = '142GA';
+            $seccion->nombre_seccion = 'MA12';
             $seccion->id_campus = $campus->id;
             $seccion->habilitado = true;
             $seccion->save();
 
-            $maquina = new Maquina();
-            $maquina->nombre_maquina = 'Torno CNC';
-            $maquina->id_seccion = $seccion->id;
-            $maquina->numero_interno = 12345;
-            $maquina->tipo_maquina = 'Industrial';
-            $maquina->prioridad = 1;
-            $maquina->habilitado = true;
-            $maquina->save();
+            $seccion = new Seccion();
+            $seccion->nombre_seccion = 'MA13';
+            $seccion->id_campus = $campus->id;
+            $seccion->habilitado = true;
+            $seccion->save();
+
 
             $maquina = new Maquina();
             $maquina->nombre_maquina = 'Fresadora';
@@ -60,6 +46,77 @@ class MainController extends Controller
             $maquina->prioridad = 3;
             $maquina->habilitado = true;
             $maquina->save();
+
+
+            $campus = new Campus();
+            $campus->nombre_campus = 'Arriaga';
+            $campus->habilitado = true;
+            $campus->save();
+
+
+            $seccion = new Seccion();
+            $seccion->nombre_seccion = '142GA';
+            $seccion->id_campus = $campus->id;
+            $seccion->habilitado = true;
+            $seccion->save();
+
+            $seccion = new Seccion();
+            $seccion->nombre_seccion = '141GA';
+            $seccion->id_campus = $campus->id;
+            $seccion->habilitado = true;
+            $seccion->save();
+
+
+
+
+            $maquina = new Maquina();
+            $maquina->nombre_maquina = 'Torno CNC';
+            $maquina->id_seccion = $seccion->id;
+            $maquina->numero_interno = 12345;
+            $maquina->tipo_maquina = 'Industrial';
+            $maquina->prioridad = 1;
+            $maquina->habilitado = true;
+            $maquina->save();   
+            
+
+
+
+
+            $user = new User();
+            $user->name = 'Hefesto';
+            $user->primer_apellido = 'Admin';
+            $user->segundo_apellido = 'Hefesto';
+            $user->email = 'hefesto@hefesto.com';
+            $user->password = Hash::make('adminhefesto');
+            $user->rol = 'administrador';
+            $user->habilitado = true;
+            $user->id_campus = 1;
+            $user->save();
+
+            $user = new User();
+            $user->name = 'ibai';
+            $user->primer_apellido = 'tecnico';
+            $user->segundo_apellido = 'Hefesto';
+            $user->email = 'i@i.com';
+            $user->password = Hash::make('tecnicoibai');
+            $user->rol = 'tecnico';
+            $user->habilitado = true;
+            $user->id_campus = 2;
+            $user->save();
+
+            $user = new User();
+            $user->name = 'erik';
+            $user->primer_apellido = 'erik';
+            $user->segundo_apellido = 'Hefesto';
+            $user->email = 'e@e.com';
+            $user->password = Hash::make('tecnicoerik');
+            $user->rol = 'tecnico';
+            $user->habilitado = true;
+            $user->id_campus = 2;
+            $user->save();
+
+        
+          
 
             TipoIncidenciaController::crearTipos();
 
