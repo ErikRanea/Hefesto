@@ -167,7 +167,7 @@
                 <button class="popup-btn1 cancel-btn" @click="openMotivoSalidaPopup">Salir de
                   Incidencia
                 </button>
-                <button class="popup-btn danger" @click="openMotivoCierrePopup">Cerrar Incidencia
+                <button class="popup-btn primary" @click="openMotivoCierrePopup">Cerrar Incidencia
                 </button>
               </div>
             </div>
@@ -266,18 +266,14 @@ const hasReclamada = ref(false);
 const showErrorPopup = ref(false);
 const errorMessage = ref('');
 
-const obtenerPrioridad = (id_tipo_incidencia) => {
-  switch (id_tipo_incidencia) {
-    case 1:
-      return 'alta';
-    case 2:
-      return 'media';
-    case 3:
-      return 'baja';
-    default:
-      return 'baja';
-  }
+const obtenerPrioridad = (prioridad) => {
+    if (prioridad === "alta" || prioridad ==="media" || prioridad === "baja") {
+       return prioridad;
+    } else {
+      return "baja";
+    }
 };
+
 
 const obtenerEstado = (estado) => {
   switch (estado) {
@@ -400,12 +396,12 @@ const loadIncidencias = async () => {
     incidencias.value = incidenciasData.map((incidencia) => ({
       ...incidencia,
       id: incidencia.id,
-      priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
+      priority: obtenerPrioridad(incidencia.prioridad),
       status: obtenerEstado(incidencia.estado),
       date: formatDate(incidencia.fecha_apertura),
       time: formatTime(incidencia.fecha_apertura),
       descripcion: incidencia.descripcion,
-      id_tecnico: incidencia.id_tecnico
+      id_tecnico: incidencia.id_mantenimiento
     }));
   } catch (err) {
     error.value = err;

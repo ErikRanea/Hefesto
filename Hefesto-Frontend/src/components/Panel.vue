@@ -86,34 +86,34 @@
             </div>
             <div v-if="loading">Cargando incidencias...</div>
             <div v-else-if="error">Error al cargar las incidencias.</div>
-            <div v-else class="incidencias-container">
-              <div v-for="incidencia in incidenciasFiltradas" :key="incidencia.date + incidencia.time" class="incidencia-item">
-                <!-- Restructured layout to match the image -->
-                <div class="priority-marker" :class="incidencia.priority"></div>
-                <div class="incidencia-content">
-                  <div class="incidencia-date">
-                    <span>{{ incidencia.date }}</span>
-                    <span>{{ incidencia.time }}</span>
-                  </div>
-                  <div class="incidencia-text">
-                    <div>{{ incidencia.titulo }}</div>
-                    <small class="text-muted">{{ incidencia.subtitulo }}</small>
-                  </div>
-                  <div class="incidencia-status-box">
-                    <span class="incidencia-status" :class="incidencia.status.toLowerCase().replace(' ', '-')">
-                      {{ incidencia.status }}
-                    </span>
-                </div>
-              </div>
-            </div>
-          </div>
+             <div v-else class="incidencias-container">
+                <div v-for="incidencia in incidenciasFiltradas" :key="incidencia.id" class="incidencia-item">
+                    <div class="priority-marker" :class="incidencia.priority"></div>
+                      <div class="incidencia-content">
+                          <div class="incidencia-date">
+                            <span>{{ incidencia.date }}</span>
+                            <span>{{ incidencia.time }}</span>
+                          </div>
+                          <div class="incidencia-text">
+                            <div>{{ incidencia.titulo }}</div>
+                            <small class="text-muted">{{ incidencia.subtitulo }}</small>
+                          </div>
+                            <div class="incidencia-status-box">
+                              <span class="incidencia-status" :class="incidencia.status.toLowerCase().replace(' ', '-')">
+                                {{ incidencia.status }}
+                              </span>
+                            </div>
+                      </div>
+                   </div>
+             </div>
+
         </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { Chart } from 'chart.js/auto';
 import axios from 'axios';
 
@@ -124,22 +124,22 @@ const loading = ref(true);
 const error = ref(null);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
+const ME_URL = `${API_AUTH_URL}/auth/me`;
+const userRole = ref(null);
+const userId = localStorage.getItem('id');
 
-// Función para obtener la prioridad de una incidencia
-const obtenerPrioridad = (id_tipo_incidencia) => {
-  switch (id_tipo_incidencia) {
-    case 3:
-      return 'alta';
-    case 2:
-      return 'media';
-    case 1:
-      return 'baja';
-    default:
-      return 'baja';
-  }
+const isTecnico = computed(() => userRole.value === 'tecnico');
+const isAdmin = computed(() => userRole.value === 'administrador');
+
+
+const obtenerPrioridad = (prioridad) => {
+    if (prioridad === "alta" || prioridad ==="media" || prioridad === "baja") {
+       return prioridad;
+    } else {
+      return "baja";
+    }
 };
 
-// Función para obtener el estado de una incidencia
 const obtenerEstado = (estado) => {
   switch (estado) {
     case 0:
@@ -153,7 +153,7 @@ const obtenerEstado = (estado) => {
     case 4:
       return 'Mantenimiento';
     default:
-      return 'Nueva';
+      return '';
   }
 };
 
@@ -171,12 +171,14 @@ const formatTime = (dateString) => {
     return date.toLocaleTimeString(undefined, options);
 };
 
-// Filtra incidencias para no mostrar las cerradas ni en mantenimiento
+// Filtra incidencias para no mostrar las cerradas ni en mantenimiento y solo muestra 8 incidencias
 const incidenciasFiltradas = computed(() => {
-  return incidencias.value.filter(incidencia => {
-    const estado = obtenerEstado(incidencia.estado);
-    return estado !== 'Cerrada' && estado !== 'Mantenimiento';
-  });
+  return incidencias.value
+      .filter(incidencia => {
+          const estado = obtenerEstado(incidencia.estado);
+          return estado !== 'Cerrada' && estado !== 'Mantenimiento';
+      })
+      .slice(0, 8);
 });
 
 // Cálculo del total de incidencias, incluyendo cerradas y en mantenimiento
@@ -213,6 +215,7 @@ const incidenciasEnCursoCount = computed(() => {
 const incidenciasCerradasCount = computed(() => {
   return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Cerrada').length;
 });
+
 
 // Función para generar datos para el gráfico de barras
 const generateChartData = (incidencias) => {
@@ -276,49 +279,53 @@ const generateLineChartData = (incidencias) => {
     return hourlyData.slice(0, 24) //return the first 24 items of the array in case there are incidents with wrong data
 };
 
-
-// Hook onMounted para realizar la lógica al montar el componente
-onMounted(async () => {
+const fetchUserData = async () => {
     const token = localStorage.getItem('token');
-    if (token) {
-        try {
-          /* Super importante fijarse que en post hay que enviarlo fuera del body
-                                                                este corchete vacio es el body  */
+  if (token) {
+      try {
+          const response = await axios.get(ME_URL, {
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+          });
+          userRole.value = response.data.rol;
+
+      } catch (error) {
+          console.error('Error fetching user data:', error);
+      }
+  }
+};
+const checkUserHasReclamada = () => {
+    if(isTecnico.value || isAdmin.value){
+    }
+}
+onMounted(async () => {
+     try {
+         await fetchUserData()
+       const token = localStorage.getItem('token');
+          if (token) {
+             try {
             const response = await axios.post(ALL_INCIDENCIAS_URL,{}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-
-            // Log the raw response data
-            console.log('Raw API Response:', response.data);
-
-            // Mapear los datos de la API y añadir propiedades calculadas
-            incidencias.value = response.data.map(incidencia => ({
-                ...incidencia,
-                priority: obtenerPrioridad(incidencia.id_tipo_incidencia),
-                status: obtenerEstado(incidencia.estado),
-                date: formatDate(incidencia.fecha_apertura),
-                time: formatTime(incidencia.fecha_apertura),
-                 descripcion: incidencia.descripcion,
+               incidencias.value = response.data.map(incidencia => ({
+                  ...incidencia,
+                  priority: obtenerPrioridad(incidencia.prioridad),
+                  status: obtenerEstado(incidencia.estado),
+                  date: formatDate(incidencia.fecha_apertura),
+                  time: formatTime(incidencia.fecha_apertura),
+                   descripcion: incidencia.descripcion,
                   titulo: incidencia.titulo,
                    subtitulo: incidencia.subtitulo,
-                fecha_cierre: incidencia.fecha_cierre
-            }));
+                   fecha_cierre: incidencia.fecha_cierre,
+                    id_tecnico: incidencia.id_mantenimiento
+              }));
 
+                const chartData = generateChartData(incidencias.value);
+                  const lineChartData = generateLineChartData(incidencias.value);
 
-            // Log the processed incidencias data
-            console.log('Processed Incidencias:', incidencias.value);
-           console.log('Total Incidencias Count:', totalIncidenciasCount.value);
-            console.log('Incidencias Abiertas Hoy:', incidenciasAbiertasHoy.value);
-             console.log('Incidencias Pendientes Count:', incidenciasPendientesCount.value);
-            console.log('Incidencias En Curso Count:', incidenciasEnCursoCount.value);
-            console.log('Incidencias Cerradas Count:', incidenciasCerradasCount.value);
-
-               const chartData = generateChartData(incidencias.value);
-              console.log('Chart Data:', chartData);
-               const lineChartData = generateLineChartData(incidencias.value);
-                console.log('Line Chart Data:', lineChartData);
 
               new Chart(lineChart.value, {
                   type: 'line',
@@ -413,7 +420,15 @@ onMounted(async () => {
         } finally {
             loading.value = false;
         }
+               checkUserHasReclamada();
+          }
+    } catch (err) {
+      error.value = err;
+      loading.value = false;
     }
+});
+watch(incidencias,()=>{
+  checkUserHasReclamada();
 });
 </script>
 
