@@ -122,6 +122,7 @@ class TecnicoIncidenciaController extends Controller
                 Priemro cierro la actividad del técnico que envía la petición y luego con un foreach reviso si tengo que cerrar
                 más actividades
             */
+          
             
             // Cerrar la actividad del técnico que envía la petición
             $tecnicoIncidencia = TecnicoIncidencia::where('id_incidencia', $request->get('id_incidencia'))
@@ -150,15 +151,25 @@ class TecnicoIncidenciaController extends Controller
                 $incidencia->save();
             }
 
+
+          
+
             $incidencia = Incidencia::find($request->get('id_incidencia'));
             IncidenciaController::estadoCerrado($incidencia);
             
+         
+
             return response()->json(['message' => 'Incidencia cerrada con éxito!', 'data' => $tecnicoIncidencia], Response::HTTP_OK);
 
         } 
         catch (Exception $e) {
             return response()->json([
-                'error' => 'Error al cerrar la incidencia.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'error' => 'aad',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
 
