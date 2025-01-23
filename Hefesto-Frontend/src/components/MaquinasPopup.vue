@@ -26,36 +26,11 @@
                 <input type="text" class="form-control" placeholder="Nombre de la máquina" v-model="searchName">
                 <button @click="searchMachines" class="btn btn-outline-secondary">Buscar</button>
             </div>
-           <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
-            <div v-for="maquina in maquinas" :key="maquina.id_maquina" class="col d-flex justify-content-center">
-                <div class="card glassmorphic-card mb-4">
-                    <div class="d-flex justify-content-center">
+           <div class="row">
+            <div v-for="maquina in maquinas" :key="maquina.id_maquina" class="col-6">
+                <button class="glass-card">
                         <h5>{{ maquina.nombre_maquina }}</h5>
-                    </div>
-                    <div class="d-flex flex-column">
-                        <div class="d-flex justify-content-between">
-                            <span>ID:</span>
-                            <span>{{ maquina.id_maquina }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Número interno:</span>
-                            <span>{{ maquina.numero_interno }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Tipo:</span>
-                            <span>{{ maquina.tipo_maquina }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Prioridad:</span>
-                            <span>{{ maquina.prioridad }}</span>
-                        </div>
-                         <div class="machine-status-button">
-                            <button :class="getStatusClass(maquina.habilitado, maquina.parada)" class="btn w-100" disabled>
-                                {{ getStatusText(maquina.habilitado, maquina.parada) }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                </button>
             </div>
         </div>
     </template>
@@ -179,5 +154,36 @@ const getStatusText = (habilitado, parada) => {
 </script>
 
 <style scoped>
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        width: 250px;
+        margin: 1em;
+        height: auto;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .glass-card:hover {
+        transform: scale(1.05);
+    }
+
+    .card-text {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .card-body {
+        padding: 32px;
+    }
+
+    .card-body-2 {
+        padding: 120px;
+    }
 
 </style>

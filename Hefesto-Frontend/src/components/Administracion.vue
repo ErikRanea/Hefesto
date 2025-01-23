@@ -72,7 +72,6 @@
 </template>
 
 <script setup>
-import GlassmorphicPopup from './GlassmorphicPopup.vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
 import { ref, onMounted, computed } from 'vue';
@@ -91,8 +90,6 @@ const popupSubtitle = ref(null);
 const popupCloseButtonText = ref(null);
 const popupActionButtonText = ref(null);
 const token = ref(null)
-const userPicture = ref(null);
-const userName = ref(null);
 
 
 // --- Funciones del Popup ---
@@ -100,37 +97,19 @@ const openPopup = (type) => {
     popupVisible.value = true;
     popupType.value = type;
 
-    if (type === 'perfil') {
-        popupTitle.value = 'Editar perfil';
-        popupSubtitle.value = 'Edita tu perfil';
-        popupCloseButtonText.value = 'Cerrar';
-        popupActionButtonText.value = 'Guardar';
-    } else if (type === 'contraseña') {
-        popupTitle.value = 'Cambiar contraseña';
-        popupSubtitle.value = 'Introduce tu nueva contraseña';
-        popupCloseButtonText.value = 'Cerrar';
-        popupActionButtonText.value = 'Guardar';
-    } else if (type === 'fondo') {
-        popupTitle.value = 'Cambiar fondo';
-        popupSubtitle.value = 'Añade la descripción de tu fondo';
-        popupCloseButtonText.value = 'Cerrar';
-        popupActionButtonText.value = 'Aceptar';
-    }
-    else if (type === 'maquinas'){
+    if (type === 'maquinas'){
         popupTitle.value = 'Maquinas';
         popupSubtitle.value = 'Listado maquinas';
         popupCloseButtonText.value = 'Cerrar';
         popupActionButtonText.value = 'Aceptar';
-         maquinasPopupRef.value.fetchData();
+        maquinasPopupRef.value.fetchData();
     }
 };
 
 const closePopup = () => {
     popupVisible.value = false;
 };
- const userImagePath = computed(() => {
-  return userPicture.value ? `../src/assets/images/userpicture/${userPicture.value}` : null;
-});
+
 onMounted(async () => {
     token.value = localStorage.getItem('token');
     if (token.value) {
@@ -140,10 +119,8 @@ onMounted(async () => {
                     Authorization: `Bearer ${token.value}`,
                 },
             });
-             userName.value = response.data.name;
-             userPicture.value = response.data.foto_perfil;
         } catch (error) {
-           console.error('Error fetching user data:', error);
+           console.error('Error fetching data:', error);
         }
     }
 });
