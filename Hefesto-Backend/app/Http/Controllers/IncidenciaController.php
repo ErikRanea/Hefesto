@@ -8,6 +8,7 @@ use App\Models\Maquina;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use App\Models\TipoIncidencia;
 use Exception;
 use Carbon\Carbon;
@@ -16,48 +17,113 @@ use App\Models\Campus;
 
 class IncidenciaController extends Controller
 {
-    public function all(Request $request){
-        try{
-            
-            $query = Incidencia::query();
+    public function all(Request $request)
+    {
+        try {
+            $query = Incidencia::query()
+            ->with(['tipoIncidencia', 'maquina'])
+            ->where('habilitado', 1); 
 
-            
-            if($request->has('id_campus')){
-                
+
+            // Filtro por campus si se proporciona
+            if ($request->has('id_campus')) {
                 $id_campus = $request->get('id_campus');
                 $campusExists = Campus::where('id', $id_campus)->exists();
-    
+
                 if ($campusExists) {
-                    $query->whereHas('maquina', function($q) use ($request){
-                        $q->whereHas('seccion', function($q) use ($request){
+                    $query->whereHas('maquina', function ($q) use ($request) {
+                        $q->whereHas('seccion', function ($q) use ($request) {
                             $q->where('id_campus', $request->get('id_campus'));
                         });
                     });
                 } else {
-                    return response()->json(["El campus ".$request->get('id_campus').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                    return response()->json(["El campus " . $id_campus . ' no existe'], Response::HTTP_NOT_FOUND);
                 }
             }
 
-            if($request->has('id_seccion')){
+            // Filtro por sección si se proporciona
+            if ($request->has('id_seccion')) {
                 $id_seccion = $request->get('id_seccion');
                 $seccionExists = Seccion::where('id', $id_seccion)->exists();
-    
+
                 if ($seccionExists) {
-                    $query->whereHas('maquina', function($q) use ($request){
+                    $query->whereHas('maquina', function ($q) use ($request) {
                         $q->where('id_seccion', $request->get('id_seccion'));
                     });
                 } else {
-                    return response()->json(["La seccion ".$request->get('id_seccion').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                    return response()->json(["La sección " . $id_seccion . ' no existe'], Response::HTTP_NOT_FOUND);
                 }
             }
-    
 
-    
-            $incidencias = $query->get();
-            return response()->json($incidencias, Response::HTTP_OK);
+           $incidencias = $query->get();
+
+           // Ordenar las incidencias
+           $incidenciasOrdenadas = $incidencias->sortBy(function($incidencia) {
+             
+                return [- optional($incidencia->tipoIncidencia)->prioridad, -optional($incidencia->maquina)->prioridad];
+            });
+
+            return response()->json($incidenciasOrdenadas->values()->all(), Response::HTTP_OK);
+
+        } catch (Exception $e) {
+            // Registrar el error para depuración
+            Log::error("Error al obtener incidencias: " . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener las incidencias. Por favor, inténtalo de nuevo más tarde.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        catch(Exception $e){
-            return response()->json(['error' => 'Error al obtener los incidencias.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+
+    public function allConCerradas(Request $request)
+    {
+        try {
+            $query = Incidencia::query()
+            ->with(['tipoIncidencia', 'maquina']); 
+
+
+            // Filtro por campus si se proporciona
+            if ($request->has('id_campus')) {
+                $id_campus = $request->get('id_campus');
+                $campusExists = Campus::where('id', $id_campus)->exists();
+
+                if ($campusExists) {
+                    $query->whereHas('maquina', function ($q) use ($request) {
+                        $q->whereHas('seccion', function ($q) use ($request) {
+                            $q->where('id_campus', $request->get('id_campus'));
+                        });
+                    });
+                } else {
+                    return response()->json(["El campus " . $id_campus . ' no existe'], Response::HTTP_NOT_FOUND);
+                }
+            }
+
+            // Filtro por sección si se proporciona
+            if ($request->has('id_seccion')) {
+                $id_seccion = $request->get('id_seccion');
+                $seccionExists = Seccion::where('id', $id_seccion)->exists();
+
+                if ($seccionExists) {
+                    $query->whereHas('maquina', function ($q) use ($request) {
+                        $q->where('id_seccion', $request->get('id_seccion'));
+                    });
+                } else {
+                    return response()->json(["La sección " . $id_seccion . ' no existe'], Response::HTTP_NOT_FOUND);
+                }
+            }
+
+           $incidencias = $query->get();
+
+           // Ordenar las incidencias
+           $incidenciasOrdenadas = $incidencias->sortBy(function($incidencia) {
+             
+                return [- optional($incidencia->tipoIncidencia)->prioridad, -optional($incidencia->maquina)->prioridad];
+            });
+
+            return response()->json($incidenciasOrdenadas->values()->all(), Response::HTTP_OK);
+
+        } catch (Exception $e) {
+            // Registrar el error para depuración
+            Log::error("Error al obtener incidencias: " . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener las incidencias. Por favor, inténtalo de nuevo más tarde.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -121,6 +187,52 @@ class IncidenciaController extends Controller
         }
     }    
     
+    public function allMantenimiento(Request $request){
+        try{
+            
+            $query = Incidencia::query()->where('estado', 4);
+
+            
+            if($request->has('id_campus')){
+                
+                $id_campus = $request->get('id_campus');
+                $campusExists = Campus::where('id', $id_campus)->exists();
+    
+                if ($campusExists) {
+                    $query->whereHas('maquina', function($q) use ($request){
+                        $q->whereHas('seccion', function($q) use ($request){
+                            $q->where('id_campus', $request->get('id_campus'));
+                        });
+                    });
+                } else {
+                    return response()->json(["El campus ".$request->get('id_campus').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+
+            if($request->has('id_seccion')){
+                $id_seccion = $request->get('id_seccion');
+                $seccionExists = Seccion::where('id', $id_seccion)->exists();
+    
+                if ($seccionExists) {
+                    $query->whereHas('maquina', function($q) use ($request){
+                        $q->where('id_seccion', $request->get('id_seccion'));
+                    });
+                } else {
+                    return response()->json(["La seccion ".$request->get('id_seccion').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            }
+    
+
+    
+            $incidencias = $query->get();
+            return response()->json($incidencias, Response::HTTP_OK);
+        }
+        catch(Exception $e){
+            return response()->json(['error' => 'Error al obtener los incidencias.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    
 
     //Metodos internos
 
@@ -153,7 +265,7 @@ class IncidenciaController extends Controller
 
     public static function estadoCerrado(Incidencia $incidencia){
         $incidencia->estado = 3;
-        $incidencia->fecha_cerrado = Date::now();
+        $incidencia->fecha_cierre = Date::now();
         $incidencia->habilitado = 0;
         $incidencia->save();
     }
