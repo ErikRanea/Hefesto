@@ -49,9 +49,9 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'id_campus' => 'required', 'int',
-            'primer_apellido' => 'string',
-            'segundo_apellido' => 'string'
+            'id_campus' => ['required', 'integer', 'exists:campus,id'], // Agregamos la validación para id_campus
+            'primer_apellido' => ['nullable', 'string'],
+            'segundo_apellido' => ['nullable', 'string']
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -61,7 +61,11 @@ class AuthController extends Controller
             'email.email' => 'El correo no tiene el formato correcto.',
             'password.required' => 'El campo contraseña es obligatorio.',
             'password.min' => 'El campo contraseña debe tener un minimo :min caracteres.',
+            'id_campus.required' => 'El campo campus es obligatorio.',
+            'id_campus.integer' => 'El campo campus debe ser un número entero.',
+            'id_campus.exists' => 'El campus seleccionado no es válido.',
         ]);
+
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
@@ -77,7 +81,7 @@ class AuthController extends Controller
                 'password' => Hash::make($request->input('password')),//haseo de la contraseña
                 'rol' => 'operario',
                 'habilitado' => true,
-                
+                'id_campus' => $request->input('id_campus'), // Agregamos id_campus
             ]);
             if (!$new) {
                 return response()->json(['error' => 'No se logró crear'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -95,9 +99,9 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'id_campus' => 'required', 'int',
-            'primer_apellido' => 'string',
-            'segundo_apellido' => 'string'
+            'id_campus' => ['required', 'integer', 'exists:campus,id'], // Agregamos la validación para id_campus
+            'primer_apellido' => ['nullable', 'string'],
+            'segundo_apellido' => ['nullable', 'string']
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -107,7 +111,11 @@ class AuthController extends Controller
             'email.email' => 'El correo no tiene el formato correcto.',
             'password.required' => 'El campo contraseña es obligatorio.',
             'password.min' => 'El campo contraseña debe tener un minimo :min caracteres.',
+            'id_campus.required' => 'El campo campus es obligatorio.',
+            'id_campus.integer' => 'El campo campus debe ser un número entero.',
+            'id_campus.exists' => 'El campus seleccionado no es válido.',
         ]);
+
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
@@ -123,7 +131,7 @@ class AuthController extends Controller
                 'password' => Hash::make($request->input('password')),//haseo de la contraseña
                 'rol' => 'tecnico',
                 'habilitado' => true,
-                
+                'id_campus' => $request->input('id_campus'), // Agregamos id_campus
             ]);
             if (!$new) {
                 return response()->json(['error' => 'No se logró crear'], Response::HTTP_INTERNAL_SERVER_ERROR);
