@@ -323,10 +323,14 @@ class IncidenciaController extends Controller
         $incidencia->save();
     }
     
-    public static function estadoEnEspera(Incidencia $incidencia){
+    public static function estadoEnEspera(Incidencia $incidencia)
+{
+    if($incidencia->estado != 3){
         $incidencia->estado = 1;
         $incidencia->save();
     }
+    return;
+}
 
     public static function estadoCerrado(Incidencia $incidencia){
         $incidencia->estado = 3;

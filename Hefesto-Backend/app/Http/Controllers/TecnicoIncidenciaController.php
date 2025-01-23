@@ -79,7 +79,7 @@ class TecnicoIncidenciaController extends Controller
 
             $idtecnico = auth()->user()->id;
             $tecnicoIncidencia = TecnicoIncidencia::where('id_incidencia', $request->get('id_incidencia'))->where('id_tecnico', $idtecnico)
-            ->where('fecha_salida', null)->first();
+            ->where('estado_tecnico', 'activo')->first();
 
             if($tecnicoIncidencia == null){
                 return response()->json(['error' => 'No se ha encontrado la incidencia.'], Response::HTTP_NOT_FOUND);
@@ -91,20 +91,22 @@ class TecnicoIncidenciaController extends Controller
             $tecnicoIncidencia->tiempo_trabajado = Carbon::parse($tecnicoIncidencia->fecha_entrada)->diffInMinutes($tecnicoIncidencia->fecha_salida);
             $tecnicoIncidencia->save();
 
+            $incidencia = Incidencia::find($request->get('id_incidencia'));
+            // Verificar si quedan técnicos activos en la incidencia
+            $tecnicosActivos = TecnicoIncidencia::where('id_incidencia', $request->get('id_incidencia'))
+                ->where('estado_tecnico', 'activo')
+                ->exists();
 
-            $hayGente = TecnicoIncidencia::find('id', $tecnicoIncidencia->id)->where('fecha_salida', null)->first();
-            if($hayGente == null){
-                $incidencia = Incidencia::find($request->get('id_incidencia'));
+            // Si no quedan técnicos activos, cambiar el estado de la incidencia a "Pendiente"
+            if (!$tecnicosActivos) {
                 IncidenciaController::estadoEnEspera($incidencia);
             }
-
-
 
             return response()->json(['message' => 'Incidencia desasignada con exitó!', 'data' => $tecnicoIncidencia], Response::HTTP_OK);
 
         } catch (Exception $e) {
             return response()->json([
-                'error' => 'Error al salir de la incidencia.',$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'error' => 'Error al salir de la incidencia.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -211,50 +213,51 @@ class TecnicoIncidenciaController extends Controller
     }
 
     public function reclamarIncidenciaMultiple(Request $request)
-{
-    try {
-        $validator = Validator::make($request->all(), [
-            'id_incidencia' => 'required|int',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id_incidencia' => 'required|int',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
+            }
+    
+            $idtecnico = auth()->user()->id;
+    
+            // Verificar si el técnico ya tiene una incidencia en curso
+            $tecnicoIncidenciaActiva = TecnicoIncidencia::where('id_tecnico', $idtecnico)
+                ->where('estado_tecnico', 'activo')
+                ->first();
+    
+            if ($tecnicoIncidenciaActiva) {
+                return response()->json(['error' => 'Ya tienes una incidencia en curso asignada. Debes salir de esa incidencia para poder reclamar otra.'], Response::HTTP_BAD_REQUEST);
+            }
+    
+    
+            $incidencia = Incidencia::find($request->get('id_incidencia'));
+    
+    
+            $tecnicoIncidencia = new TecnicoIncidencia();
+            $tecnicoIncidencia->id_tecnico = $idtecnico;
+            $tecnicoIncidencia->id_incidencia = $incidencia->id;
+            $tecnicoIncidencia->fecha_entrada = Date::now();
+            $tecnicoIncidencia->estado_tecnico = 'activo';
+            $tecnicoIncidencia->save();
+    
+             if($incidencia->estado != 2){
+                 IncidenciaController::estadoEnCurso($incidencia);
+             }
+    
+    
+            return response()->json(['message' => 'Incidencia asignada con éxito!', 'data' => $tecnicoIncidencia], Response::HTTP_CREATED);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Error al asignar la incidencia.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $idtecnico = auth()->user()->id;
-
-        // Verificar si el técnico ya tiene una incidencia en curso
-        $tecnicoIncidenciaActiva = TecnicoIncidencia::where('id_tecnico', $idtecnico)
-            ->where('estado_tecnico', 'activo')
-            ->first();
-
-        if ($tecnicoIncidenciaActiva) {
-            return response()->json(['error' => 'Ya tienes una incidencia en curso asignada. Debes salir de esa incidencia para poder reclamar otra.'], Response::HTTP_BAD_REQUEST);
-        }
-
-
-        $incidencia = Incidencia::find($request->get('id_incidencia'));
-
-
-        $tecnicoIncidencia = new TecnicoIncidencia();
-        $tecnicoIncidencia->id_tecnico = $idtecnico;
-        $tecnicoIncidencia->id_incidencia = $incidencia->id;
-        $tecnicoIncidencia->fecha_entrada = Date::now();
-        $tecnicoIncidencia->estado_tecnico = 'activo';
-        $tecnicoIncidencia->save();
-
-         if($incidencia->estado != 2){
-            IncidenciaController::estadoEnCurso($incidencia);
-         }
-
-
-        return response()->json(['message' => 'Incidencia asignada con éxito!', 'data' => $tecnicoIncidencia], Response::HTTP_CREATED);
-    } catch (Exception $e) {
-        return response()->json([
-            'error' => 'Error al asignar la incidencia.'
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
-}
+
 
 
 }
