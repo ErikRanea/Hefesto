@@ -49,6 +49,9 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],
+            'id_campus' => 'required', 'int',
+            'primer_apellido' => 'string',
+            'segundo_apellido' => 'string'
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -92,6 +95,9 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],
+            'id_campus' => 'required', 'int',
+            'primer_apellido' => 'string',
+            'segundo_apellido' => 'string'
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
