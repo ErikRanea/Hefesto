@@ -4,7 +4,7 @@
       <div class="incidencia-list glassmorphic-card">
         <div class="incidencia-list-header">
           <div>Mantenimientos</div>
-          <div><img class="img-fluid mb-3 huge-icon" src="../assets/images/icons/filtro.svg" alt=""></div>
+          <div class="boton-barra-box"><img class="img-fluid mb-3 boton-barra huge-icon" src="../assets/images/icons/filtro.svg" alt=""></div>
           <div class="priority-legend">
             <span><span class="priority-dot alta"></span> Alta</span>
             <span><span class="priority-dot media"></span> Media</span>
@@ -647,6 +647,20 @@ const handleCerrarIncidencia = async () => {
   background-color: #f0f0f0;
 }
 
+
+.boton-barra-box{
+  display: flex;
+  align-items: center;
+}
+
+.boton-barra{
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+
 .plus-icon {
   font-size: 1.5rem;
   margin-top: -4px;
@@ -1034,6 +1048,9 @@ canvas {
   cursor: pointer;
 }
 
+
+
+
 .glassmorphic-btn {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
@@ -1102,7 +1119,7 @@ canvas {
 }
 
 .huge-icon {
-  max-width: 120px;
+  max-width: 20px;
 }
 
 </style>

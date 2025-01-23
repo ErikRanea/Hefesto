@@ -139,8 +139,11 @@ class MainController extends Controller
             $incidencia->prioridad = 'baja';
             $incidencia->computo_prioridad=2;
             $incidencia->id_creador = $user->id;
+            $incidencia->id_mantenimiento = 1;
             $incidencia->fecha_apertura = now();
             $incidencia->save();
+
+
 
             
 
