@@ -149,7 +149,7 @@
         </div>
       </template>
     </GlassmorphicPopup>
-    <GlassmorphicPopup
+    <GlassmorphicPopup 
       :visible="showIncidenciaDetailsPopup"
       title="Detalles de la Incidencia"
       closeButtonText="Cerrar"
@@ -180,7 +180,7 @@
           <div v-else>
             <p>No hay comentarios para mostrar</p>
           </div>
-            <div class="action-buttons mt-auto">
+            <div class="action-buttons mt-auto"  v-if="!isOperario">
              <button
                v-if="(isTecnico || isAdmin) && !isUserActiveInIncidencia && selectedIncidencia.status !== 'Cerrada'"
                 class="popup-btn primary"
@@ -203,7 +203,7 @@
         </div>
       </template>
     </GlassmorphicPopup>
-     <GlassmorphicPopup
+     <GlassmorphicPopup  v-if="!isOperario"
       :visible="showMotivoCierrePopup"
       title="Motivo de Cierre de Incidencia"
       closeButtonText="Cancelar"
@@ -229,7 +229,7 @@
               <p>{{ errorMessage }}</p>
           </template>
       </GlassmorphicPopup>
-    <GlassmorphicPopup
+    <GlassmorphicPopup  v-if="!isOperario"
       :visible="showMotivoSalidaPopup"
       title="Motivo de Salida de Incidencia"
       closeButtonText="Cancelar"
@@ -382,17 +382,21 @@ const fetchData = async (url) => {
 
 const fetchTecnicoIncidencias = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found');
+
+      if(!isOperario){
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found');
+        }
+        const response = await axios.get(ALL_TECNICO_INCIDENCIA_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+          tecnicoIncidencias.value = response.data.data;
+          console.log('tecnicoIncidencias:', tecnicoIncidencias.value);
       }
-      const response = await axios.get(ALL_TECNICO_INCIDENCIA_URL, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-        tecnicoIncidencias.value = response.data.data;
-        console.log('tecnicoIncidencias:', tecnicoIncidencias.value); // Añade esta línea
+      
     } catch (error) {
       console.error('Error al obtener los técnicos de las incidencias:', error);
       throw new Error('Error al obtener los técnicos de las incidencias');

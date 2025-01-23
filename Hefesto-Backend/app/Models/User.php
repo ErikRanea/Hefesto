@@ -27,6 +27,7 @@ class User extends Authenticatable implements JWTSubject // Implement the interf
         'rol',
         'foto_perfil',
         'habilitado',
+        'id_campus'
     ];
 
     /**
@@ -76,5 +77,10 @@ class User extends Authenticatable implements JWTSubject // Implement the interf
     public function incindencias(){
         return $this->hasMany(Incidencia::class, 'id_usuario_reporta', 'id_usuario');
     }
+
+    public function campus(){
+        return $this->belongsTo(Campus::class, 'id_campus','id_campus');
+    }
+
 
 }
