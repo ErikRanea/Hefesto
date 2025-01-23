@@ -38,7 +38,9 @@ Route::prefix('v1')->group(function () {
 
 
     Route::prefix('image')->group(function () {
-        Route::post('upload', [ImageController::class, 'upload']);
+        Route::middleware('auth:api')->group(function () {
+            Route::post('upload', [ImageController::class, 'upload']);
+        });
     });
 
     Route::prefix('incidencia')->group(function () {
@@ -48,6 +50,7 @@ Route::prefix('v1')->group(function () {
             Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
             Route::delete('delete/{id}', [IncidenciaController::class, 'delete'])->middleware('admin');
+            Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
         });
     });
     
@@ -56,6 +59,7 @@ Route::prefix('v1')->group(function () {
             Route::post('reclamar_incidencia/', [TecnicoIncidenciaController::class, 'reclamarIncidencia'])->middleware('tecnico');
             Route::put('salir_incidencia/', [TecnicoIncidenciaController::class, 'salirIncidencia'])->middleware('tecnico');
             Route::put('cerrar_incidencia/', [TecnicoIncidenciaController::class, 'cerrarIncidencia'])->middleware('tecnico');
+            Route::get('incidencia_asignada', [TecnicoIncidenciaController::class, 'getIncidenciasAsignadas'])->middleware('tecnico');
         });
     });
 
