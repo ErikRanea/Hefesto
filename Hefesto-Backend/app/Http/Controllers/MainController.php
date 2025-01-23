@@ -52,23 +52,35 @@ class MainController extends Controller
             $maquina->habilitado = true;
             $maquina->save();
 
+            $maquina = new Maquina();
+            $maquina->nombre_maquina = 'Fresadora';
+            $maquina->id_seccion = $seccion->id;
+            $maquina->numero_interno = 2134132;
+            $maquina->tipo_maquina = 'Industrial';
+            $maquina->prioridad = 3;
+            $maquina->habilitado = true;
+            $maquina->save();
+
             TipoIncidenciaController::crearTipos();
 
             $mantenimiento = new MantenimientoPreventivo();
-            $mantenimiento->nombre = 'Mantenimiento preventivo';
+            $mantenimiento->nombre = 'Se engrasa la maquina';
             $mantenimiento->descripcion = 'Mantenimiento preventivo';
             $mantenimiento->id_maquina = $maquina->id;
             $mantenimiento->periodicidad = 1;
             $mantenimiento->fecha_ultimo_mantenimiento = now();
             $mantenimiento->save();
 
+            IncidenciaController::cargarIncidencias();
+
             $incidencia = new Incidencia();
-            $incidencia->titulo = 'Máquina no arranca';
-            $incidencia->subtitulo = 'Máquina no arranca ibai';
-            $incidencia->descripcion = 'La máquina no arranca';
+            $incidencia->titulo = 'Engrasar Maquina';
+            $incidencia->subtitulo = 'Hay que engrasar la máquina';
             $incidencia->id_maquina = $maquina->id;
-            $incidencia->id_tipo_incidencia = 10;
-            $incidencia->estado = 0;
+            $incidencia->id_tipo_incidencia = 7;
+            $incidencia->estado = 4;
+            $incidencia->prioridad = 'baja';
+            $incidencia->computo_prioridad=2;
             $incidencia->id_creador = $user->id;
             $incidencia->fecha_apertura = now();
             $incidencia->save();

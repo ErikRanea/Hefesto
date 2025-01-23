@@ -47,9 +47,43 @@
   <script setup>
   import { onBeforeMount, ref } from 'vue';
   import axios from 'axios';
+import Incidencias from './Incidencias.vue';
   const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
   const ALL_MANTENIMIENTOS_URL = `${API_AUTH_URL}/incidencia/all_mantenimientos`;
+  const mantenimientos = ref[null];
+  const loading = ref(true);
   
+  const obtenerPrioridad = (id_tipo_incidencia) => {
+  switch (id_tipo_incidencia) {
+    case 1:
+      return 'alta';
+    case 2:
+      return 'media';
+    case 3:
+      return 'baja';
+    default:
+      return 'baja';
+  }
+};
+
+const obtenerEstado = (estado) => {
+  switch (estado) {
+    case 0:
+      return 'Nueva';
+    case 1:
+      return 'Pendiente';
+    case 2:
+      return 'En curso';
+    case 3:
+      return 'Cerrada';
+    case 4:
+      return 'Mantenimiento';
+    default:
+      return '';
+  }
+};
+
+
   const recogerMantenimiento = async () => {
     try{
       const token = localStorage.getItem('token');
@@ -65,6 +99,7 @@
       });
 
       console.log(response.data);
+      return response.data;
       
       }
     catch(error){
@@ -72,8 +107,28 @@
     }
   }
 
+  const cargarMantenimientos = async () => {
+    try {
+      loading.value = true;
+      const mantenimientosData = await recogerMantenimiento();
+
+      mantenimientos.value = mantenimientosData.map((mantenimiento)=> ({
+        ...mantenimiento,
+        id: mantenimiento.id,
+        proridad: obtenerPrioridad(Incidencia.id),
+
+
+      }));
+
+
+    }
+    catch (error) {
+      
+    }
+  }
+
   onBeforeMount(async () => {
-    await recogerMantenimiento();
+    await cargarMantenimientos();
   })
   
   </script>

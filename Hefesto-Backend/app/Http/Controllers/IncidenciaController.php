@@ -295,6 +295,9 @@ class IncidenciaController extends Controller
     }
 
     
+    
+
+
 
     //Metodos internos
 
@@ -335,6 +338,160 @@ class IncidenciaController extends Controller
     public static function estadoMantenimiento(Incidencia $incidencia){
         $incidencia->estado = 4;
         $incidencia->save();
+    }
+
+    public static function cargarIncidencias()
+    {
+        try {
+            $incidenciasData = [
+                [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 1,
+                    'id_tipo_incidencia' => 1,
+                    'titulo' => 'Fallo en el motor',
+                    'subtitulo' => 'Ruido extraño al arrancar',
+                    'descripcion' => 'El motor hace un ruido inusual y parece que vibra más de lo normal. Revisar correas y rodamientos.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                ],
+                [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 2,
+                    'id_tipo_incidencia' => 3,
+                    'titulo' => 'Mantenimiento Semanal',
+                    'subtitulo' => 'Revisión general de componentes',
+                    'descripcion' => 'Realizar la rutina de mantenimiento preventivo semanal. Lubricar, ajustar y limpiar.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                ],
+                 [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 1,
+                    'id_tipo_incidencia' => 5,
+                    'titulo' => 'Parada de Emergencia',
+                    'subtitulo' => 'La máquina dejó de funcionar',
+                    'descripcion' => 'Se detuvo inesperadamente y no responde a los controles. Revisar sistema eléctrico y de control inmediatamente.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                ],
+                 [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 2,
+                    'id_tipo_incidencia' => 13,
+                    'titulo' => 'Piezas con defectos',
+                    'subtitulo' => 'Revisar calidad de la producción',
+                    'descripcion' => 'Las piezas producidas presentan rebabas y falta de precisión. Ajustar parámetros o revisar herramientas.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                 ],
+                  [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 1,
+                    'id_tipo_incidencia' => 6,
+                    'titulo' => 'Ajuste de parámetros',
+                     'subtitulo' => 'La máquina está funcionando fuera de rango',
+                    'descripcion' => 'Ajustar los parámetros de velocidad y temperatura para un funcionamiento óptimo.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                  ],
+                 [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 2,
+                    'id_tipo_incidencia' => 14,
+                    'titulo' => 'Sensor de proximidad no funciona',
+                    'subtitulo' => 'La máquina no detecta la pieza',
+                    'descripcion' => 'Revisar el sensor de proximidad, cableado y configuración.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                 ],
+                [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 1,
+                    'id_tipo_incidencia' => 8,
+                    'titulo' => 'Cambiar correa',
+                    'subtitulo' => 'La correa está desgastada',
+                    'descripcion' => 'Reemplazar la correa de transmisión principal. Pedir la pieza necesaria.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                 ],
+                  [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 2,
+                    'id_tipo_incidencia' => 7,
+                    'titulo' => 'Lubricación general',
+                    'subtitulo' => 'Engrasar los puntos de fricción',
+                    'descripcion' => 'Realizar lubricación en todos los puntos recomendados en el manual del fabricante.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                   ],
+                   [
+                     'fecha_apertura' => Date::now(),
+                     'id_maquina' => 1,
+                     'id_tipo_incidencia' => 10,
+                      'titulo' => 'Actualizar software de control',
+                       'subtitulo' => 'Nueva versión disponible',
+                     'descripcion' => 'Instalar la nueva versión del software de control de la máquina.',
+                     'id_creador' => 1,
+                    'estado' => 0,
+                   ],
+                    [
+                    'fecha_apertura' => Date::now(),
+                    'id_maquina' => 2,
+                     'id_tipo_incidencia' => 11,
+                    'titulo' => 'Calibrar medidor de presión',
+                      'subtitulo' => 'Mediciones incorrectas',
+                   'descripcion' => 'Calibrar el medidor de presión para garantizar mediciones precisas.',
+                    'id_creador' => 1,
+                    'estado' => 0,
+                    ],
+            ];
+            
+            foreach ($incidenciasData as $data) {
+                $tipoIncidencia = TipoIncidencia::find($data['id_tipo_incidencia']);
+                $maquina = Maquina::find($data['id_maquina']);
+                
+                if (!$tipoIncidencia || !$maquina) {
+                    Log::error("No se pudo encontrar la maquina o el tipo de incidencia con los siguientes ids  id_maquina:". $data['id_maquina']."  tipo_incidencia:". $data['id_tipo_incidencia']);
+                     return response()->json(['error' => 'Error al crear la incidencia, revisar logs.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+
+                $computoPrioridad = $tipoIncidencia->prioridad + $maquina->prioridad;
+
+                  $prioridad = '';
+
+                switch($computoPrioridad){
+                    case 6:
+                        $prioridad = 'alta';
+                        break;
+                    case 5:
+                        $prioridad = 'alta';
+                        break;
+                    case 4:
+                        $prioridad = 'media';
+                        break;
+                    case 3:
+                        $prioridad = 'media';
+                        break;
+                    case 2:
+                        $prioridad = 'baja';
+                        break;
+                }
+
+                $incidencia = new Incidencia();
+                $incidencia->fill($data); // Usar fill para asignar los datos del array
+                $incidencia->prioridad = $prioridad;
+                $incidencia->computo_prioridad = $computoPrioridad;
+
+               $incidencia->save();
+
+            }
+             return response()->json(['message' => 'Incidencias cargadas con éxito!'], Response::HTTP_CREATED);
+
+        } catch (Exception $e) {
+             // Registrar el error para depuración
+              Log::error("Error al cargar incidencias: " . $e->getMessage());
+              return response()->json(['error' => 'Error al cargar las incidencias, por favor intentalo de nuevo más tarde.', 'data' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
