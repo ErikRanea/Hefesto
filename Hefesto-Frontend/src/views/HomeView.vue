@@ -330,4 +330,8 @@ $white-09: rgba(255, 255, 255, 0.9);
   max-width: 100px;
 }
 
+.text-end{
+  display: flex;
+  flex-direction: column;
+}
 </style>

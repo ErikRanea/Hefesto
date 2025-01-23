@@ -186,6 +186,36 @@ class IncidenciaController extends Controller
             return response()->json(['error' => 'Error al eliminar la incidencia.'], Response::HTTP_INTERNAL_SERVER_ERROR);    
         }
     }    
+
+    /**
+     * Actualiza la descripción de una incidencia.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateDescription(Request $request, $id)
+    {
+         try {
+            $validator = Validator::make($request->all(), [
+                'descripcion' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
+            }
+
+            $incidencia = Incidencia::findOrFail($id);
+            $incidencia->descripcion = $request->input('descripcion');
+            $incidencia->save();
+
+            return response()->json(['message' => 'Descripción de la incidencia actualizada con éxito', 'data' => $incidencia], Response::HTTP_OK);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error al actualizar la descripción de la incidencia.', 'data' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+    
     
     public function allMantenimiento(Request $request){
         try{
