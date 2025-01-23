@@ -51,39 +51,65 @@
       <div class="incidencia-list glassmorphic-card">
         <div class="incidencia-list-header">
           <div>Incidencias</div>
-          <div class="priority-legend">
-            <span><span class="priority-dot alta"></span> Alta</span>
-            <span><span class="priority-dot media"></span> Media</span>
-            <span><span class="priority-dot baja"></span> Baja</span>
-          </div>
-        </div>
-        <div v-if="loading">Cargando incidencias...</div>
-        <div v-else-if="error">Error al cargar las incidencias.</div>
-        <div v-else class="incidencias-container">
-          <div
-            v-for="incidencia in incidenciasPanel"
-            :key="incidencia.date + incidencia.time"
-            class="incidencia-item"
-            @click="handleIncidenciaClick(incidencia)"
+          
+        <div class="priority-legend">
+          <span
+            @click="seleccionarPrioridad('alta')"
+            :class="{ 'selected': prioridadSeleccionada === 'alta' }"
+            class="priority-filter"
           >
-            <!-- Restructured layout to match the image -->
-            <div class="priority-marker" :class="incidencia.priority"></div>
-            <div class="incidencia-content">
-              <div class="incidencia-date">
-                <span>{{ incidencia.date }}</span>
-                <span>{{ incidencia.time }}</span>
-              </div>
-              <div class="incidencia-text">
-                <div>{{ incidencia.titulo }}</div>
-                <small class="text-muted">{{ incidencia.subtitulo }}</small>
-              </div>
-              <div class="incidencia-status-box">
-                <span
-                  class="incidencia-status"
-                  :class="incidencia.status.toLowerCase().replace(' ', '-')"
-                >
-                  {{ incidencia.status }}
-                </span>
+            <span class="priority-dot alta"></span> Alta
+          </span>
+          <span
+            @click="seleccionarPrioridad('media')"
+            :class="{ 'selected': prioridadSeleccionada === 'media' }"
+            class="priority-filter"
+          >
+            <span class="priority-dot media"></span> Media
+          </span>
+          <span
+            @click="seleccionarPrioridad('baja')"
+            :class="{ 'selected': prioridadSeleccionada === 'baja' }"
+            class="priority-filter"
+          >
+            <span class="priority-dot baja"></span> Baja
+          </span>
+          <span
+            @click="seleccionarPrioridad(null)"
+            :class="{ 'selected': prioridadSeleccionada === null }"
+            class="priority-filter"
+          >
+            Limpiar Filtro
+          </span>
+        </div>
+      </div>
+      <div v-if="loading">Cargando incidencias...</div>
+      <div v-else-if="error">Error al cargar las incidencias.</div>
+      <div v-else class="incidencias-container">
+        <div
+          v-for="incidencia in incidenciasFiltradas"
+          :key="incidencia.date + incidencia.time"
+          class="incidencia-item"
+          @click="handleIncidenciaClick(incidencia)"
+        >
+          <!-- Restructured layout to match the image -->
+          <div class="priority-marker" :class="incidencia.priority"></div>
+          <div class="incidencia-content">
+            <div class="incidencia-date">
+              <span>{{ incidencia.date }}</span>
+              <span>{{ incidencia.time }}</span>
+            </div>
+            <div class="incidencia-text">
+              <div>{{ incidencia.titulo }}</div>
+              <small class="text-muted">{{ incidencia.subtitulo }}</small>
+            </div>
+            <div class="incidencia-status-box">
+              <span
+                class="incidencia-status"
+                :class="incidencia.status.toLowerCase().replace(' ', '-')"
+              >
+                {{ incidencia.status }}
+              </span>
               </div>
             </div>
           </div>
@@ -246,6 +272,10 @@ const ME_URL = `${API_AUTH_URL}/auth/me`;
 const userPicture = ref(null);
 const userId = ref(null);
 const userRole = ref(null);
+const prioridadSeleccionada = ref(null); 
+const seleccionarPrioridad = (prioridad) => {
+  prioridadSeleccionada.value = prioridad;
+};
 console.log('userId from localStorage:', userId);
 const isTecnico = computed(() => userRole.value === 'tecnico');
 const isAdmin = computed(() => userRole.value === 'administrador');
@@ -280,6 +310,14 @@ const isSoloTecnico = computed(()=>{
 })
 
 
+const incidenciasFiltradas = computed(() => {
+  if (!prioridadSeleccionada.value) {
+    return incidenciasPanel.value; // Muestra todas si no hay filtro
+  }
+  return incidenciasPanel.value.filter(
+    (incidencia) => incidencia.priority === prioridadSeleccionada.value
+  );
+});
 
 const obtenerPrioridad = (prioridad) => {
     if (prioridad === "alta" || prioridad ==="media" || prioridad === "baja") {
@@ -1259,5 +1297,30 @@ canvas {
     flex-direction: column;
     gap: 0.5rem;
     align-items: center;
+}
+
+.priority-filter {
+  cursor: pointer; /* Cambia el cursor a "mano" */
+  position: relative; /* Necesario para posicionar la barra */
+  padding-bottom: 3px; /* Espacio para la barra */
+}
+
+.priority-filter:hover {
+  opacity: 0.8; /* Reduce la opacidad al pasar el ratón */
+}
+
+.priority-filter.selected {
+  text-decoration: underline; /* Añade el subrayado */
+  text-decoration-color: var(--color-primario); /* Color del subrayado */
+  text-decoration-thickness: 4px; /* Grosor del subrayado */
+}
+
+:root {
+    --color-primario: #007bff;
+}
+
+/* Ajusta el espaciado entre los elementos de la leyenda */
+.priority-legend span {
+  margin-right: 10px; /* Ajusta el valor según sea necesario */
 }
 </style>
