@@ -61,7 +61,7 @@
         <div v-else-if="error">Error al cargar las incidencias.</div>
         <div v-else class="incidencias-container">
           <div
-            v-for="incidencia in incidencias"
+            v-for="incidencia in incidenciasPanel"
             :key="incidencia.date + incidencia.time"
             class="incidencia-item"
             @click="handleIncidenciaClick(incidencia)"
@@ -156,18 +156,18 @@
           </div>
             <div class="action-buttons mt-auto">
              <button
-               v-if="(isTecnico || isAdmin) && selectedIncidencia.status !== 'En curso' && !hasReclamada"
+               v-if="(isTecnico || isAdmin) && !isUserActiveInIncidencia && selectedIncidencia.status !== 'Cerrada'"
                 class="popup-btn primary"
                 @click="handleReclamarIncidencia"
                 :disabled="reclamandoIncidencia"
               >
                 {{ reclamandoIncidencia ? 'Reclamando...' : 'Reclamar Incidencia' }}
               </button>
-              <div v-if="(isTecnico || isAdmin) && selectedIncidencia.status === 'En curso'" class="d-flex justify-content-center gap-2">
+              <div v-if="isUserActiveInIncidencia && selectedIncidencia.status === 'En curso'" class="d-flex justify-content-center gap-2">
                 <button class="popup-btn1 cancel-btn" @click="openMotivoSalidaPopup">Salir de
                   Incidencia
                 </button>
-                <button class="popup-btn primary" @click="openMotivoCierrePopup">Cerrar Incidencia
+                <button  v-if="isSoloTecnico" class="popup-btn primary" @click="openMotivoCierrePopup">Cerrar Incidencia
                 </button>
               </div>
             </div>
@@ -232,31 +232,36 @@ import CustomInput from './CustomInput.vue';
 const loading = ref(true);
 const error = ref(null);
 const incidencias = ref([]);
+const incidenciasPanel = ref([]); 
 const tiposIncidencia = ref([]);
 const maquinas = ref([]);
+const tecnicoIncidencias = ref([]);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
+const ALL_INCIDENCIAS_URL_CERRADAS = `${API_AUTH_URL}/incidencia/all_cerradas`;
 const ALL_TIPO_INCIDENCIAS_URL = `${API_AUTH_URL}/tipo_incidencia/all`;
 const ALL_MAQUINAS_URL = `${API_AUTH_URL}/maquina/all`;
+const ALL_TECNICO_INCIDENCIA_URL = `${API_AUTH_URL}/tecnico_incidencia/all`;
 const ME_URL = `${API_AUTH_URL}/auth/me`;
-const userPicture = localStorage.getItem('picture');
-const userId = localStorage.getItem('id');
+const userPicture = ref(null);
+const userId = ref(null);
 const userRole = ref(null);
+console.log('userId from localStorage:', userId);
 const isTecnico = computed(() => userRole.value === 'tecnico');
 const isAdmin = computed(() => userRole.value === 'administrador');
 const isOperario = computed(() => userRole.value === 'operario');
 const userImagePath = computed(() => {
-  return userPicture ? `${IMAGE_URL}${userPicture}` : null;
+    return userPicture ? `${IMAGE_URL}${userPicture}` : null;
 });
 const showMotivoSalidaPopup = ref(false);
 const motivoSalida = ref('');
 const showCreateIncidenciaPopup = ref(false);
 const guardandoComentario = ref(false);
 const newIncidencia = ref({
-  titulo: '',
-  subtitulo: '',
-  id_tipo_incidencia: null,
-  id_maquina: null,
+    titulo: '',
+    subtitulo: '',
+    id_tipo_incidencia: null,
+    id_maquina: null,
 });
 const reclamandoIncidencia = ref(false);
 const showMotivoCierrePopup = ref(false);
@@ -265,257 +270,321 @@ const debouncedUpdateDescription = ref(null);
 const hasReclamada = ref(false);
 const showErrorPopup = ref(false);
 const errorMessage = ref('');
+const isSoloTecnico = computed(()=>{
+    if(selectedIncidencia.value && (isTecnico.value || isAdmin.value)){
+    const count = tecnicoIncidencias.value.filter(incidencia => incidencia.id_incidencia === selectedIncidencia.value.id && incidencia.estado_tecnico === 'activo').length;
+     console.log('isSoloTecnico:', count === 1, 'count:', count);
+    return count === 1;
+    }
+    return false
+})
+
+
 
 const obtenerPrioridad = (prioridad) => {
     if (prioridad === "alta" || prioridad ==="media" || prioridad === "baja") {
-       return prioridad;
+        return prioridad;
     } else {
-      return "baja";
+        return "baja";
     }
 };
 
 
 const obtenerEstado = (estado) => {
-  switch (estado) {
-    case 0:
-      return 'Nueva';
-    case 1:
-      return 'Pendiente';
-    case 2:
-      return 'En curso';
-    case 3:
-      return 'Cerrada';
-    case 4:
-      return 'Mantenimiento';
-    default:
-      return '';
-  }
+    switch (estado) {
+        case 0:
+            return 'Nueva';
+        case 1:
+            return 'Pendiente';
+        case 2:
+            return 'En curso';
+        case 3:
+            return 'Cerrada';
+        case 4:
+            return 'Mantenimiento';
+        default:
+            return '';
+    }
 };
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  return date.toLocaleDateString(undefined, options);
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
 };
 
 const formatTime = (dateString) => {
-  const date = new Date(dateString);
-  const options = { hour: '2-digit', minute: '2-digit' };
-  return date.toLocaleTimeString(undefined, options);
+    const date = new Date(dateString);
+    const options = { hour: '2-digit', minute: '2-digit' };
+    return date.toLocaleTimeString(undefined, options);
 };
 
-const fetchData = async () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('No token found');
-  }
-  try {
-    const response = await axios.post(
-      ALL_INCIDENCIAS_URL,
-      {},
-      {
+
+const fetchData = async (url) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error('No token found');
+    }
+    try {
+        const response = await axios.post(
+            url,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (err) {
+        console.error('Error al obtener los datos de las incidencias:', err);
+        throw new Error('Error al obtener los datos de las incidencias');
+    }
+};
+
+const fetchTecnicoIncidencias = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+      const response = await axios.get(ALL_TECNICO_INCIDENCIA_URL, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
-    return response.data;
-  } catch (err) {
-    console.error('Error al obtener los datos de las incidencias:', err);
-    throw new Error('Error al obtener los datos de las incidencias');
-  }
-};
+      });
+        tecnicoIncidencias.value = response.data.data;
+        console.log('tecnicoIncidencias:', tecnicoIncidencias.value); // Añade esta línea
+    } catch (error) {
+      console.error('Error al obtener los técnicos de las incidencias:', error);
+      throw new Error('Error al obtener los técnicos de las incidencias');
+    }
+  };
 
 const fetchTipoIncidencias = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No token found');
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found');
+        }
+        const response = await axios.get(ALL_TIPO_INCIDENCIAS_URL, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error al obtener los tipos de incidencia:', error);
+        throw new Error('Error al obtener los tipos de incidencia');
     }
-    const response = await axios.get(ALL_TIPO_INCIDENCIAS_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error al obtener los tipos de incidencia:', error);
-    throw new Error('Error al obtener los tipos de incidencia');
-  }
 };
 
 const fetchMaquinas = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No token found');
-    }
-    const response = await axios.post(ALL_MAQUINAS_URL, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found');
+        }
+        const response = await axios.post(ALL_MAQUINAS_URL, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
-    if (response.data && Array.isArray(response.data.data)) {
-      return response.data.data;
-    } else {
-      return [];
+        if (response.data && Array.isArray(response.data.data)) {
+            return response.data.data;
+        } else {
+            return [];
+        }
+    } catch (error) {
+        console.error('Error al obtener las maquinas:', error);
+        throw new Error('Error al obtener las maquinas');
     }
-  } catch (error) {
-    console.error('Error al obtener las maquinas:', error);
-    throw new Error('Error al obtener las maquinas');
-  }
 };
 
 const incidenciasPendientesCount = computed(() => {
-  return incidencias.value.filter(
-    (incidencia) => {
-      const estado = obtenerEstado(incidencia.estado);
-      return estado === 'Pendiente' || estado === 'Nueva';
-    }
-  ).length;
+    return incidencias.value.filter(
+        (incidencia) => {
+            const estado = obtenerEstado(incidencia.estado);
+            return estado === 'Pendiente' || estado === 'Nueva';
+        }
+    ).length;
 });
 
 const incidenciasEnCursoCount = computed(() => {
-  return incidencias.value.filter(
-    (incidencia) => obtenerEstado(incidencia.estado) === 'En curso'
-  ).length;
+    return incidencias.value.filter(
+        (incidencia) => obtenerEstado(incidencia.estado) === 'En curso'
+    ).length;
 });
 
 const incidenciasCerradasCount = computed(() => {
-  return incidencias.value.filter(
-    (incidencia) => obtenerEstado(incidencia.estado) === 'Cerrada'
-  ).length;
+    return incidencias.value.filter(
+        (incidencia) => obtenerEstado(incidencia.estado) === 'Cerrada'
+    ).length;
 });
 
-const loadIncidencias = async () => {
-  try {
-    loading.value = true;
-    const incidenciasData = await fetchData();
+const loadIncidencias = async (url) => {
+    try {
+        loading.value = true;
+        const incidenciasData = await fetchData(url);
 
-    incidencias.value = incidenciasData.map((incidencia) => ({
-      ...incidencia,
-      id: incidencia.id,
-      priority: obtenerPrioridad(incidencia.prioridad),
-      status: obtenerEstado(incidencia.estado),
-      date: formatDate(incidencia.fecha_apertura),
-      time: formatTime(incidencia.fecha_apertura),
-      descripcion: incidencia.descripcion,
-      id_tecnico: incidencia.id_mantenimiento
-    }));
-  } catch (err) {
-    error.value = err;
-  } finally {
-    loading.value = false;
-  }
+        return incidenciasData.map((incidencia) => ({
+            ...incidencia,
+            id: incidencia.id,
+            priority: obtenerPrioridad(incidencia.prioridad),
+            status: obtenerEstado(incidencia.estado),
+            date: formatDate(incidencia.fecha_apertura),
+            time: formatTime(incidencia.fecha_apertura),
+            descripcion: incidencia.descripcion,
+            id_tecnico: incidencia.id_mantenimiento
+        }));
+    } catch (err) {
+        error.value = err;
+        throw new Error(err);
+    } finally {
+        loading.value = false;
+    }
 }
+const isUserActiveInIncidencia = computed(() => {
+    if (!selectedIncidencia.value || !userId.value) return false;
+    return tecnicoIncidencias.value.some(
+        (item) =>
+        item.id_incidencia === selectedIncidencia.value.id &&
+        item.id_tecnico === Number(userId.value) &&
+        item.estado_tecnico === 'activo'
+    );
+});
+const loadIncidenciasDashboard = async () => {
+    try {
+        incidencias.value = await loadIncidencias(ALL_INCIDENCIAS_URL_CERRADAS)
+    } catch (err){
+        error.value = err;
+    }
+};
+const loadIncidenciasPanel = async () => {
+    try {
+        incidenciasPanel.value = await loadIncidencias(ALL_INCIDENCIAS_URL)
+    }catch(err){
+        error.value = err;
+    }
+};
 const fetchUserData = async () => {
     const token = localStorage.getItem('token');
-  if (token) {
-      try {
-          const response = await axios.get(ME_URL, {
-              headers: {
-                  Authorization: `Bearer ${token}`,
-              },
-          });
-          userRole.value = response.data.rol;
+    if (token) {
+        try {
+            const response = await axios.get(ME_URL, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+           userRole.value = response.data.rol;
+            userPicture.value = response.data.picture;
+            userId.value = response.data.id
+             localStorage.setItem('id', response.data.id);
 
-      } catch (error) {
-          console.error('Error fetching user data:', error);
-      }
-  }
+
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    }
 };
 const checkUserHasReclamada = () => {
     if(isTecnico.value || isAdmin.value){
-         hasReclamada.value = incidencias.value.some(incidencia => incidencia.id_tecnico === Number(userId) && incidencia.status === 'En curso')
+         hasReclamada.value = tecnicoIncidencias.value.some(incidencia => incidencia.id_tecnico === Number(userId.value) && incidencia.estado_tecnico === 'activo')
     }
 }
 onMounted(async () => {
-  try {
+    try {
         await fetchUserData()
-    const [tiposData, maquinasData] = await Promise.all([
-      fetchTipoIncidencias(),
-      fetchMaquinas(),
-    ]);
+        const [tiposData, maquinasData] = await Promise.all([
+            fetchTipoIncidencias(),
+            fetchMaquinas(),
+        ]);
 
-    tiposIncidencia.value = tiposData.map((tipo) => ({
-      id: tipo.id,
-      label: tipo.tipo,
-    }));
+        tiposIncidencia.value = tiposData.map((tipo) => ({
+            id: tipo.id,
+            label: tipo.tipo,
+        }));
 
-    maquinas.value = maquinasData.map((maquina) => ({
-      id: maquina.id,
-      label: maquina.nombre_maquina,
-    }));
-
-      await loadIncidencias();
-       checkUserHasReclamada();
-  } catch (err) {
-    error.value = err;
-      loading.value = false;
-  }
+        maquinas.value = maquinasData.map((maquina) => ({
+            id: maquina.id,
+            label: maquina.nombre_maquina,
+        }));
+        await Promise.all([
+            loadIncidenciasDashboard(),
+            loadIncidenciasPanel(),
+             fetchTecnicoIncidencias()
+        ]);
+        checkUserHasReclamada();
+    } catch (err) {
+        error.value = err;
+        loading.value = false;
+    }
 });
 watch(incidencias,()=>{
-  checkUserHasReclamada();
+    checkUserHasReclamada();
 });
 
 const openCreateIncidenciaPopup = () => {
-  showCreateIncidenciaPopup.value = true;
+    showCreateIncidenciaPopup.value = true;
 };
 
 const closeCreateIncidenciaPopup = () => {
-  showCreateIncidenciaPopup.value = false;
-  newIncidencia.value = {
-    titulo: '',
-    subtitulo: '',
-    id_tipo_incidencia: null,
-    id_maquina: null,
-  };
+    showCreateIncidenciaPopup.value = false;
+    newIncidencia.value = {
+        titulo: '',
+        subtitulo: '',
+        id_tipo_incidencia: null,
+        id_maquina: null,
+    };
 };
 const validateIncidenciaData = () => {
-  if (!newIncidencia.value.titulo || !newIncidencia.value.subtitulo || !newIncidencia.value.id_tipo_incidencia || !newIncidencia.value.id_maquina) {
-      alert('Por favor, complete el título, el subtítulo, el tipo de incidencia y la máquina.');
-      return false;
-  }
-  return true;
+    if (!newIncidencia.value.titulo || !newIncidencia.value.subtitulo || !newIncidencia.value.id_tipo_incidencia || !newIncidencia.value.id_maquina) {
+        alert('Por favor, complete el título, el subtítulo, el tipo de incidencia y la máquina.');
+        return false;
+    }
+    return true;
 };
 
 const handleCreateIncidencia = async () => {
-  if (!validateIncidenciaData()) {
-      return;
-  }
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('No token found');
-  }
-  try {
-      const apiUrl = `${API_AUTH_URL}/incidencia/store`;
-      const fecha_apertura = new Date();
-      const formattedDate = fecha_apertura.toISOString().slice(0, 19).replace('T', ' ');
+    if (!validateIncidenciaData()) {
+        return;
+    }
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error('No token found');
+    }
+    try {
+        const apiUrl = `${API_AUTH_URL}/incidencia/store`;
+        const fecha_apertura = new Date();
+        const formattedDate = fecha_apertura.toISOString().slice(0, 19).replace('T', ' ');
 
-      const requestData = {
-          titulo: newIncidencia.value.titulo,
-          subtitulo: newIncidencia.value.subtitulo,
-          estado: 0,
-          id_maquina: Number(newIncidencia.value.id_maquina),
-          tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia),
-          id_creador: 1,
-          id_mantenimiento: 1,
-      };
+        const requestData = {
+            titulo: newIncidencia.value.titulo,
+            subtitulo: newIncidencia.value.subtitulo,
+            estado: 0,
+            id_maquina: Number(newIncidencia.value.id_maquina),
+            tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia),
+            id_creador: 1,
+            id_mantenimiento: 1,
+        };
 
-      const response = await axios.post(apiUrl, requestData, {
-          headers: {
-              Authorization: `Bearer ${token}`,
-          },
-      });
+        const response = await axios.post(apiUrl, requestData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
-      if (response.status === 201) {
-          closeCreateIncidenciaPopup();
-          await loadIncidencias();
-      }
-  } catch (error) {
-      console.error('Error al crear la incidencia:', error);
-  }
+        if (response.status === 201) {
+            closeCreateIncidenciaPopup();
+             await Promise.all([
+            loadIncidenciasDashboard(),
+            loadIncidenciasPanel()
+        ]);
+        }
+    } catch (error) {
+        console.error('Error al crear la incidencia:', error);
+    }
 };
 
 const showIncidenciaDetailsPopup = ref(false);
@@ -523,55 +592,55 @@ const selectedIncidencia = ref(null);
 const commentText = ref('');
 
 const handleIncidenciaClick = (incidencia) => {
-  selectedIncidencia.value = incidencia;
-  commentText.value = incidencia.descripcion || '';
-  showIncidenciaDetailsPopup.value = true;
+    selectedIncidencia.value = incidencia;
+    commentText.value = incidencia.descripcion || '';
+    showIncidenciaDetailsPopup.value = true;
 };
 
 const closeIncidenciaDetailsPopup = () => {
-  showIncidenciaDetailsPopup.value = false;
-  selectedIncidencia.value = null;
-  commentText.value = '';
+    showIncidenciaDetailsPopup.value = false;
+    selectedIncidencia.value = null;
+    commentText.value = '';
     motivoSalida.value = '';
     motivoCierre.value = '';
 };
 const handleCommentChange = () => {
-     if (debouncedUpdateDescription.value) {
-      clearTimeout(debouncedUpdateDescription.value);
+    if (debouncedUpdateDescription.value) {
+        clearTimeout(debouncedUpdateDescription.value);
     }
 
     debouncedUpdateDescription.value = setTimeout(async () => {
-         await handleUpdateDescription();
+        await handleUpdateDescription();
     }, 1000);
 };
 
 
 const handleUpdateDescription = async () => {
-  if (!selectedIncidencia.value) return;
-  guardandoComentario.value = true;
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('No token found');
-  }
-  try {
-    const apiUrl = `${API_AUTH_URL}/incidencia/update_description/${selectedIncidencia.value.id}`;
-    const requestData = {
-        descripcion: commentText.value,
-    };
-
-    const response = await axios.put(apiUrl,requestData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    if (response.status === 200) {
-      selectedIncidencia.value.descripcion = commentText.value;
+    if (!selectedIncidencia.value) return;
+    guardandoComentario.value = true;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error('No token found');
     }
-  } catch (error) {
-    console.error("Error al actualizar el comentario:", error);
-  }finally{
-    guardandoComentario.value = false;
-  }
+    try {
+        const apiUrl = `${API_AUTH_URL}/incidencia/update_description/${selectedIncidencia.value.id}`;
+        const requestData = {
+            descripcion: commentText.value,
+        };
+
+        const response = await axios.put(apiUrl,requestData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status === 200) {
+            selectedIncidencia.value.descripcion = commentText.value;
+        }
+    } catch (error) {
+        console.error("Error al actualizar el comentario:", error);
+    }finally{
+        guardandoComentario.value = false;
+    }
 };
 const handleReclamarIncidencia = async () => {
     if(!selectedIncidencia.value) return;
@@ -581,7 +650,7 @@ const handleReclamarIncidencia = async () => {
         throw new Error('No token found');
     }
     try{
-        const apiUrl = `${API_AUTH_URL}/tecnico_incidencia/reclamar_incidencia`;
+        const apiUrl = `${API_AUTH_URL}/tecnico_incidencia/reclamar_incidencia_multiple`;
         const requestData = {
             id_incidencia: selectedIncidencia.value.id
         };
@@ -592,34 +661,41 @@ const handleReclamarIncidencia = async () => {
             }
         });
         if(response.status === 200 || response.status === 201){
-           console.log('Incidencia reclamada con éxito');
-            await loadIncidencias();
+       console.log('Incidencia reclamada con éxito');
+          await Promise.all([
+        loadIncidenciasDashboard(),
+        loadIncidenciasPanel(),
+        fetchTecnicoIncidencias()
+    ]);
+     if(selectedIncidencia.value.status !== 'En curso'){
             selectedIncidencia.value.status = 'En curso';
         }
+        console.log('selectedIncidencia.status', selectedIncidencia.value.status)
+    }
         else {
-            if (response.status === 400) {
+             if (response.status === 400) {
                 errorMessage.value = 'No puedes reclamar más de una incidencia a la vez.';
                 showErrorPopup.value = true;
             } else {
-           console.error('Error al reclamar la incidencia, respuesta no exitosa', response);
-          alert("Error al reclamar la incidencia: " + (response.data.message || "Compruebe la consola para más información"));
+                console.error('Error al reclamar la incidencia, respuesta no exitosa', response);
+                alert("Error al reclamar la incidencia: " + (response.data.message || "Compruebe la consola para más información"));
             }
         }
     }catch(error){
         if (error.message.includes('400')) {
-                errorMessage.value = 'No puedes reclamar más de una incidencia a la vez.';
+                 errorMessage.value = 'No puedes reclamar más de una incidencia a la vez.';
                 showErrorPopup.value = true;
             } else{
-       console.error('Error al reclamar la incidencia:', error);
-          alert("Error al reclamar la incidencia: " + (error.message || "Compruebe la consola para más información"));
-        }
+                 console.error('Error al reclamar la incidencia:', error);
+                alert("Error al reclamar la incidencia: " + (error.message || "Compruebe la consola para más información"));
+         }
     }finally{
         reclamandoIncidencia.value = false;
     }
 }
 const closeErrorPopup = () =>{
     showErrorPopup.value = false;
-     errorMessage.value = '';
+    errorMessage.value = '';
 }
 const openMotivoSalidaPopup = () => {
     showMotivoSalidaPopup.value = true;
@@ -643,14 +719,17 @@ const handleSalirIncidencia = async () => {
         };
 
         const response = await axios.put(apiUrl,requestData,{
-           headers:{
-               Authorization: `Bearer ${token}`
-           }
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
         });
         if(response.status === 200){
             closeMotivoSalidaPopup();
             closeIncidenciaDetailsPopup();
-           await loadIncidencias();
+           await Promise.all([
+            loadIncidenciasDashboard(),
+            loadIncidenciasPanel()
+        ]);
         }
     }catch (error){
         console.error('Error al salir de la incidencia:',error);
@@ -665,14 +744,14 @@ const closeMotivoCierrePopup = () => {
     motivoCierre.value = '';
 };
 const handleCerrarIncidencia = async () => {
-     if(!selectedIncidencia.value) return;
+    if(!selectedIncidencia.value) return;
     const token = localStorage.getItem('token');
     if(!token){
         throw new Error('No token found');
     }
     try{
         const apiUrl = `${API_AUTH_URL}/tecnico_incidencia/cerrar_incidencia`;
-          const requestData = {
+        const requestData = {
             id_incidencia: selectedIncidencia.value.id,
             motivo_salida: motivoCierre.value,
         };
@@ -682,7 +761,10 @@ const handleCerrarIncidencia = async () => {
             }
         });
         if(response.status === 200){
-            await loadIncidencias();
+            await  Promise.all([
+            loadIncidenciasDashboard(),
+            loadIncidenciasPanel()
+        ]);
              selectedIncidencia.value.status = 'Cerrada';
             closeMotivoCierrePopup();
             closeIncidenciaDetailsPopup();

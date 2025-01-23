@@ -87,7 +87,7 @@
             <div v-if="loading">Cargando incidencias...</div>
             <div v-else-if="error">Error al cargar las incidencias.</div>
              <div v-else class="incidencias-container">
-                <div v-for="incidencia in incidenciasFiltradas" :key="incidencia.id" class="incidencia-item">
+                <div v-for="incidencia in incidenciasPanelFiltradas" :key="incidencia.id" class="incidencia-item">
                     <div class="priority-marker" :class="incidencia.priority"></div>
                       <div class="incidencia-content">
                           <div class="incidencia-date">
@@ -120,10 +120,12 @@ import axios from 'axios';
 const lineChart = ref(null);
 const barChart = ref(null);
 const incidencias = ref([]);
+const incidenciasPanel = ref([]); // Nuevo ref para las incidencias del panel
 const loading = ref(true);
 const error = ref(null);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
+const ALL_INCIDENCIAS_URL_CERRADAS = `${API_AUTH_URL}/incidencia/all_cerradas`;
 const ME_URL = `${API_AUTH_URL}/auth/me`;
 const userRole = ref(null);
 const userId = localStorage.getItem('id');
@@ -134,32 +136,32 @@ const isAdmin = computed(() => userRole.value === 'administrador');
 
 const obtenerPrioridad = (prioridad) => {
     if (prioridad === "alta" || prioridad ==="media" || prioridad === "baja") {
-       return prioridad;
+        return prioridad;
     } else {
-      return "baja";
+        return "baja";
     }
 };
 
 const obtenerEstado = (estado) => {
-  switch (estado) {
-    case 0:
-      return 'Nueva';
-    case 1:
-      return 'Pendiente';
-    case 2:
-      return 'En curso';
-    case 3:
-      return 'Cerrada';
-    case 4:
-      return 'Mantenimiento';
-    default:
-      return '';
-  }
+    switch (estado) {
+        case 0:
+            return 'Nueva';
+        case 1:
+            return 'Pendiente';
+        case 2:
+            return 'En curso';
+        case 3:
+            return 'Cerrada';
+        case 4:
+            return 'Mantenimiento';
+        default:
+            return '';
+    }
 };
 
 // Función para formatear la fecha
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
+    const date = new Date(dateString);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString(undefined, options);
 };
@@ -173,13 +175,18 @@ const formatTime = (dateString) => {
 
 // Filtra incidencias para no mostrar las cerradas ni en mantenimiento y solo muestra 8 incidencias
 const incidenciasFiltradas = computed(() => {
-  return incidencias.value
-      .filter(incidencia => {
-          const estado = obtenerEstado(incidencia.estado);
-          return estado !== 'Cerrada' && estado !== 'Mantenimiento';
-      })
-      .slice(0, 8);
+    return incidencias.value
+        .slice(0, 8);
 });
+const incidenciasPanelFiltradas = computed(() => {
+    return incidenciasPanel.value
+        .filter(incidencia => {
+            const estado = obtenerEstado(incidencia.estado);
+            return estado !== 'Cerrada' && estado !== 'Mantenimiento';
+        })
+        .slice(0, 8);
+});
+
 
 // Cálculo del total de incidencias, incluyendo cerradas y en mantenimiento
 const totalIncidenciasCount = computed(() => {
@@ -188,22 +195,22 @@ const totalIncidenciasCount = computed(() => {
 
 // Cálculo de incidencias abiertas hoy
 const incidenciasAbiertasHoy = computed(() => {
-  const today = new Date();
-  return incidencias.value.filter(incidencia => {
-    const fechaIncidencia = new Date(incidencia.fecha_apertura);
-    return fechaIncidencia.getDate() === today.getDate() &&
-      fechaIncidencia.getMonth() === today.getMonth() &&
-      fechaIncidencia.getFullYear() === today.getFullYear() &&
-        obtenerEstado(incidencia.estado) === 'Nueva';
-  }).length;
+    const today = new Date();
+    return incidencias.value.filter(incidencia => {
+        const fechaIncidencia = new Date(incidencia.fecha_apertura);
+        return fechaIncidencia.getDate() === today.getDate() &&
+            fechaIncidencia.getMonth() === today.getMonth() &&
+            fechaIncidencia.getFullYear() === today.getFullYear() &&
+            obtenerEstado(incidencia.estado) === 'Nueva';
+    }).length;
 });
 
 // Cálculo de incidencias pendientes
 const incidenciasPendientesCount = computed(() => {
-  return incidencias.value.filter(incidencia => {
-    const estado = obtenerEstado(incidencia.estado);
-    return estado === 'Pendiente' || estado === 'Nueva';
-  }).length;
+    return incidencias.value.filter(incidencia => {
+        const estado = obtenerEstado(incidencia.estado);
+        return estado === 'Pendiente' || estado === 'Nueva';
+    }).length;
 });
 
 // Cálculo de incidencias en curso
@@ -213,7 +220,7 @@ const incidenciasEnCursoCount = computed(() => {
 
 // Cálculo de incidencias cerradas
 const incidenciasCerradasCount = computed(() => {
-  return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Cerrada').length;
+    return incidencias.value.filter(incidencia => obtenerEstado(incidencia.estado) === 'Cerrada').length;
 });
 
 
@@ -221,8 +228,8 @@ const incidenciasCerradasCount = computed(() => {
 const generateChartData = (incidencias) => {
     const today = new Date();
     const labels = [];
-    const openedData = [];
     const resolvedData = [];
+    const inProgressData = [];
 
     for (let i = 6; i >= 0; i--) {
         const date = new Date(today);
@@ -232,30 +239,30 @@ const generateChartData = (incidencias) => {
         const formattedDate = `${day}/${month}`;
         labels.push(formattedDate);
 
-      const opened = incidencias.filter(incidencia => {
-             const fechaIncidencia = new Date(incidencia.fecha_apertura);
-              return fechaIncidencia.getDate() === date.getDate() &&
-                fechaIncidencia.getMonth() === date.getMonth() &&
-                fechaIncidencia.getFullYear() === date.getFullYear() &&
-                 obtenerEstado(incidencia.estado) === 'En curso'
-        }).length;
-
-
-
-         const resolved = incidencias.filter(incidencia => {
-             if (obtenerEstado(incidencia.estado) === 'Cerrada' && incidencia.fecha_cierre) {
-                    const fechaCierre = new Date(incidencia.fecha_cierre);
-                    return  fechaCierre.getDate() === date.getDate() &&
-                        fechaCierre.getMonth() === date.getMonth() &&
-                        fechaCierre.getFullYear() === date.getFullYear()
+        const resolved = incidencias.filter(incidencia => {
+            if (obtenerEstado(incidencia.estado) === 'Cerrada' && incidencia.fecha_cierre) {
+                const fechaCierre = new Date(incidencia.fecha_cierre);
+                return fechaCierre.getDate() === date.getDate() &&
+                    fechaCierre.getMonth() === date.getMonth() &&
+                    fechaCierre.getFullYear() === date.getFullYear()
             }
             return false;
 
         }).length;
-        openedData.push(opened);
+
+        const inProgress = incidencias.filter(incidencia => {
+            const fechaIncidencia = new Date(incidencia.fecha_apertura);
+            return fechaIncidencia.getDate() === date.getDate() &&
+                fechaIncidencia.getMonth() === date.getMonth() &&
+                fechaIncidencia.getFullYear() === date.getFullYear() &&
+                (obtenerEstado(incidencia.estado) === 'En curso' || obtenerEstado(incidencia.estado) === 'Pendiente' || obtenerEstado(incidencia.estado) === 'Nueva')
+        }).length;
         resolvedData.push(resolved);
+        inProgressData.push(inProgress)
+
+
     }
-    return { labels: labels, opened: openedData, resolved: resolvedData };
+    return { labels: labels, resolved: resolvedData, opened: inProgressData };
 };
 
 
@@ -270,8 +277,8 @@ const generateLineChartData = (incidencias) => {
         if (fechaIncidencia.getDate() === today.getDate() &&
             fechaIncidencia.getMonth() === today.getMonth() &&
             fechaIncidencia.getFullYear() === today.getFullYear()) {
-              const hour = fechaIncidencia.getHours();
-             hourlyData[hour]++; // If it is today, increment count at this hour
+            const hour = fechaIncidencia.getHours();
+            hourlyData[hour]++; // If it is today, increment count at this hour
         }
 
     });
@@ -281,155 +288,180 @@ const generateLineChartData = (incidencias) => {
 
 const fetchUserData = async () => {
     const token = localStorage.getItem('token');
-  if (token) {
-      try {
-          const response = await axios.get(ME_URL, {
-              headers: {
-                  Authorization: `Bearer ${token}`,
-              },
-          });
-          userRole.value = response.data.rol;
+    if (token) {
+        try {
+            const response = await axios.get(ME_URL, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            userRole.value = response.data.rol;
 
-      } catch (error) {
-          console.error('Error fetching user data:', error);
-      }
-  }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    }
 };
+
 const checkUserHasReclamada = () => {
-    if(isTecnico.value || isAdmin.value){
+    if (isTecnico.value || isAdmin.value) {
     }
 }
+
 onMounted(async () => {
-     try {
-         await fetchUserData()
-       const token = localStorage.getItem('token');
-          if (token) {
-             try {
-            const response = await axios.post(ALL_INCIDENCIAS_URL,{}, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-               incidencias.value = response.data.map(incidencia => ({
-                  ...incidencia,
-                  priority: obtenerPrioridad(incidencia.prioridad),
-                  status: obtenerEstado(incidencia.estado),
-                  date: formatDate(incidencia.fecha_apertura),
-                  time: formatTime(incidencia.fecha_apertura),
-                   descripcion: incidencia.descripcion,
-                  titulo: incidencia.titulo,
-                   subtitulo: incidencia.subtitulo,
-                   fecha_cierre: incidencia.fecha_cierre,
+    try {
+        await fetchUserData()
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                // Petición para las incidencias del panel (all)
+                const responsePanel = await axios.post(ALL_INCIDENCIAS_URL, {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                incidenciasPanel.value = responsePanel.data.map(incidencia => ({
+                    ...incidencia,
+                    priority: obtenerPrioridad(incidencia.prioridad),
+                    status: obtenerEstado(incidencia.estado),
+                    date: formatDate(incidencia.fecha_apertura),
+                    time: formatTime(incidencia.fecha_apertura),
+                    descripcion: incidencia.descripcion,
+                    titulo: incidencia.titulo,
+                    subtitulo: incidencia.subtitulo,
+                    fecha_cierre: incidencia.fecha_cierre,
                     id_tecnico: incidencia.id_mantenimiento
-              }));
+                }));
+                  // Petición para las incidencias del dashboard (all_cerradas)
+                 const responseDashboard = await axios.post(ALL_INCIDENCIAS_URL_CERRADAS,{}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                incidencias.value = responseDashboard.data.map(incidencia => ({
+                    ...incidencia,
+                    priority: obtenerPrioridad(incidencia.prioridad),
+                    status: obtenerEstado(incidencia.estado),
+                    date: formatDate(incidencia.fecha_apertura),
+                    time: formatTime(incidencia.fecha_apertura),
+                    descripcion: incidencia.descripcion,
+                    titulo: incidencia.titulo,
+                    subtitulo: incidencia.subtitulo,
+                    fecha_cierre: incidencia.fecha_cierre,
+                    id_tecnico: incidencia.id_mantenimiento
+                }));
+
+
 
                 const chartData = generateChartData(incidencias.value);
-                  const lineChartData = generateLineChartData(incidencias.value);
+                const lineChartData = generateLineChartData(incidencias.value);
 
 
-              new Chart(lineChart.value, {
-                  type: 'line',
-                  data: {
-                      labels: ['0:00', '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
-                      datasets: [{
-                          label: 'Incidencias',
-                          data: lineChartData,
-                          borderColor: '#600484',
-                          backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                          tension: 0.4,
-                          fill: true,
-                          borderWidth: 2
-                      }]
-                  },
-                  options: {
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: {
-                          legend: {
-                              display: false
-                          }
-                      },
-                      scales: {
-                          y: {
-                              beginAtZero: true,
-                              grid: {
-                                  color: 'rgba(116, 116, 116, 1)',
-                                  drawBorder: false
-                              },
-                              ticks: {
-                                  color: 'rgba(116, 116, 116, 1)',
-                                  padding: 10
-                              }
-                          },
-                          x: {
-                              grid: {
-                                  display: false
-                              },
-                              ticks: {
-                                  color: 'rgba(116, 116, 116, 1)',
-                                  padding: 10
-                              }
-                          }
-                      }
-                  }
-              });
-
-
-             new Chart(barChart.value, {
-                type: 'bar',
-                data: {
-                   labels: chartData.labels,
-                    datasets: [
-                         {
-                            label: 'Promedio incidencias resueltas',
-                           data: chartData.resolved,
-                           backgroundColor: '#600484',
-                           borderRadius: 10,
-                           stack: 'combined',
+                new Chart(lineChart.value, {
+                    type: 'line',
+                    data: {
+                        labels: ['0:00', '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                        datasets: [{
+                            label: 'Incidencias',
+                            data: lineChartData,
+                            borderColor: '#600484',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
                         },
-                        {
-                           label: 'Promedio incidencias abiertas',
-                            data: chartData.opened,
-                            backgroundColor: '#a470c2',
-                           borderRadius: 10,
-                            stack: 'combined',
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 40,
-                            ticks: {
-                                stepSize: 10,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(116, 116, 116, 1)',
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: 'rgba(116, 116, 116, 1)',
+                                    padding: 10
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: 'rgba(116, 116, 116, 1)',
+                                    padding: 10
+                                }
                             }
                         }
+                    }
+                });
+
+
+                new Chart(barChart.value, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [
+                            {
+                                label: 'Promedio incidencias resueltas',
+                                data: chartData.resolved,
+                                backgroundColor: '#600484',
+                                borderRadius: 10,
+                                stack: 'combined',
+                            },
+                            {
+                                label: 'Promedio incidencias abiertas',
+                                data: chartData.opened,
+                                backgroundColor: '#a470c2',
+                                borderRadius: 10,
+                                stack: 'combined',
+                            }
+                        ]
                     },
-                    plugins: {
-                        legend: {
-                            display: true,
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 40,
+                                ticks: {
+                                    stepSize: 10,
+                                }
+                            }
                         },
-                         roundedBars: true
-                    },
-                }
-            });
-        } catch (err) {
-            error.value = err;
-        } finally {
-            loading.value = false;
+                        plugins: {
+                            legend: {
+                                display: true,
+                            },
+                            roundedBars: true
+                        },
+                    }
+                });
+            } catch (err) {
+                error.value = err;
+            } finally {
+                loading.value = false;
+            }
+            checkUserHasReclamada();
         }
-               checkUserHasReclamada();
-          }
     } catch (err) {
-      error.value = err;
-      loading.value = false;
+        error.value = err;
+        loading.value = false;
     }
 });
-watch(incidencias,()=>{
-  checkUserHasReclamada();
+
+watch(incidencias, () => {
+    checkUserHasReclamada();
 });
+
 </script>
 
 <style scoped>
