@@ -46,8 +46,9 @@
   
   <script setup>
   import { onBeforeMount, ref } from 'vue';
+  import axios from 'axios';
   const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
-  const ALL_MANTENIMIENTOS_URL = `${API_AUTH_URL}/incidencias/all_mantenimientos`;
+  const ALL_MANTENIMIENTOS_URL = `${API_AUTH_URL}/incidencia/all_mantenimientos`;
   
   const recogerMantenimiento = async () => {
     try{
@@ -71,8 +72,8 @@
     }
   }
 
-  onBeforeMount(async => function (){
-    recogerMantenimiento();
+  onBeforeMount(async () => {
+    await recogerMantenimiento();
   })
   
   </script>

@@ -24,6 +24,8 @@ return new class extends Migration
              * 3-> cerrado
              * 4-> mantenimiento
              */
+            $table->text('prioridad')->nullable();
+            $table->integer('computo_prioridad')->nullable();
             $table->integer('estado')->default(0); // Estado actual de la incidencia
             $table->unsignedBigInteger('id_creador')->nullable(); // Identificador del usuario que reportó la incidencia (puede ser null)
             $table->unsignedBigInteger('id_maquina'); // Identificador de la máquina relacionada

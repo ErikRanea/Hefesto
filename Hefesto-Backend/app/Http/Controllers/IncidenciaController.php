@@ -21,9 +21,8 @@ class IncidenciaController extends Controller
     {
         try {
             $query = Incidencia::query()
-            ->with(['tipoIncidencia', 'maquina'])
-            ->where('habilitado', 1); 
-
+                ->with(['tipoIncidencia', 'maquina'])
+                ->where('habilitado', 1);
 
             // Filtro por campus si se proporciona
             if ($request->has('id_campus')) {
@@ -55,14 +54,13 @@ class IncidenciaController extends Controller
                 }
             }
 
-           $incidencias = $query->get();
-
-           // Ordenar las incidencias
-           $incidenciasOrdenadas = $incidencias->sortBy(function($incidencia) {
-             
-                return [- optional($incidencia->tipoIncidencia)->prioridad, -optional($incidencia->maquina)->prioridad];
+            $incidencias = $query->get();
+           
+            // Ordenar las incidencias primero por computo_prioridad descendente, y luego por fecha_apertura ascendente (más antiguas primero).
+           $incidenciasOrdenadas = $incidencias->sortBy(function ($incidencia) {
+                return [-$incidencia->computo_prioridad, $incidencia->fecha_apertura];
             });
-
+            
             return response()->json($incidenciasOrdenadas->values()->all(), Response::HTTP_OK);
 
         } catch (Exception $e) {
@@ -110,14 +108,13 @@ class IncidenciaController extends Controller
                 }
             }
 
-           $incidencias = $query->get();
-
-           // Ordenar las incidencias
-           $incidenciasOrdenadas = $incidencias->sortBy(function($incidencia) {
-             
-                return [- optional($incidencia->tipoIncidencia)->prioridad, -optional($incidencia->maquina)->prioridad];
+            $incidencias = $query->get();
+           
+            // Ordenar las incidencias primero por computo_prioridad descendente, y luego por fecha_apertura ascendente (más antiguas primero).
+           $incidenciasOrdenadas = $incidencias->sortBy(function ($incidencia) {
+                return [-$incidencia->computo_prioridad, $incidencia->fecha_apertura];
             });
-
+            
             return response()->json($incidenciasOrdenadas->values()->all(), Response::HTTP_OK);
 
         } catch (Exception $e) {
@@ -129,6 +126,7 @@ class IncidenciaController extends Controller
 
     public function store(Request $request){
         try{
+            
             $validator = Validator::make($request->all(), [
                 'titulo' => 'required',
                 'subtitulo' => 'required',
@@ -141,12 +139,45 @@ class IncidenciaController extends Controller
             if ($validator->fails()) {
                 return response()->json($validator->errors(), Response::HTTP_BAD_REQUEST);
             }
+            $tipoIncidencia = TipoIncidencia::find($request->get('tipo_incidencia'));         
+            $maquina = Maquina::find($request->get('id_maquina'));       
+            $computoPrioridad = $tipoIncidencia->prioridad + $maquina ->prioridad;
+            $prioridad = '';
+
+            /**@author: Erik
+             * 
+             * En función de el computo de la prioridad de la máquina y del tipo de incidencia, lo que haremos en asignarle una gravedad
+             * 
+             * 6 5 | 4 3 | 2
+             *alta  media  baja   
+             */
+
+            switch($computoPrioridad){
+                case 6:
+                    $prioridad = 'alta';
+                    break;
+                case 5:
+                    $prioridad = 'alta';
+                    break;
+                case 4:
+                    $prioridad = 'media';
+                    break;
+                case 3:
+                    $prioridad = 'media';
+                    break;
+                case 2:
+                    $prioridad = 'baja';
+                    break;
+            }
+
+       
 
             $incidencia = new Incidencia();
             $incidencia->fecha_apertura = Date::now();
-            $incidencia->id_maquina = $request->get('id_maquina');
-            $tipoIncidencia = TipoIncidencia::find($request->get('tipo_incidencia'));
+            $incidencia->id_maquina = $maquina->id;
             $incidencia->id_tipo_incidencia = $tipoIncidencia->id;
+            $incidencia->prioridad = $prioridad;
+            $incidencia->computo_prioridad = $computoPrioridad;
             $incidencia->titulo = $request->get('titulo');
             $incidencia->subtitulo = $request->get('subtitulo');
             $request->get('descripcion') != null ? $incidencia->descripcion = $request->get('descripcion'): null;
@@ -217,7 +248,7 @@ class IncidenciaController extends Controller
     }
     
     
-    public function allMantenimiento(Request $request){
+    public function allMantenimientos(Request $request){
         try{
             
             $query = Incidencia::query()->where('estado', 4);
@@ -235,7 +266,7 @@ class IncidenciaController extends Controller
                         });
                     });
                 } else {
-                    return response()->json(["El campus ".$request->get('id_campus').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                    return response()->json(["El campus ".$request->get('id_campus').' no existe'], Response::HTTP_BAD_REQUEST);
                 }
             }
 
@@ -248,17 +279,18 @@ class IncidenciaController extends Controller
                         $q->where('id_seccion', $request->get('id_seccion'));
                     });
                 } else {
-                    return response()->json(["La seccion ".$request->get('id_seccion').' no existe'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                    return response()->json(["La seccion ".$request->get('id_seccion').' no existe'], Response::HTTP_BAD_REQUEST);
                 }
             }
     
+            
 
     
             $incidencias = $query->get();
             return response()->json($incidencias, Response::HTTP_OK);
         }
         catch(Exception $e){
-            return response()->json(['error' => 'Error al obtener los incidencias.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['error' => 'Error al obtener los incidencias.','data'=>$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
