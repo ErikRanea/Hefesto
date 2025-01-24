@@ -49,7 +49,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'id_campus' => ['required', 'integer', 'exists:campus,id'], // Agregamos la validación para id_campus
+            'id_campus' => ['required', 'integer', 'exists:campuses,id'], // Agregamos la validación para id_campus
             'primer_apellido' => ['nullable', 'string'],
             'segundo_apellido' => ['nullable', 'string'],
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -102,7 +102,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],  
-            'id_campus' => ['required', 'integer', 'exists:campus,id'], // Agregamos la validación para id_campus
+            'id_campus' => ['required', 'integer', 'exists:campuses,id'], // Agregamos la validación para id_campus
             'primer_apellido' => ['nullable', 'string'],
             'segundo_apellido' => ['nullable', 'string'],
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
