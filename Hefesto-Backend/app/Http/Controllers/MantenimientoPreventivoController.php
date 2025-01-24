@@ -17,9 +17,7 @@ class MantenimientoPreventivoController extends Controller
             $validator = Validator::make($request->all(), [
                 'nombre' => 'required|string|max:255',
                 'descripcion' => 'required|string|max:255',
-                'periodicidad' => 'required|integer',
-                'id_maquina' => 'required|integer',
-                'fecha_ultimo_mantenimiento' => 'required|date'
+                'periodicidad' => 'required|integer',      
             ]);
 
             if ($validator->fails()) {
@@ -30,8 +28,6 @@ class MantenimientoPreventivoController extends Controller
             $mantenimiento->nombre = $request->get('nombre');
             $mantenimiento->descripcion = $request->get('descripcion');
             $mantenimiento->periodicidad = $request->get('periodicidad');
-            $mantenimiento->id_maquina = $request->get('id_maquina');
-            $mantenimiento->fecha_ultimo_mantenimiento = $request->get('fecha_ultimo_mantenimiento');
             $mantenimiento->habilitado = $request->get('habilitado') == false ? 1 : $request->get('habilitado');
             $mantenimiento->estado = 'pendiente';
             $mantenimiento->habilitado = true;
@@ -71,8 +67,6 @@ class MantenimientoPreventivoController extends Controller
                 'nombre' => 'required|string|max:255',
                 'descripcion' => 'required|string|max:255',
                 'periodicidad' => 'required|integer',
-                'id_maquina' => 'required|integer',
-                'fecha_ultimo_mantenimiento' => 'required|date',
                 'habilitado' => 'boolean',
                 'estado' => 'string|max:255|required'
             ]);
@@ -84,8 +78,6 @@ class MantenimientoPreventivoController extends Controller
             $mantenimiento->nombre = $request->get('nombre');
             $mantenimiento->descripcion = $request->get('descripcion');
             $mantenimiento->periodicidad = $request->get('periodicidad');
-            $mantenimiento->id_maquina = $request->get('id_maquina');
-            $mantenimiento->fecha_ultimo_mantenimiento = $request->get('fecha_ultimo_mantenimiento');
             $mantenimiento->habilitado = $request->get('habilitado') == false ? 1 : $request->get('habilitado');
             $mantenimiento->save();
 

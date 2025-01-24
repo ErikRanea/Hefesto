@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('fecha_realizacion')->nullable();
             $table->date('fecha_proximo_mantenimiento')->nullable();
             $table->foreign('id_incidencia')->references('id')->on('incidencias');
-            $table->foreign('id_mantenimiento')->references('id')->on('mantemientos_preventivos');
+            $table->foreign('id_mantenimiento')->references('id')->on('mantenimientos_preventivos');
 
         });
     }

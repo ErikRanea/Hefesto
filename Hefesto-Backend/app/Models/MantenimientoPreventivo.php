@@ -16,7 +16,7 @@ class MantenimientoPreventivo extends Model
     ];
 
     public function mantenimientosIncidencias(){
-        return $this->hasMany(MantenimientosIncidencias::class, 'id_incidencia','id');
+        return $this->hasMany(MantenimientoIncidencia::class, 'id_incidencia','id');
     }
 
 }

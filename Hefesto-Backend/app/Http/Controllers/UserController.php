@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -185,6 +186,16 @@ class UserController extends Controller
         }
 
     }
+
+
+
+
+
+    /**
+     * Metodo estáticos
+     */
+
+
     public static function createDummyUsers()
     {
         $users = [];
@@ -202,6 +213,7 @@ class UserController extends Controller
                     'rol' => $role,
                     'foto_perfil' => null,
                     'habilitado' => true,
+                    'id_campus' => 2
                 ];
             }
         }
@@ -216,6 +228,7 @@ class UserController extends Controller
                 'rol' => 'administrador',
                 'foto_perfil' => null,
                 'habilitado' => true,
+                'id_campus' => 2
             ];
         
         // Create the users in the database
