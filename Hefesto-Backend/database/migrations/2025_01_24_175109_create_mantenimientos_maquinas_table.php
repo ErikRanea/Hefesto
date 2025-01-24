@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mantenimientos_incindencias', function (Blueprint $table) {
+        Schema::create('mantenimientos_maquinas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_incidencia');
+            $table->unsignedBigInteger('id_maquina');
             $table->unsignedBigInteger('id_mantenimiento');
+            $table->date('fecha_proximo');
             $table->date('fecha_realizacion')->nullable();
-            $table->date('fecha_proximo_mantenimiento')->nullable();
-            $table->foreign('id_incidencia')->references('id')->on('incidencias');
-            $table->foreign('id_mantenimiento')->references('id')->on('mantenimientos_preventivos');
-
+            $table->timestamps();
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mantenimientos_incindencias');
+        Schema::dropIfExists('mantenimientos_maquinas');
     }
 };

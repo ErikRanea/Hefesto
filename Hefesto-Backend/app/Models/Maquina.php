@@ -22,7 +22,7 @@ class Maquina extends Model
        return $this->hasMany(Incidencia::class, 'id_maquina');
     }
 
-   public function mantenimientosPreventivos(){
-        return $this->hasMany(MantenimientoPreventivo::class, 'id_maquina');
+    public function mantenimientosMaquinas(){
+        return $this->hasMany(MantenimientoMaquina::class, 'id_incidencia','id');
     }
 }
