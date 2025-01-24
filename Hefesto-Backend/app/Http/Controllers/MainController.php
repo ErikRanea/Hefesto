@@ -80,6 +80,8 @@ class MainController extends Controller
             
 
 
+            UserController::createDummyUsers();
+
 
 
             $user = new User();
