@@ -210,10 +210,10 @@
   const selectedSeccion = ref(null);
   const selectedCampus = ref(null);
   const filteredMaquina = computed(() => {
-        if(!maquinas.value){
+      if(!maquinas.value){
           return [];
       }
-    let filtered = [...maquinas.value];
+    let filtered = maquinas.value;
       if (searchQuery.value) {
         const searchTerm = searchQuery.value.toLowerCase();
           filtered = filtered.filter(maquina => {
@@ -301,30 +301,23 @@
     const headers = {
       Authorization: `Bearer ${token}`,
     };
-       const response = await axios.post(`${MAQUINA_ALL_URL}?per_page=20&page=${page}`,{}, { headers });
-          console.log('maquinas response: ',response.data);
-          if(response.data.data){
-              maquinas.value = response.data.data.data;
-              pagination.value = {
-                  current_page: response.data.data.current_page,
-                  last_page: response.data.data.last_page,
-                  per_page: response.data.data.per_page,
-                  total: response.data.data.total,
-              }
-           }else{
-              maquinas.value = response.data;
-                 pagination.value = {
-                      current_page: 1,
-                      last_page: 1,
-                      per_page: 20,
-                      total: response.data.length,
-                  }
-           }
+    const response = await axios.post(`${MAQUINA_ALL_URL}?per_page=20&page=${page}`, {}, { headers });
+    
+    // Directly use response.data.data since the data is in this array
+    maquinas.value = response.data.data;
+    
+    // Simplified pagination since you're not getting pagination metadata
+    pagination.value = {
+      current_page: 1,
+      last_page: 1,
+      per_page: 20,
+      total: response.data.data.length,
+    }
   } catch (error) {
     console.error('Error al obtener máquinas:', error);
-      toast.error('Error al obtener máquinas: ' + error.message);
+    toast.error('Error al obtener máquinas: ' + error.message);
   }
-  };
+};
   // Función para seleccionar un maquina
   const selectMaquina = (event) => {
       const maquinaId = parseInt(event.target.value);
@@ -373,7 +366,7 @@
   const toggleMaquinaStatus = async (maquinaItem) => {
     try {
       if (maquinaItem.habilitado === 1) {
-          const token = localStorage.getItem('token');
+           const token = localStorage.getItem('token');
               const headers = {
                   Authorization: `Bearer ${token}`,
               };
