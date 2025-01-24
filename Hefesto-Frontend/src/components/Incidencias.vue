@@ -52,6 +52,14 @@
         <div class="incidencia-list-header">
           <div>Incidencias</div>
           
+
+          <div class="priority-legend">
+            <div class="boton-filtro" @click="openFiltroPopup">
+              <img src="../assets/images/icons/filtro.svg" alt="Filtro" class="imagen-filtro">
+              Filtros
+            </div>
+          </div>
+
         <div class="priority-legend">
           <span
             @click="seleccionarPrioridad('alta')"
@@ -79,7 +87,7 @@
             :class="{ 'selected': prioridadSeleccionada === null }"
             class="priority-filter"
           >
-            Limpiar Filtro
+            Todos
           </span>
         </div>
       </div>
@@ -245,6 +253,20 @@
         </div>
       </template>
     </GlassmorphicPopup>
+    <GlassmorphicPopup
+      :visible="showFiltroPopup"
+      title="Filtros incidencias"
+      closeButtonText="Cerrar"
+      @close="closeFiltroPopup">
+
+      <template #popup-content>
+        <div class="row">
+          <div class="col">
+            <p>Filtros</p>
+          </div>
+        </div>
+      </template>
+    </GlassmorphicPopup>
   </div>
 </template>
 
@@ -286,6 +308,7 @@ const userImagePath = computed(() => {
 const showMotivoSalidaPopup = ref(false);
 const motivoSalida = ref('');
 const showCreateIncidenciaPopup = ref(false);
+const showFiltroPopup = ref(false);
 const guardandoComentario = ref(false);
 const newIncidencia = ref({
     titulo: '',
@@ -570,6 +593,14 @@ watch(incidencias,()=>{
 const openCreateIncidenciaPopup = () => {
     showCreateIncidenciaPopup.value = true;
 };
+
+const openFiltroPopup = () => {
+  showFiltroPopup.value = true;
+}
+
+const closeFiltroPopup = () => {
+  showFiltroPopup.value = false;
+}
 
 const closeCreateIncidenciaPopup = () => {
     showCreateIncidenciaPopup.value = false;
@@ -1303,6 +1334,10 @@ canvas {
     align-items: center;
 }
 
+:root {
+    --color-primario: #007bff;
+}
+
 .priority-filter {
   cursor: pointer; /* Cambia el cursor a "mano" */
   position: relative; /* Necesario para posicionar la barra */
@@ -1314,17 +1349,40 @@ canvas {
 }
 
 .priority-filter.selected {
-  text-decoration: underline; /* Añade el subrayado */
+  /* Añade el subrayado */
   text-decoration-color: var(--color-primario); /* Color del subrayado */
   text-decoration-thickness: 4px; /* Grosor del subrayado */
 }
 
-:root {
-    --color-primario: #007bff;
+
+.boton-filtro{
+  cursor: pointer;
+  position: relative;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  border: 0.5px solid black;
 }
+
+.boton-filtro:hover{
+  opacity: 0.8;
+}
+
+
+
+
+
 
 /* Ajusta el espaciado entre los elementos de la leyenda */
 .priority-legend span {
   margin-right: 10px; /* Ajusta el valor según sea necesario */
 }
+
+
+.imagen-filtro{
+  width: 20px;
+}
+
+
 </style>
