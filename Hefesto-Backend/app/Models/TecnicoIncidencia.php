@@ -22,7 +22,11 @@ class TecnicoIncidencia extends Model
 
     public function incidencia()
     {
-        return $this->belongsTo(Incidencia::class, 'id_incidencia', 'id_incidencia');
+        return $this->belongsTo(Incidencia::class, 'id', 'id_incidencia');
+    }
+
+    public function tecnico(){
+        return $this->belongsTo(User::class, 'id','id_tecnico');
     }
 
 }
