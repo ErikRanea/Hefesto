@@ -15,12 +15,9 @@ return new class extends Migration
             $table->id();// Identificador único del mantenimiento preventivo
             $table->string('nombre'); // Nombre del mantenimiento preventivo
             $table->text('descripcion')->nullable(); // Descripción del mantenimiento preventivo
-            $table->integer('periodicidad'); // Periodicidad del mantenimiento preventivo
-            $table->unsignedBigInteger('id_maquina'); // Identificador de la máquina a la que pertenece
-            $table->date('fecha_ultimo_mantenimiento'); // Fecha del último mantenimiento
+            $table->integer('periodicidad'); // Periodicidad del mantenimiento preventivo// Identificador de la máquina a la que pertenece
             $table->boolean('habilitado')->default(true);
-            $table->enum('estado', ['pendiente', 'en curso', 'completado'])->default('pendiente'); // Estado del mantenimiento preventivo
-            $table->foreign('id_maquina')->references('id')->on('maquinas');
+            $table->enum('estado', ['pendiente', 'en curso', 'completado'])->default('pendiente'); // Estado del mantenimiento preventiv
             $table->timestamps();
         });
     }

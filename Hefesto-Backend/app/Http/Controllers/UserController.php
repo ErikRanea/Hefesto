@@ -114,8 +114,8 @@ class UserController extends Controller
             'email' => ['sometimes', 'required', 'email', \Illuminate\Validation\Rule::unique('users')->ignore($user->id)],
             'password' => ['sometimes', 'required', 'string', 'min:8'],
             'rol' => ['sometimes', 'required', 'in:operario,tecnico,administrador'],
-            'foto_perfil' => ['nullable', 'string'],
             'habilitado' => ['sometimes', 'boolean'],
+            'id_campus' => ['sometimes','required','integer'],
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -129,8 +129,8 @@ class UserController extends Controller
             'password.min' => 'El campo contraseña debe tener un mínimo de :min caracteres.',
             'rol.required' => 'El campo rol es obligatorio.',
             'rol.in' => 'El rol seleccionado no es válido.',
-            'foto_perfil.string' => 'La foto de perfil debe ser una cadena de texto.',
             'habilitado.boolean' => 'El campo habilitado debe ser booleano.',
+            'id_campus.required' => 'El campo id_campues es obligatorio'
         ]);
 
         if ($validator->fails()) {
@@ -144,8 +144,8 @@ class UserController extends Controller
         if ($request->filled('email')) $validatedData['email'] = strip_tags($request->input('email'));
         if ($request->filled('password')) $validatedData['password'] = Hash::make($request->input('password'));
         if ($request->filled('rol')) $validatedData['rol'] = $request->input('rol');
-        if ($request->filled('foto_perfil')) $validatedData['foto_perfil'] = $request->input('foto_perfil');
         if ($request->has('habilitado')) $validatedData['habilitado'] = $request->boolean('habilitado');
+        if ($request->filled('id_campus')) $validatedData['id_campus'] = $request->input('id_campus');
 
 
         $user->update($validatedData);
