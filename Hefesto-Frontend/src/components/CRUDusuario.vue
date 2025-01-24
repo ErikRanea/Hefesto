@@ -1,59 +1,8 @@
 <template>
   <div class="glassmorphic-container">
-      <button v-if="currentView === 'list'" class="glassmorphic-btn" @click="goBackToList">Volver</button>
-      <div v-if="currentView === 'register'" class="glassmorphic-form">
-          <h2 class="form-title">Registrar Usuario</h2>
-          <div class="radio-group">
-              <label class="radio-label">
-                  <input type="radio" v-model="isTecnico" :value="true" />
-                  <span>Técnico</span>
-              </label>
-              <label class="radio-label">
-                  <input type="radio" v-model="isTecnico" :value="false" />
-                  <span>Usuario</span>
-              </label>
-          </div>
-
-          <div class="form-group">
-              <label for="nombre">Nombre:</label>
-              <input type="text" id="nombre" v-model="userData.name" class="glassmorphic-input" />
-          </div>
-
-          <div class="form-group">
-              <label for="email">Email:</label>
-              <input type="email" id="email" v-model="userData.email" class="glassmorphic-input" />
-          </div>
-
-          <div class="form-group">
-              <label for="password">Contraseña:</label>
-              <input type="password" id="password" v-model="userData.password" class="glassmorphic-input" />
-          </div>
-
-          <div class="form-group">
-              <label for="primer_apellido">Primer Apellido:</label>
-              <input type="text" id="primer_apellido" v-model="userData.primer_apellido" class="glassmorphic-input" />
-          </div>
-
-          <div class="form-group">
-              <label for="segundo_apellido">Segundo Apellido:</label>
-              <input type="text" id="segundo_apellido" v-model="userData.segundo_apellido" class="glassmorphic-input" />
-          </div>
-
-          <div class="form-group">
-              <label for="campus">Campus:</label>
-              <CustomSelect
-                  :options="campusOptions"
-                  :modelValue="userData.id_campus"
-                  @update:modelValue="handleCampusSelect"
-                  class="glassmorphic-select"
-              />
-          </div>
-
-          <button class="glassmorphic-btn" @click="goBack">Volver</button>
-      </div>
-      <div v-else-if="currentView === 'list'" class="user-list">
+    <div v-if="currentView === 'list'" class="user-list">
           <h2 class="list-title">Lista de Usuarios</h2>
-          <button class="glassmorphic-btn add-user-btn" @click="openRegisterView">
+          <button class="glassmorphic-btn add-user-btn" @click="registerModalVisible = true">
               <img src="../assets/images/icons/usuarios.svg" alt="Añadir Usuario" class="btn-icon" />
               Añadir Usuario
           </button>
@@ -107,58 +56,144 @@
                   </tbody>
               </table>
           </div>
+        <!-- Paginacion-->
+         <div class="pagination">
+                <button
+                        @click="changePage(pagination.current_page - 1)"
+                        :disabled="pagination.current_page === 1"
+                        class="glassmorphic-btn pagination-btn"
+                >
+                  Anterior
+                </button>
+
+               <span class="pagination-info">Página {{ pagination.current_page }} de {{ pagination.last_page }}</span>
+
+                <button
+                        @click="changePage(pagination.current_page + 1)"
+                        :disabled="pagination.current_page === pagination.last_page"
+                        class="glassmorphic-btn pagination-btn"
+                >
+                Siguiente
+                </button>
+        </div>
+          <button v-if="currentView === 'list'" class="glassmorphic-btn" @click="goBackToList">Volver</button>
           <button class="glassmorphic-btn danger-btn" @click="deleteSelectedUsers" :disabled="selectedUsers.length === 0">Deshabilitar Seleccionados</button>
       </div>
-    <teleport to="body">
-       <div v-if="editModalVisible" class="edit-modal">
-          <div class="modal-content">
-          <h2 class="form-title">Editar Usuario</h2>
-               <div class="form-group">
-                  <label for="edit_nombre">Nombre:</label>
-                      <input type="text" id="edit_nombre" v-model="editUserData.name" class="glassmorphic-input" />
-                  </div>
+     <teleport to="body">
+         <GlassmorphicPopup
+          :visible="registerModalVisible"
+          title="Registrar Usuario"
+          closeButtonText="Cancelar"
+           actionButtonText="Registrar"
+          @close="goBack"
+          @action="handleAction"
+          closeButtonStyle="cancel"
+          actionButtonStyle="primary"
+       >
+        <template #popup-content>
+          <div class="radio-group">
+              <div class="checkbox-wrapper-47">
+                <input type="radio" name="rol" id="tecnico" v-model="isTecnico" :value="true" />
+                <label for="tecnico">Técnico</label>
+              </div>
+              <div class="checkbox-wrapper-47">
+                <input type="radio" name="rol" id="usuario" v-model="isTecnico" :value="false" />
+                <label for="usuario">Usuario</label>
+              </div>
+          </div>
 
-                   <div class="form-group">
-                       <label for="edit_email">Email:</label>
-                       <input type="email" id="edit_email" v-model="editUserData.email" class="glassmorphic-input" />
-                   </div>
+          <div class="form-group">
+              <label for="nombre">Nombre:</label>
+              <input type="text" id="nombre" v-model="userData.name" class="glassmorphic-input" />
+          </div>
 
-              <div class="form-group">
-                  <label for="edit_password">Contraseña:</label>
-                  <input type="password" id="edit_password" v-model="editUserData.password" class="glassmorphic-input" />
+          <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" id="email" v-model="userData.email" class="glassmorphic-input" />
+          </div>
+
+          <div class="form-group">
+              <label for="password">Contraseña:</label>
+              <input type="password" id="password" v-model="userData.password" class="glassmorphic-input" />
+          </div>
+
+          <div class="form-group">
+              <label for="primer_apellido">Primer Apellido:</label>
+              <input type="text" id="primer_apellido" v-model="userData.primer_apellido" class="glassmorphic-input" />
+          </div>
+
+          <div class="form-group">
+              <label for="segundo_apellido">Segundo Apellido:</label>
+              <input type="text" id="segundo_apellido" v-model="userData.segundo_apellido" class="glassmorphic-input" />
+          </div>
+
+          <div class="form-group">
+              <label for="campus">Campus:</label>
+              <CustomSelect
+                  :options="campusOptions"
+                  :modelValue="userData.id_campus"
+                  @update:modelValue="handleCampusSelect"
+                  class="glassmorphic-select"
+              />
+          </div>
+         </template>
+       </GlassmorphicPopup>
+     </teleport>
+     <teleport to="body">
+          <GlassmorphicPopup
+            :visible="editModalVisible"
+            title="Editar Usuario"
+            closeButtonText="Cancelar"
+            actionButtonText="Guardar"
+            @close="closeEditModal"
+            @action="updateUser"
+            closeButtonStyle="cancel"
+            actionButtonStyle="primary"
+          >
+            <template #popup-content>
+             <div class="form-group">
+              <label for="edit_nombre">Nombre:</label>
+                  <input type="text" id="edit_nombre" v-model="editUserData.name" class="glassmorphic-input" />
               </div>
 
                <div class="form-group">
-                   <label for="edit_primer_apellido">Primer Apellido:</label>
-                   <input type="text" id="edit_primer_apellido" v-model="editUserData.primer_apellido" class="glassmorphic-input" />
+                   <label for="edit_email">Email:</label>
+                   <input type="email" id="edit_email" v-model="editUserData.email" class="glassmorphic-input" />
                </div>
 
-               <div class="form-group">
-                   <label for="edit_segundo_apellido">Segundo Apellido:</label>
-                   <input type="text" id="edit_segundo_apellido" v-model="editUserData.segundo_apellido" class="glassmorphic-input" />
-               </div>
-                <div class="form-group">
-                   <label for="edit_rol">Rol:</label>
-                    <select id="edit_rol" v-model="editUserData.rol" class="glassmorphic-select">
-                     <option value="operario">Operario</option>
-                       <option value="tecnico">Técnico</option>
-                      <option value="administrador">Administrador</option>
-                     </select>
-                </div>
-               <div class="form-group">
-                  <label for="edit_campus">Campus:</label>
-                   <CustomSelect
-                      :options="campusOptions"
-                       :modelValue="editUserData.id_campus"
-                      @update:modelValue="handleEditCampusSelect"
-                    class="glassmorphic-select"
-                      />
-               </div>
-              <button class="glassmorphic-btn" @click="closeEditModal">Cancelar</button>
-              <button class="glassmorphic-btn" @click="updateUser">Guardar</button>
+          <div class="form-group">
+              <label for="edit_password">Contraseña:</label>
+              <input type="password" id="edit_password" v-model="editUserData.password" class="glassmorphic-input" />
+          </div>
+
+           <div class="form-group">
+               <label for="edit_primer_apellido">Primer Apellido:</label>
+               <input type="text" id="edit_primer_apellido" v-model="editUserData.primer_apellido" class="glassmorphic-input" />
            </div>
-       </div>
-   </teleport>
+
+           <div class="form-group">
+               <label for="edit_segundo_apellido">Segundo Apellido:</label>
+               <input type="text" id="edit_segundo_apellido" v-model="editUserData.segundo_apellido" class="glassmorphic-input" />
+           </div>
+            <div class="form-group">
+               <label for="edit_rol">Rol:</label>
+                <select id="edit_rol" v-model="editUserData.rol" class="glassmorphic-select">
+                 <option value="operario">Operario</option>
+                   <option value="tecnico">Técnico</option>
+                  </select>
+            </div>
+           <div class="form-group">
+              <label for="edit_campus">Campus:</label>
+               <CustomSelect
+                  :options="campusOptions"
+                   :modelValue="editUserData.id_campus"
+                  @update:modelValue="handleEditCampusSelect"
+                class="glassmorphic-select"
+                  />
+           </div>
+            </template>
+         </GlassmorphicPopup>
+    </teleport>
   </div>
 </template>
 
@@ -167,7 +202,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import CustomSelect from './CustomSelect.vue';
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
-
+import GlassmorphicPopup from './GlassmorphicPopup.vue';
 
 const toast = useToast();
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
@@ -177,12 +212,6 @@ const CAMPUS_ALL_URL = `${API_AUTH_URL}/campus/all`;
 const USUARIO_ALL_URL = `${API_AUTH_URL}/usuario/all`;
 const USUARIO_DELETE_URL = `${API_AUTH_URL}/usuario/update`;
 const USUARIO_UPDATE_URL = `${API_AUTH_URL}/usuario/update`;
-
-const popupVisible = ref(true);
-const popupTitle = ref('Gestión de Usuarios');
-const popupSubtitle = ref('');
-const popupCloseButtonText = ref('Cerrar');
-const popupActionButtonText = ref('Registrar');
 
 const isTecnico = ref(false);
 const userData = ref({
@@ -222,32 +251,32 @@ const props = defineProps({
 const searchQuery = ref(''); // Para la barra de búsqueda
 const selectedCampus = ref(null);
 const filteredUsers = computed(() => {
-let filtered = [...users.value];
+  let filtered = [...users.value];
+  
+    if (searchQuery.value) {
+      const searchTerm = searchQuery.value.toLowerCase();
+        filtered = filtered.filter(user => {
+            const fullName = `${user.name} ${user.primer_apellido} ${user.segundo_apellido}`.toLowerCase();
+            return fullName.includes(searchTerm);
+        });
+    }
+    
+    if (selectedCampus.value) {
+        filtered = filtered.filter(user => user.id_campus === selectedCampus.value);
+    }
 
-if (searchQuery.value) {
-  const searchTerm = searchQuery.value.toLowerCase();
-  filtered = filtered.filter(user => {
-    const fullName = `${user.name} ${user.primer_apellido} ${user.segundo_apellido}`.toLowerCase();
-    return fullName.includes(searchTerm);
-  });
-}
-
-if (selectedCampus.value) {
-  filtered = filtered.filter(user => user.id_campus === selectedCampus.value);
-}
-
-return filtered;
+  return filtered;
 });
 
 
 const openRegisterView = () => {
 currentView.value = 'register';
-popupActionButtonText.value = 'Registrar';
 };
 
 const goBack = () => {
   currentView.value = 'list';
-  popupActionButtonText.value = null;
+    registerModalVisible.value = false;
+
 };
 const goBackToList = () => {
 emit('back-to-list')
@@ -259,6 +288,8 @@ userData.value.id_campus = campusId;
 const handleEditCampusSelect = (campusId) => {
  editUserData.value.id_campus = campusId;
 };
+const registerModalVisible = ref(false);
+
 
 const handleAction = async () => {
   try {
@@ -325,6 +356,7 @@ const handleAction = async () => {
           segundo_apellido: '',
           id_campus: null,
       };
+       registerModalVisible.value = false;
   } catch (error) {
       console.error('Error al registrar usuario:', error.response ? error.response.data : error);
     toast.error('Error al registrar usuario: ' + (error.response ? JSON.stringify(error.response.data) : error));
@@ -338,14 +370,21 @@ return campus ? campus.label : 'Desconocido';
 };
 
 // Función para obtener los usuarios de la API
-const fetchUsers = async () => {
+const fetchUsers = async (page = 1) => {
 try {
   const token = localStorage.getItem('token');
   const headers = {
     Authorization: `Bearer ${token}`,
   };
-  const response = await axios.get(USUARIO_ALL_URL, { headers });
-  users.value = response.data.data;
+     const response = await axios.get(`${USUARIO_ALL_URL}?per_page=20&page=${page}`, { headers });
+    console.log(response.data.data);
+    users.value = response.data.data.data;
+    pagination.value = {
+        current_page: response.data.data.current_page,
+        last_page: response.data.data.last_page,
+        per_page: response.data.data.per_page,
+        total: response.data.data.total,
+    }
 } catch (error) {
   console.error('Error al obtener usuarios:', error);
    toast.error('Error al obtener usuarios: ' + error.message);
@@ -465,7 +504,7 @@ const updateUser = async () =>{
        console.log("Respuesta de la api: ", response);
        toast.success("Usuario modificado exitosamente!");
       closeEditModal();
-      await fetchUsers()
+        fetchUsers(pagination.value.current_page)
   }
   catch (error) {
        console.error('Error al actualizar usuario:', error);
@@ -492,7 +531,7 @@ if (confirm('¿Estás seguro de que quieres eliminar los usuarios seleccionados?
 
     toast.success('Usuarios deshabilitados exitosamente.');
     selectedUsers.value = []; // Limpiar la selección
-    await fetchUsers(); // Recargar la lista de usuarios
+      fetchUsers(pagination.value.current_page) // Recargar la lista de usuarios
   } catch (error) {
     console.error('Error al deshabilitar los usuarios:', error);
     toast.error('Error al deshabilitar los usuarios: ' + error.message);
@@ -501,6 +540,17 @@ if (confirm('¿Estás seguro de que quieres eliminar los usuarios seleccionados?
 };
 const handleFilterCampusSelect = (campusId) =>{
   selectedCampus.value = campusId;
+}
+const pagination = ref({
+    current_page: 1,
+    last_page: null,
+    per_page: 20,
+    total: null
+})
+const changePage = (page) =>{
+  if(page > 0 && page <= pagination.value.last_page){
+      fetchUsers(page);
+  }
 }
 onMounted(async () => {
 try {
@@ -519,9 +569,7 @@ try {
 }
    await fetchUsers();
 });
-const closeButtonStyle = ref('default');
-const actionButtonStyle = ref('primary');
-const actionButtonText = ref(null); // Inicialmente no hay botón de acción
+
 </script>
 
 <style scoped>
@@ -533,6 +581,14 @@ padding: 30px;
 box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 border: 1px solid rgba(255, 255, 255, 0.18);
 color: #333;
+
+}
+.pagination{
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+  align-items: center;
 }
 
 .glassmorphic-btn {
@@ -557,13 +613,17 @@ flex-direction: column;
 gap: 20px;
 }
 
-.glassmorphic-input, .glassmorphic-select {
-background: rgba(255, 255, 255, 0.2);
-border: 1px solid rgba(255, 255, 255, 0.3);
-border-radius: 10px;
-padding: 10px;
-color: #333;
+.glassmorphic-input,
+.glassmorphic-select {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 10px;
+  color: #333;
+  width: 300px;
 }
+
+
 
 .glassmorphic-table {
 width: 100%;
@@ -641,9 +701,12 @@ color: #333;
 }
 
 .radio-group {
-display: flex;
-gap: 20px;
-}
+    display: flex; /* Cambia a flex */
+    flex-direction: row; /* Alinear horizontalmente */
+    gap: 20px; /* Añade espacio entre elementos */
+    margin-bottom: 10px;
+    align-items: center;
+ }
 
 .radio-label {
 display: flex;
@@ -758,29 +821,65 @@ background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
 }
-.edit-modal{
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.form-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
 }
-.modal-content{
-   background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      color: #333;
-   display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-width: 400px;
+.form-group label {
+    width: 150px;
+    text-align:left;
+    
+}
+
+.checkbox-wrapper-47 input[type="radio"] {
+  display: none;
+  visibility: hidden;
+}
+
+.checkbox-wrapper-47 label {
+  position: relative;
+  padding-left: 2em;
+  padding-right: 1em;
+  line-height: 2;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.checkbox-wrapper-47 label:before {
+  box-sizing: border-box;
+  content: " ";
+  position: absolute;
+  top: 0.3em;
+  left: 0;
+  display: block;
+  width: 1.4em;
+  height: 1.4em;
+  border: 2px solid #9098A9;
+  border-radius: 6px;
+  z-index: -1;
+}
+
+ .checkbox-wrapper-47 input[type=radio]:checked + label {
+     padding-left: 1em;
+    color: #fff; /* Color de texto cuando está seleccionado */
+}
+.checkbox-wrapper-47 input[type=radio]:checked + label:before {
+    top: 0;
+    width: 100%;
+    height: 2em;
+    background: rgba(96, 4, 132, 1); /* Morado */
+    border-color: rgba(96, 4, 132, 1); /* Morado */
+}
+
+.checkbox-wrapper-47 label,
+.checkbox-wrapper-47 label::before {
+    transition: 0.25s all ease;
+}
+.checkbox-wrapper-47 {
+    margin-right: 15px;
 }
 </style>

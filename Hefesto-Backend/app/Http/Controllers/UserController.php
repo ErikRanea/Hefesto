@@ -14,15 +14,14 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+       $perPage = $request->input('per_page', 20); // Numero de usuarios por pagina, default a 5
         if ($user->rol == 'administrador') {
-            $users = User::orderBy('name', 'asc')->get();
+           $users = User::orderBy('name', 'asc')->paginate($perPage);
         } else {
-            // For other roles, potentially show only themselves or a specific subset.
-            // Modify this logic as needed based on your application's requirements.
-            $users = User::where('id', $user->id)->get();
+            $users = User::where('id', $user->id)->paginate($perPage);
         }
         return response()->json($users);
     }
@@ -176,9 +175,10 @@ class UserController extends Controller
         }
     }
 
-    public function all(){
+    public function all(Request $request){
         try {
-            $users = User::all();
+            $perPage = $request->input('per_page', 5); // Numero de usuarios por pagina, default a 5
+            $users = User::paginate($perPage);
             return response()->json(['data' => $users], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(['error' => 'Error al obtener los usuarios.'], Response::HTTP_INTERNAL_SERVER_ERROR);

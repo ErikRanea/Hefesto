@@ -69,19 +69,23 @@ Route::prefix('v1')->group(function () {
     Route::prefix('campus')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('store', [CampusController::class, 'store'])->middleware('admin');
-            Route::get('all',[CampusController::class, 'all']);
-            Route::get('show/{campus}',[CampusController::class, 'show']);
-            Route::put('update/{campus}',[CampusController::class, 'update'])->middleware('admin');
-            Route::delete('delete/{campus}',[CampusController::class,'delete'])->middleware('admin');
+            Route::get('all',[CampusController::class, 'all'])->middleware('admin');
+             Route::get('show/{id}',[CampusController::class, 'show'])->middleware('admin');
+            Route::put('update/{id}',[CampusController::class, 'update'])->middleware('admin');
+            Route::put('enable/{id}',[CampusController::class, 'enable'])->middleware('admin');
+            Route::put('disable/{id}',[CampusController::class, 'disable'])->middleware('admin');
+           Route::delete('delete/{id}',[CampusController::class,'destroy'])->middleware('admin');
         });
     });
 
     Route::prefix('seccion')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('store', [SeccionController::class, 'store'])->middleware('admin');
-            Route::post('all',[SeccionController::class, 'all']);
-            Route::get('show/{seccion}',[SeccionController::class, 'show']);
-            Route::put('update/{seccion}',[SeccionController::class, 'update'])->middleware('admin');
+           Route::get('all',[SeccionController::class, 'all'])->middleware('admin');
+            Route::get('show/{seccion}',[SeccionController::class, 'show'])->middleware('admin');
+             Route::put('update/{seccion}',[SeccionController::class, 'update'])->middleware('admin');
+              Route::put('enable/{seccion}',[SeccionController::class, 'enable'])->middleware('admin');
+             Route::put('disable/{seccion}',[SeccionController::class, 'disable'])->middleware('admin');
             Route::delete('delete/{seccion}',[SeccionController::class,'delete'])->middleware('admin');
         });
     });
@@ -92,6 +96,8 @@ Route::prefix('v1')->group(function () {
             Route::post('all',[MaquinaController::class, 'all']);
             Route::get('show/{maquina}',[MaquinaController::class, 'show']);
             Route::put('update/{maquina}',[MaquinaController::class, 'update'])->middleware('admin');
+             Route::put('enable/{maquina}',[MaquinaController::class, 'enable'])->middleware('admin');
+            Route::put('disable/{maquina}',[MaquinaController::class, 'disable'])->middleware('admin');
             Route::delete('delete/{maquina}',[MaquinaController::class,'delete'])->middleware('admin');
         });
     });
