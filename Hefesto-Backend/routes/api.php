@@ -107,6 +107,8 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+
+
     Route::prefix('tipo_incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('create', [TipoIncidenciaController::class, 'create'])->middleware('admin');
