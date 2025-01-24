@@ -147,7 +147,6 @@ class UserController extends Controller
         if ($request->has('habilitado')) $validatedData['habilitado'] = $request->boolean('habilitado');
         if ($request->filled('id_campus')) $validatedData['id_campus'] = $request->input('id_campus');
 
-
         $user->update($validatedData);
 
         return response()->json($user);
@@ -156,7 +155,7 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-     public function destroy(string $id)
+    public function destroy(string $id)
     {
         $authUser = auth()->user();
         $userToDelete = User::find($id);
@@ -167,9 +166,8 @@ class UserController extends Controller
 
         if ($authUser->rol == 'administrador') {
             if ($authUser->id != $userToDelete->id) {
-              
-               $userToDelete->update(['habilitado' => 0]);
-                return response()->json(['message' => 'Usuario deshabilitado'], Response::HTTP_OK);
+                $userToDelete->delete();
+                return response()->json(['message' => 'Usuario eliminado'], Response::HTTP_OK);
             } else {
                 return response()->json(['error' => 'No puedes eliminar tu propia cuenta'], Response::HTTP_BAD_REQUEST);
             }
@@ -187,33 +185,51 @@ class UserController extends Controller
         }
 
     }
-  
-      public function enable(string $id) {
-        $authUser = auth()->user();
-        if($authUser->rol !== 'administrador') {
-          return response()->json(['error' => 'No tienes permisos para habilitar usuarios'], Response::HTTP_UNAUTHORIZED);
-        }
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado'], Response::HTTP_NOT_FOUND);
-        }
+    public static function createDummyUsers()
+    {
+        $users = [];
+        $roles = ['operario', 'tecnico', 'administrador'];
 
-        $user->update(['habilitado' => 1]);
-        return response()->json(['message' => 'Usuario habilitado'], Response::HTTP_OK);
-      }
-
-        public function disable(string $id) {
-            $authUser = auth()->user();
-              if($authUser->rol !== 'administrador') {
-                  return response()->json(['error' => 'No tienes permisos para deshabilitar usuarios'], Response::HTTP_UNAUTHORIZED);
-              }
-            $user = User::find($id);
-
-            if (!$user) {
-                return response()->json(['error' => 'Usuario no encontrado'], Response::HTTP_NOT_FOUND);
+        // Create 3 users per role
+        for ($i = 0; $i < 3; $i++) {
+            foreach ($roles as $role) {
+                $users[] = [
+                    'name' => "{$role}User" . ($i+1),
+                    'primer_apellido' => 'Test',
+                    'segundo_apellido' => 'User',
+                    'email' => Str::random(10) . '@example.com',
+                    'password' => Hash::make('password123'),
+                    'rol' => $role,
+                    'foto_perfil' => null,
+                    'habilitado' => true,
+                ];
             }
-
-          $user->update(['habilitado' => 0]);
-            return response()->json(['message' => 'Usuario deshabilitado'], Response::HTTP_OK);
         }
+
+        // Add a extra administrator user
+        $users[] = [
+                'name' => "adminUser" . 4,
+                'primer_apellido' => 'Test',
+                'segundo_apellido' => 'User',
+                'email' => Str::random(10) . '@example.com',
+                'password' => Hash::make('password123'),
+                'rol' => 'administrador',
+                'foto_perfil' => null,
+                'habilitado' => true,
+            ];
+        
+        // Create the users in the database
+        try {
+              foreach ($users as $userData) {
+                 User::create($userData);
+              }
+          }
+         catch(\Exception $e) {
+            return response()->json(['error' => 'Error al generar usuarios de prueba: ' . $e->getMessage()], 500);
+        }
+        return response()->json(['message' => '11 usuarios de prueba creados con éxito'], 201);
+
+    }
+
+
 }
