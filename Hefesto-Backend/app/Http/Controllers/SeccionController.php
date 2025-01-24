@@ -13,6 +13,23 @@ use Illuminate\Support\Facades\Validator;
 class SeccionController extends Controller
 {
     //
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $perPage = $request->input('per_page', 20);
+         $query = Seccion::query();
+
+            // Filtrar por campus si se proporciona
+            if ($request->has('id_campus')) {
+                $query->where('id_campus', $request->input('id_campus'));
+            }
+
+        $secciones = $query->orderBy('nombre_seccion', 'asc')->paginate($perPage);
+
+        return response()->json($secciones);
+    }
 
     public function store(Request $request){
         try{
@@ -25,8 +42,8 @@ class SeccionController extends Controller
                 return response()->json($validator->errors(), 400);
             }
     
-            $seccion = new Seccion();
-            $seccion->nombre_seccion = $request->get('nombre_seccion');
+             $seccion = new Seccion();
+            $seccion->nombre_seccion = strip_tags($request->get('nombre_seccion'));
             $seccion->id_campus = $request->get('id_campus');
             $seccion->save();
     
@@ -37,9 +54,10 @@ class SeccionController extends Controller
         }
     }
 
-    public function all(Request $request)
+   public function all(Request $request)
     {
-        try {$query = Seccion::query();
+        try {
+             $query = Seccion::query();
 
             // Filtrar por campus si se proporciona
             if ($request->has('id_campus')) {
@@ -47,12 +65,12 @@ class SeccionController extends Controller
             }
 
             $secciones = $query->get();
-
             return response()->json(['message' => 'Lista de todas las secciones', 'data' => $secciones], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(['error' => 'Ha habido un error al solicitar las secciones'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public function show(Seccion $seccion)
     {
@@ -65,44 +83,52 @@ class SeccionController extends Controller
 
     public function update(Seccion $seccion,Request $request){
         
-        try {
+       try {
             $validator = Validator::make($request->all(), [
-                'nombre_seccion' => 'required|string|max:255',
-                'id_campus' => '|integer',
-                'habilitado'
+                 'nombre_seccion' => ['sometimes','required', 'string', 'max:255'],
+                'id_campus' => ['sometimes', 'required','integer','exists:campuses,id'],
+                'habilitado' => ['sometimes', 'boolean'],
+            ],[
+                 'nombre_seccion.required' => 'El nombre de la seccion es obligatorio.',
+                'nombre_seccion.max' => 'El nombre de la seccion no puede tener más de :max caracteres.',
+                'id_campus.required' => 'El campo id_campus es obligatorio.',
+                'id_campus.integer' => 'El id_campus debe ser un número entero.',
+                'habilitado.boolean' => 'El campo habilitado debe ser booleano.',
+                'id_campus.exists' => 'El id_campus no es valido'
             ]);
 
             if ($validator->fails()) {
-                return response()->json($validator->errors(), 400);
+                return response()->json(['error' => $validator->errors()], 400);
             }
 
-            if($request->get('habilitado')&& $request->get('id_campus')&& $request->get('nombre_seccion')){
-                $seccion->update([
-                    'nombre_seccion' => $request->get('nombre_seccion'),
-                    'id_campus' => $request->get('id_campus'),
-                    'habilitado' => $request->get('habilitado')
-                ]);
-            }
-            elseif($request->get('habilitado')&& $request->get('id_campus')){
-                $seccion->update([
-                    'id_campus' => $request->get('id_campus'),
-                    'habilitado' => $request->get('habilitado')
-                ]);
-            }
-            elseif($request->get('habilitado')&& $request->get('nombre_seccion')){
-                $seccion->update([
-                    'nombre_seccion' => $request->get('nombre_seccion'),
-                    'habilitado' => $request->get('habilitado')
-                ]);
-            }
-            else{
-                $seccion->update([
-                    'nombre_seccion' => $request->get('nombre_seccion')
-                ]);
-            }
-            return response()->json(['message' => 'Seccion actualizada con éxito!','data' => $seccion],Response::HTTP_ACCEPTED);
+            $validatedData = [];
+            if ($request->filled('nombre_seccion')) $validatedData['nombre_seccion'] = strip_tags($request->input('nombre_seccion'));
+           if ($request->filled('id_campus')) $validatedData['id_campus'] = $request->input('id_campus');
+            if ($request->has('habilitado')) $validatedData['habilitado'] = $request->boolean('habilitado');
+
+            $seccion->update($validatedData);
+             return response()->json(['message' => 'Seccion actualizada con éxito!','data' => $seccion],Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(['error' => 'Ha habido un error al actualizar la seccion'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+     public function enable(Seccion $seccion)
+    {
+         try {
+               $seccion->update(['habilitado' => true]);
+            return response()->json(['message' => 'Seccion habilitada'],Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['error'=> 'Error al habilitar la seccion'],Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function disable(Seccion $seccion)
+     {
+         try {
+               $seccion->update(['habilitado' => false]);
+            return response()->json(['message' => 'Seccion deshabilitada'],Response::HTTP_OK);
+        } catch (Exception $e) {
+             return response()->json(['error'=> 'Error al deshabilitar la seccion'],Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -114,6 +140,4 @@ class SeccionController extends Controller
             return response()->json(['error' => 'Ha habido un error al eliminar la seccion'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }

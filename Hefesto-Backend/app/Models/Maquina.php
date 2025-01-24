@@ -9,7 +9,7 @@ class Maquina extends Model
     //
 
     protected $fillable = ['nombre_maquina', 'numero_interno', 'tipo_maquina', 'prioridad', 
-    'habilitado'];
+    'habilitado', 'id_seccion'];
 
 
     public function seccion()

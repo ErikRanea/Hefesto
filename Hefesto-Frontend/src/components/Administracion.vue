@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid h-100">
-    <div v-if="!showUsuariosCrud">
+    <div v-if="!showUsuariosCrud && !showCampusCrud && !showSeccionCrud && !showMaquinaCrud">
         <div class="row">
           <div class="col-md-6 h-100">
             <div class="d-flex flex-column h-100">
@@ -14,7 +14,7 @@
                   </div>
                 </div>
               </button>
-              <button class="glass-card mb-4">
+              <button class="glass-card mb-4" @click="openCampusCrud">
                 <div class="d-flex justify-content-between align-items-center">
                   <div class="card-body text-center">
                     <h2 class="card-text">Campuses</h2>
@@ -24,7 +24,7 @@
                   </div>
                 </div>
               </button>
-              <button class="glass-card">
+              <button class="glass-card mb-4" @click="openSeccionCrud">
                 <div class="d-flex justify-content-center align-items-center text-center">
                   <div class="card-body text-center">
                     <h2 class="card-text">Secciones</h2>
@@ -37,7 +37,7 @@
             </div>
           </div>
           <div class="col-md-6">
-            <button class="glass-card mb-4" @click="openPopup('maquinas')">
+            <button class="glass-card mb-4" @click="openMaquinaCrud">
               <div class="justify-content-between align-items-center mb-3">
                 <div class="card-body text-center">
                   <h2 class="card-text">Maquinas</h2>
@@ -63,6 +63,15 @@
     <transition name="fade">
        <CRUDusuario v-if="showUsuariosCrud"  @close="closeUsuariosCrud" :enableUser="enableUser" :disableUser="disableUser"  :API_AUTH_URL="API_AUTH_URL" :IMAGE_URL="IMAGE_URL" @back-to-list="closeUsuariosCrud"/>
     </transition>
+       <transition name="fade">
+       <CRUDcampus v-if="showCampusCrud"  @close="closeCampusCrud" :enableCampus="enableCampus" :disableCampus="disableCampus"  :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeCampusCrud"/>
+    </transition>
+        <transition name="fade">
+       <CRUDsecciones v-if="showSeccionCrud"  @close="closeSeccionCrud" :enableSeccion="enableSeccion" :disableSeccion="disableSeccion"  :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeSeccionCrud"/>
+    </transition>
+    <transition name="fade">
+       <CRUDmaquinas v-if="showMaquinaCrud"  @close="closeMaquinaCrud" :enableMaquina="enableMaquina" :disableMaquina="disableMaquina"  :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeMaquinaCrud"/>
+    </transition>
       <MaquinasPopup
           ref="maquinasPopupRef"
           :visible="popupVisible"
@@ -79,6 +88,9 @@
 <script setup>
 import GlassmorphicPopup from "./GlassmorphicPopup.vue";
 import CRUDusuario from "./CRUDusuario.vue";
+import CRUDcampus from "./CRUDcampus.vue";
+import CRUDsecciones from "./CRUDsecciones.vue";
+import CRUDmaquinas from "./CRUDmaquinas.vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
 import { ref, onMounted, computed } from "vue";
@@ -87,6 +99,9 @@ import MaquinasPopup from "./MaquinasPopup.vue";
 
 const maquinasPopupRef = ref(null);
 const showUsuariosCrud = ref(false);
+const showCampusCrud = ref(false);
+const showSeccionCrud = ref(false);
+const showMaquinaCrud = ref(false);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
 const ME_URL = `${API_AUTH_URL}/auth/me`;
@@ -123,6 +138,111 @@ const openUsuariosCrud = () => {
 
 const closeUsuariosCrud = () => {
  showUsuariosCrud.value = false;
+};
+// Funciones para habilitar y deshabilitar campus desde el componente hijo
+const enableCampus = async (campusId) => {
+  try {
+    const token = localStorage.getItem('token');
+      const headers = {
+          Authorization: `Bearer ${token}`,
+      };
+       await axios.put(`${API_AUTH_URL}/campus/enable/${campusId}`,{},{headers});
+      console.log(`Campus ${campusId} habilitado`);
+  } catch (error) {
+    console.error('Error al habilitar campus:', error);
+      throw error;
+  }
+};
+
+const disableCampus = async (campusId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+     await axios.put(`${API_AUTH_URL}/campus/disable/${campusId}`,{},{headers});
+    console.log(`Campus ${campusId} deshabilitado`);
+  } catch (error) {
+    console.error('Error al deshabilitar campus:', error);
+       throw error;
+  }
+};
+const openCampusCrud = () => {
+   showCampusCrud.value = true;
+};
+
+const closeCampusCrud = () => {
+ showCampusCrud.value = false;
+};
+// Funciones para habilitar y deshabilitar secciones desde el componente hijo
+const enableSeccion = async (seccionId) => {
+  try {
+    const token = localStorage.getItem('token');
+      const headers = {
+          Authorization: `Bearer ${token}`,
+      };
+       await axios.put(`${API_AUTH_URL}/seccion/enable/${seccionId}`,{},{headers});
+      console.log(`Seccion ${seccionId} habilitada`);
+  } catch (error) {
+    console.error('Error al habilitar seccion:', error);
+      throw error;
+  }
+};
+
+const disableSeccion = async (seccionId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+     await axios.put(`${API_AUTH_URL}/seccion/disable/${seccionId}`,{},{headers});
+    console.log(`Seccion ${seccionId} deshabilitada`);
+  } catch (error) {
+    console.error('Error al deshabilitar seccion:', error);
+       throw error;
+  }
+};
+const openSeccionCrud = () => {
+   showSeccionCrud.value = true;
+};
+
+const closeSeccionCrud = () => {
+ showSeccionCrud.value = false;
+};
+// Funciones para habilitar y deshabilitar maquinas desde el componente hijo
+const enableMaquina = async (maquinaId) => {
+  try {
+    const token = localStorage.getItem('token');
+      const headers = {
+          Authorization: `Bearer ${token}`,
+      };
+       await axios.put(`${API_AUTH_URL}/maquina/enable/${maquinaId}`,{},{headers});
+      console.log(`Maquina ${maquinaId} habilitada`);
+  } catch (error) {
+    console.error('Error al habilitar maquina:', error);
+      throw error;
+  }
+};
+
+const disableMaquina = async (maquinaId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+     await axios.put(`${API_AUTH_URL}/maquina/disable/${maquinaId}`,{},{headers});
+    console.log(`Maquina ${maquinaId} deshabilitada`);
+  } catch (error) {
+    console.error('Error al deshabilitar maquina:', error);
+       throw error;
+  }
+};
+const openMaquinaCrud = () => {
+   showMaquinaCrud.value = true;
+};
+
+const closeMaquinaCrud = () => {
+ showMaquinaCrud.value = false;
 };
 
 // --- Variables del Popup ---
