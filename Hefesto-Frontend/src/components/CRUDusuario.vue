@@ -57,6 +57,18 @@
               <img src="../assets/images/icons/usuarios.svg" alt="Añadir Usuario" class="btn-icon" />
               Añadir Usuario
           </button>
+           <!-- Barra de búsqueda -->
+          <div class="search-bar">
+              <input type="text" v-model="searchQuery" placeholder="Buscar por nombre o apellido" class="glassmorphic-input"/>
+          
+          <CustomSelect
+                  :options="campusOptions"
+                  :modelValue="selectedCampus"
+                   @update:modelValue="handleFilterCampusSelect"
+                  placeholder="Filtrar por campus"
+                  class="glassmorphic-select"
+              />
+           </div>
           <div class="table-container">
               <table class="glassmorphic-table">
                   <thead>
@@ -73,7 +85,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr v-for="user in users" :key="user.id">
+                  <tr v-for="user in filteredUsers" :key="user.id">
                       <td>
                           <input type="checkbox" :value="user.id" @change="selectUser" v-model="selectedUsers" class="glassmorphic-checkbox" />
                       </td>
@@ -151,7 +163,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import CustomSelect from './CustomSelect.vue';
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
@@ -207,6 +219,26 @@ const props = defineProps({
           required: true
       }
 });
+const searchQuery = ref(''); // Para la barra de búsqueda
+const selectedCampus = ref(null);
+const filteredUsers = computed(() => {
+let filtered = [...users.value];
+
+if (searchQuery.value) {
+  const searchTerm = searchQuery.value.toLowerCase();
+  filtered = filtered.filter(user => {
+    const fullName = `${user.name} ${user.primer_apellido} ${user.segundo_apellido}`.toLowerCase();
+    return fullName.includes(searchTerm);
+  });
+}
+
+if (selectedCampus.value) {
+  filtered = filtered.filter(user => user.id_campus === selectedCampus.value);
+}
+
+return filtered;
+});
+
 
 const openRegisterView = () => {
 currentView.value = 'register';
@@ -387,13 +419,13 @@ rol:'',
 });
 const handleEditUser = async (user) => {
   try{
-       const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token');
     const headers = {
         Authorization: `Bearer ${token}`,
     };
      // Corrected URL to: api/v1/usuario/show/{usuario}
     const response = await axios.get(`${API_AUTH_URL}/usuario/show/${user.id}`,{headers})
-      if (response.data ) {
+      if (response.data) {
           const userData = response.data
           editUserData.value={
               id: userData.id,
@@ -467,6 +499,9 @@ if (confirm('¿Estás seguro de que quieres eliminar los usuarios seleccionados?
   }
 }
 };
+const handleFilterCampusSelect = (campusId) =>{
+  selectedCampus.value = campusId;
+}
 onMounted(async () => {
 try {
   const token = localStorage.getItem('token');
@@ -575,7 +610,12 @@ margin-bottom: 20px;
 width: 20px;
 height: 20px;
 }
-
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 .danger-btn {
 background: rgba(220, 53, 69, 0.7);
 color: white;
