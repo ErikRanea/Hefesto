@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
             Route::post('all', [IncidenciaController::class, 'all']);
             Route::post('all_cerradas', [IncidenciaController::class, 'allConCerradas']);
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
-            Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
+            Route::post('store', [IncidenciaController::class, 'store']);
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
              Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
             Route::delete('delete/{id}', [IncidenciaController::class, 'delete'])->middleware('admin');

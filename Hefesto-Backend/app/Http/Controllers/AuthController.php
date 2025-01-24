@@ -145,6 +145,7 @@ class AuthController extends Controller
             $new->password = Hash::make($request->get('password'));
             $new->rol = 'operario';
             $new->habilitado = 1;
+            $new->id_campus = $request->get('id_campus');
     
             if($request->file('image') != null){
                 ImageController::cargarImagen($request,$new);

@@ -50,6 +50,7 @@ services:
       - laravel
     environment:
       - VITE_API_AUTH_URL=${VITE_API_AUTH_URL}
+      - VITE_IMAGE_URL=${VITE_IMAGE_URL}
 
 networks:
   app-network:

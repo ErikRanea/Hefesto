@@ -9,6 +9,7 @@ class Campus extends Model
 {
     //
 
+    protected $table = 'campuses';
     protected $fillable = ['nombre_campus', 'habilitado'];
 
 
