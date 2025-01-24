@@ -15,8 +15,8 @@ class MantenimientoPreventivo extends Model
         'estado'
     ];
 
-    public function mantenimientosIncidencias(){
-        return $this->hasMany(MantenimientoIncidencia::class, 'id_incidencia','id');
+    public function mantenimientosMaquinas(){
+        return $this->hasMany(MantenimientoMaquina::class, 'id_incidencia','id');
     }
 
 }
