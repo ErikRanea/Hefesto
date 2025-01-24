@@ -31,8 +31,17 @@ class AuthController extends Controller
             return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
         $credentials = request(['email', 'password']);
+       
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Datos de acceso incorrectos. Por favor, verifica tus credenciales.'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $user = auth()->user();
+
+        // Check if the user is enabled
+        if ($user->habilitado !== 1) {
+            auth()->logout(); // Logout user if disabled
+            return response()->json(['error' => 'Este usuario está deshabilitado y no puede iniciar sesión.'], Response::HTTP_FORBIDDEN);
         }
 
         return $this->respondWithToken($token);

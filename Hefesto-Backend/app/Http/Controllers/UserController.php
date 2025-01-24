@@ -147,7 +147,6 @@ class UserController extends Controller
         if ($request->filled('foto_perfil')) $validatedData['foto_perfil'] = $request->input('foto_perfil');
         if ($request->has('habilitado')) $validatedData['habilitado'] = $request->boolean('habilitado');
 
-
         $user->update($validatedData);
 
         return response()->json($user);
@@ -156,7 +155,7 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-     public function destroy(string $id)
+    public function destroy(string $id)
     {
         $authUser = auth()->user();
         $userToDelete = User::find($id);
@@ -167,9 +166,8 @@ class UserController extends Controller
 
         if ($authUser->rol == 'administrador') {
             if ($authUser->id != $userToDelete->id) {
-              
-               $userToDelete->update(['habilitado' => 0]);
-                return response()->json(['message' => 'Usuario deshabilitado'], Response::HTTP_OK);
+                $userToDelete->delete();
+                return response()->json(['message' => 'Usuario eliminado'], Response::HTTP_OK);
             } else {
                 return response()->json(['error' => 'No puedes eliminar tu propia cuenta'], Response::HTTP_BAD_REQUEST);
             }
@@ -187,33 +185,7 @@ class UserController extends Controller
         }
 
     }
-  
-      public function enable(string $id) {
-        $authUser = auth()->user();
-        if($authUser->rol !== 'administrador') {
-          return response()->json(['error' => 'No tienes permisos para habilitar usuarios'], Response::HTTP_UNAUTHORIZED);
-        }
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado'], Response::HTTP_NOT_FOUND);
-        }
 
-        $user->update(['habilitado' => 1]);
-        return response()->json(['message' => 'Usuario habilitado'], Response::HTTP_OK);
-      }
 
-        public function disable(string $id) {
-            $authUser = auth()->user();
-              if($authUser->rol !== 'administrador') {
-                  return response()->json(['error' => 'No tienes permisos para deshabilitar usuarios'], Response::HTTP_UNAUTHORIZED);
-              }
-            $user = User::find($id);
 
-            if (!$user) {
-                return response()->json(['error' => 'Usuario no encontrado'], Response::HTTP_NOT_FOUND);
-            }
-
-          $user->update(['habilitado' => 0]);
-            return response()->json(['message' => 'Usuario deshabilitado'], Response::HTTP_OK);
-        }
 }
