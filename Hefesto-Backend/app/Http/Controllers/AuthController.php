@@ -49,6 +49,10 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],
+            'id_campus' => 'required', 'int',
+            'primer_apellido' => 'string',
+            'segundo_apellido' => 'string',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -65,20 +69,22 @@ class AuthController extends Controller
 
         $exists = User::where('email', htmlspecialchars($request->input('email')))->first();
         if (!$exists) {
-            $new = User::create([
-                'name' => htmlspecialchars($request->input('name')),
-                'primer_apellido' => htmlspecialchars($request->input('primer_apellido')),
-                'segundo_apellido' => htmlspecialchars($request->input('segundo_apellido')),
-                'foto_perfil' => htmlspecialchars($request->input('foto_perfil')),
-                'email' => htmlspecialchars($request->input('email')),
-                'password' => Hash::make($request->input('password')),//haseo de la contraseña
-                'rol' => 'operario',
-                'habilitado' => true,
-                
-            ]);
-            if (!$new) {
-                return response()->json(['error' => 'No se logró crear'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            $new = new User();
+            $new->name = $request->get('name');
+            $request->get('primer_apellido') ? $new->primer_apellido = $request->get('primer_apellido') : $new->primer_apellido = "" ;
+            $request->get('segundo_apellido') ? $new->segundo_apellido = $request->get('segundo_apellido') : $new->segundo_apellido = "" ;
+            $new->email = $request->get('email');
+            $new->password = Hash::make($request->get('password'));
+            $new->rol = 'operario';
+            $new->id_campus = $request->get('id_campus');
+            $new->habilitado = 1;
+    
+            if($request->file('image') != null){
+
+                ImageController::cargarImagen($request,$new);
             }
+            $new->save();
+
             return response()->json($new, Response::HTTP_CREATED);
         }else{
             return response()->json(['error' => 'Ya existe un usuario con ese email'], Response::HTTP_BAD_REQUEST);
@@ -92,6 +98,10 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],
+            'id_campus' => 'required', 'int',
+            'primer_apellido' => 'string',
+            'segundo_apellido' => 'string',
+            ''
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -108,20 +118,21 @@ class AuthController extends Controller
 
         $exists = User::where('email', htmlspecialchars($request->input('email')))->first();
         if (!$exists) {
-            $new = User::create([
-                'name' => htmlspecialchars($request->input('name')),
-                'primer_apellido' => htmlspecialchars($request->input('primer_apellido')),
-                'segundo_apellido' => htmlspecialchars($request->input('segundo_apellido')),
-                'foto_perfil' => htmlspecialchars($request->input('foto_perfil')),
-                'email' => htmlspecialchars($request->input('email')),
-                'password' => Hash::make($request->input('password')),//haseo de la contraseña
-                'rol' => 'tecnico',
-                'habilitado' => true,
-                
-            ]);
-            if (!$new) {
-                return response()->json(['error' => 'No se logró crear'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            $  $new = new User();
+            $new->name = $request->get('name');
+            $request->get('primer_apellido') ? $new->primer_apellido = $request->get('primer_apellido') : $new->primer_apellido = "" ;
+            $request->get('segundo_apellido') ? $new->segundo_apellido = $request->get('segundo_apellido') : $new->segundo_apellido = "" ;
+            $new->email = $request->get('email');
+            $new->password = Hash::make($request->get('password'));
+            $new->rol = 'operario';
+            $new->habilitado = 1;
+    
+            if($request->file('image') != null){
+
+                ImageController::cargarImagen($request,$new);
             }
+            $new->save();
+
             return response()->json($new, Response::HTTP_CREATED);
         }else{
             return response()->json(['error' => 'Ya existe un usuario con ese email'], Response::HTTP_BAD_REQUEST);
@@ -144,6 +155,18 @@ class AuthController extends Controller
         }
     }
 
+
+    public function meData(){
+        try {
+            // Si el token es válido, auth()->user() no lanzará una excepción
+            $user = auth()->user();
+            return response()->json(['message' => 'Token válido','data' => auth()->user()->id], Response::HTTP_OK);
+        } catch (TokenInvalidException $e) {
+            return response()->json(['error' => 'Token inválido'], Response::HTTP_UNAUTHORIZED);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al validar el token'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
     /**

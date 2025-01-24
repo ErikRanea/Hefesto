@@ -21,7 +21,6 @@ class IncidenciaController extends Controller
     {
         try {
             $query = Incidencia::query()
-                ->with(['tipoIncidencia', 'maquina'])
                 ->where('habilitado', 1);
 
             // Filtro por campus si se proporciona
@@ -251,7 +250,7 @@ class IncidenciaController extends Controller
     public function allMantenimientos(Request $request){
         try{
             
-            $query = Incidencia::query()->where('estado', 4);
+            $query = Incidencia::query();
 
             
             if($request->has('id_campus')){
@@ -283,7 +282,7 @@ class IncidenciaController extends Controller
                 }
             }
     
-            
+            $query->whereNotNull('id_mantenimiento');
 
     
             $incidencias = $query->get();
@@ -323,10 +322,14 @@ class IncidenciaController extends Controller
         $incidencia->save();
     }
     
-    public static function estadoEnEspera(Incidencia $incidencia){
+    public static function estadoEnEspera(Incidencia $incidencia)
+{
+    if($incidencia->estado != 3){
         $incidencia->estado = 1;
         $incidencia->save();
     }
+    return;
+}
 
     public static function estadoCerrado(Incidencia $incidencia){
         $incidencia->estado = 3;

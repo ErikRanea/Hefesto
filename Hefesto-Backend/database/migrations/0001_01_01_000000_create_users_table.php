@@ -22,8 +22,10 @@ return new class extends Migration
             $table->enum('rol', ['operario', 'tecnico', 'administrador']);
             $table->string('foto_perfil')->nullable();
             $table->boolean('habilitado')->default(true);
+            $table->unsignedBigInteger('id_campus')->nullable(); 
             $table->rememberToken();
             $table->timestamps();
+            $table->foreign('id_campus')->references('id')->on('campuses');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
