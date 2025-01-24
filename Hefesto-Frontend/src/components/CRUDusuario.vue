@@ -1,119 +1,108 @@
 <template>
-    <div>
-      <GlassmorphicPopup
-        :visible="popupVisible"
-        :title="popupTitle"
-        :subtitle="popupSubtitle"
-        :closeButtonText="popupCloseButtonText"
-        :actionButtonText="actionButtonText"
-        :closeButtonStyle="closeButtonStyle"
-        :actionButtonStyle="actionButtonStyle"
-        @close="closePopup"
-        @action="handleAction"
-      >
-        <template #popup-content>
-          <div v-if="currentView === 'register'">
-            <h2>Registrar Usuario</h2>
-            <label>
-              <input type="radio" v-model="isTecnico" :value="true" /> Técnico
-            </label>
-            <label>
-              <input type="radio" v-model="isTecnico" :value="false" /> Usuario
-            </label>
-            <br />
+  <div class="glassmorphic-container">
+    <button v-if="currentView === 'list'" class="glassmorphic-btn" @click="goBackToList">Volver</button>
+    <div v-if="currentView === 'register'" class="glassmorphic-form">
+      <h2 class="form-title">Registrar Usuario</h2>
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" v-model="isTecnico" :value="true" />
+          <span>Técnico</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" v-model="isTecnico" :value="false" />
+          <span>Usuario</span>
+        </label>
+      </div>
 
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" v-model="userData.name" class="form-control" />
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" v-model="userData.name" class="glassmorphic-input" />
+      </div>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" v-model="userData.email" class="form-control" />
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" v-model="userData.email" class="glassmorphic-input" />
+      </div>
 
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" v-model="userData.password" class="form-control" />
+      <div class="form-group">
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" v-model="userData.password" class="glassmorphic-input" />
+      </div>
 
-            <label for="primer_apellido">Primer Apellido:</label>
-            <input
-              type="text"
-              id="primer_apellido"
-              v-model="userData.primer_apellido"
-              class="form-control"
-            />
+      <div class="form-group">
+        <label for="primer_apellido">Primer Apellido:</label>
+        <input type="text" id="primer_apellido" v-model="userData.primer_apellido" class="glassmorphic-input" />
+      </div>
 
-            <label for="segundo_apellido">Segundo Apellido:</label>
-            <input
-              type="text"
-              id="segundo_apellido"
-              v-model="userData.segundo_apellido"
-              class="form-control"
-            />
+      <div class="form-group">
+        <label for="segundo_apellido">Segundo Apellido:</label>
+        <input type="text" id="segundo_apellido" v-model="userData.segundo_apellido" class="glassmorphic-input" />
+      </div>
 
-            <label for="campus">Campus:</label>
-            <CustomSelect
-              :options="campusOptions"
-              :modelValue="userData.id_campus"
-              @update:modelValue="handleCampusSelect"
-            />
+      <div class="form-group">
+        <label for="campus">Campus:</label>
+        <CustomSelect
+          :options="campusOptions"
+          :modelValue="userData.id_campus"
+          @update:modelValue="handleCampusSelect"
+          class="glassmorphic-select"
+        />
+      </div>
 
-            <button class="btn btn-secondary" @click="goBack">Atrás</button>
-          </div>
-          <div v-else-if="currentView === 'list'">
-            <h2>Lista de Usuarios</h2>
-            <button class="popup-btn primary-btn add-user-btn" @click="openRegisterView">
-              <img src="../assets/images/icons/usuarios.svg" alt="Añadir Usuario" style="width: 20px; margin-right: 5px;">Añadir Usuario
-            </button>
-            <div class="table-responsive">
-              <table class="table glassmorphic-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <input type="checkbox" @change="selectAll" v-model="allSelected" />
-                    </th>
-                    <th>Foto</th>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Rol</th>
-                    <th>Campus</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="user in users" :key="user.id">
-                    <td>
-                      <input type="checkbox" :value="user.id" @change="selectUser" v-model="selectedUsers" />
-                    </td>
-                    <td>
-                      <img :src="API_AUTH_URL + '/' + user.foto_perfil" alt="Foto de perfil" width="50" class="rounded-image"/>
-                    </td>
-                    <td>{{ user.name }} {{ user.primer_apellido }} {{ user.segundo_apellido }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.rol }}</td>
-                    <td>{{ getCampusName(user.id_campus) }}</td>
-                    <td>
-                      <button class="popup-btn danger-btn" @click="deleteUser(user.id)">Eliminar</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <button class="popup-btn danger-btn" @click="deleteSelectedUsers" :disabled="selectedUsers.length === 0">Eliminar Seleccionados</button>
-          </div>
-        </template>
-        <template #popup-actions>
-          <button class="popup-btn" :class="{'default-btn': closeButtonStyle === 'default', 'cancel-btn': closeButtonStyle === 'cancel'}" @click="closePopup">
-            {{ popupCloseButtonText }}
-          </button>
-          <button v-if="currentView === 'register'" class="popup-btn" :class="{'default-btn': actionButtonStyle === 'default', 'primary-btn': actionButtonStyle === 'primary'}" @click="handleAction">
-            {{ popupActionButtonText }}
-          </button>
-        </template>
-      </GlassmorphicPopup>
+      <button class="glassmorphic-btn" @click="goBack">Volver</button>
     </div>
+    <div v-else-if="currentView === 'list'" class="user-list">
+      <h2 class="list-title">Lista de Usuarios</h2>
+      <button class="glassmorphic-btn add-user-btn" @click="openRegisterView">
+        <img src="../assets/images/icons/usuarios.svg" alt="Añadir Usuario" class="btn-icon" />
+        Añadir Usuario
+      </button>
+      <div class="table-container">
+        <table class="glassmorphic-table">
+          <thead>
+            <tr>
+              <th>
+                <input type="checkbox" @change="selectAll" v-model="allSelected" class="glassmorphic-checkbox" />
+              </th>
+              <th>Foto</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Campus</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id">
+              <td>
+                <input type="checkbox" :value="user.id" @change="selectUser" v-model="selectedUsers" class="glassmorphic-checkbox" />
+              </td>
+              <td>
+                <img :src="props.IMAGE_URL + user.foto_perfil" alt="Foto de perfil" class="user-avatar" />
+              </td>
+              <td>{{ user.name }} {{ user.primer_apellido }} {{ user.segundo_apellido }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.rol }}</td>
+              <td>{{ getCampusName(user.id_campus) }}</td>
+             <td class="action-cell">
+               <label class="switch">
+                <input type="checkbox" :checked="user.habilitado === 1" @change="toggleUserStatus(user)" />
+                  <span class="slider"></span>
+                </label>
+                 <button class="glassmorphic-btn edit-btn" @click="handleEditUser(user)">Editar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="glassmorphic-btn danger-btn" @click="deleteSelectedUsers" :disabled="selectedUsers.length === 0">Deshabilitar Seleccionados</button>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import CustomSelect from './CustomSelect.vue';
-import GlassmorphicPopup from './GlassmorphicPopup.vue';
 import axios from 'axios';
 
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
@@ -121,9 +110,9 @@ const REGISTER_URL = `${API_AUTH_URL}/auth/register`;
 const REGISTER_TECNICO_URL = `${API_AUTH_URL}/auth/register_tecnico`;
 const CAMPUS_ALL_URL = `${API_AUTH_URL}/campus/all`;
 const USUARIO_ALL_URL = `${API_AUTH_URL}/usuario/all`;
-const USUARIO_DELETE_URL = `${API_AUTH_URL}/usuario/delete`;
+const USUARIO_DELETE_URL = `${API_AUTH_URL}/usuario/update`;
 
-const popupVisible = ref(false);
+const popupVisible = ref(true);
 const popupTitle = ref('Gestión de Usuarios');
 const popupSubtitle = ref('');
 const popupCloseButtonText = ref('Cerrar');
@@ -131,68 +120,103 @@ const popupActionButtonText = ref('Registrar');
 
 const isTecnico = ref(false);
 const userData = ref({
-    name: '',
-    email: '',
-    password: '',
-    primer_apellido: '',
-    segundo_apellido: '',
-    id_campus: null,
+  name: '',
+  email: '',
+  password: '',
+  primer_apellido: '',
+  segundo_apellido: '',
+  id_campus: null,
 });
 
 const campusOptions = ref([]);
-const currentView = ref('options');
-const users = ref([]); // Para almacenar los usuarios
-const selectedUsers = ref([]); // Para almacenar los usuarios seleccionados
-const allSelected = ref(false); //Para almacenar todos los usuarios
-
-const emit = defineEmits(['close']);
-
-const openPopup = () => {
-    popupVisible.value = true;
-};
-
-const closePopup = () => {
-    popupVisible.value = false;
-    emit('close');
-};
+const currentView = ref('list');
+const users = ref([]);
+const selectedUsers = ref([]);
+const allSelected = ref(false);
+const emit = defineEmits(['close', 'back-to-list'])
+const props = defineProps({
+    closeUsuariosCrud: {
+        type: Function,
+    },
+     enableUser: {
+        type: Function,
+    },
+    disableUser: {
+      type: Function
+   },
+    API_AUTH_URL: {
+            type: String,
+            required: true
+        },
+         IMAGE_URL: {
+            type: String,
+            required: true
+        }
+});
 
 const openRegisterView = () => {
-    currentView.value = 'register';
-    popupActionButtonText.value = 'Registrar';
+  currentView.value = 'register';
+  popupActionButtonText.value = 'Registrar';
 };
 
 const goBack = () => {
     currentView.value = 'list';
     popupActionButtonText.value = null;
 };
+const goBackToList = () => {
+  emit('back-to-list')
+}
 
 const handleCampusSelect = (campusId) => {
-    userData.value.id_campus = campusId;
+  userData.value.id_campus = campusId;
 };
 
 const handleAction = async () => {
     try {
         const url = isTecnico.value ? REGISTER_TECNICO_URL : REGISTER_URL;
+        const payload = {};
 
-        if (!userData.value.id_campus) {
+        // Debugging: Imprime los valores de los campos justo antes de construir el payload
+        console.log('Valor de userData.nombre:', userData.value.name);
+        console.log('Valor de userData.email:', userData.value.email);
+        console.log('Valor de userData.password:', userData.value.password);
+        console.log('Valor de userData.id_campus:', userData.value.id_campus);
+
+        // Campos requeridos
+        if (!userData.value.name) {
+            alert('El campo Nombre es obligatorio.');
+            return; // Detiene la ejecución si el nombre está vacío
+        }
+        payload.name = userData.value.name; // Cambiado a 'name'
+
+        if (!userData.value.email) {
+            alert('El campo Email es obligatorio.');
+            return; // Detiene la ejecución si el email está vacío
+        }
+        payload.email = userData.value.email;
+
+        if (!userData.value.password) {
+            alert('El campo Contraseña es obligatorio.');
+            return; // Detiene la ejecución si la contraseña está vacía
+        }
+        payload.password = userData.value.password;
+     if (userData.value.id_campus) {
+         payload.id_campus = Number(userData.value.id_campus);
+          }
+        else{
             alert('El campo Campus es obligatorio.');
             return;
         }
-
-        const payload = {
-            name: userData.value.name,
-            email: userData.value.email,
-            password: userData.value.password,
-            id_campus: Number(userData.value.id_campus),
-        };
-
+        // Campos opcionales
         if (userData.value.primer_apellido) {
             payload.primer_apellido = userData.value.primer_apellido;
         }
-
         if (userData.value.segundo_apellido) {
             payload.segundo_apellido = userData.value.segundo_apellido;
         }
+
+        // Debugging: Imprime el payload antes de enviarlo
+        console.log('Payload a enviar:', payload);
 
         const token = localStorage.getItem('token');
         const headers = {
@@ -203,6 +227,7 @@ const handleAction = async () => {
         console.log('Registro exitoso:', response.data);
         alert('Usuario registrado exitosamente!');
 
+        // Restablecer los valores de userData a sus valores iniciales
         userData.value = {
             name: '',
             email: '',
@@ -219,228 +244,358 @@ const handleAction = async () => {
 
 // Función para obtener el nombre del campus
 const getCampusName = (campusId) => {
-    const campus = campusOptions.value.find((c) => c.id === campusId);
-    return campus ? campus.label : 'Desconocido';
+  const campus = campusOptions.value.find((c) => c.id === campusId);
+  return campus ? campus.label : 'Desconocido';
 };
 
 // Función para obtener los usuarios de la API
 const fetchUsers = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        const headers = {
-            Authorization: `Bearer ${token}`,
-        };
-
-        console.log('Realizando petición a:', USUARIO_ALL_URL);
-        console.log('Headers de la petición:', headers);
-
-        const response = await axios.get(USUARIO_ALL_URL, { headers });
-        console.log('Respuesta de la API:', response.data); // Imprime la respuesta completa
-
-        users.value = response.data.data; // Almacena los usuarios en el ref users
-        currentView.value = 'list'; // Cambia a la vista de lista
-    } catch (error) {
-        console.error('Error al obtener la lista de usuarios:', error);
-        alert('Error al obtener la lista de usuarios: ' + error.message);
-    }
+  try {
+    const token = localStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const response = await axios.get(USUARIO_ALL_URL, { headers });
+    users.value = response.data.data;
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    alert('Error al obtener usuarios: ' + error.message);
+  }
 };
 
 // Función para seleccionar un usuario
 const selectUser = (event) => {
     const userId = parseInt(event.target.value);
-    if (event.target.checked) {
+    const index = selectedUsers.value.indexOf(userId);
+
+  if (event.target.checked) {
+    // Add the user if not already selected
+    if(index === -1){
         selectedUsers.value.push(userId);
-    } else {
-        const index = selectedUsers.value.indexOf(userId);
-        if (index !== -1) {
-            selectedUsers.value.splice(index, 1);
-        }
     }
-    console.log('Usuarios seleccionados:', selectedUsers.value);
+  } else {
+    // Remove the user if selected
+     if (index !== -1) {
+        selectedUsers.value.splice(index, 1);
+    }
+  }
+  console.log('Usuarios seleccionados:', selectedUsers.value);
 };
 
 // Función para seleccionar todos los usuarios
 const selectAll = () => {
-    if (allSelected.value) {
-        selectedUsers.value = users.value.map((user) => parseInt(user.id));
+ if (allSelected.value) {
+    selectedUsers.value = users.value.map((user) => parseInt(user.id));
+  } else {
+    selectedUsers.value = [];
+  }
+  console.log('Usuarios seleccionados:', selectedUsers.value);
+};
+// Computed para sincronizar el checkbox selectAll
+allSelected.value = computed({
+  get: () => selectedUsers.value.length === users.value.length,
+  set: (val) => {
+    if (val) {
+      selectedUsers.value = users.value.map((user) => parseInt(user.id));
     } else {
-        selectedUsers.value = [];
+      selectedUsers.value = [];
     }
-    console.log('Usuarios seleccionados:', selectedUsers.value);
-};
+  },
+});
 
-// Función para eliminar un usuario
-const deleteUser = async (userId) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-        try {
-            const token = localStorage.getItem('token');
-            const headers = {
-                Authorization: `Bearer ${token}`,
-            };
-            const response = await axios.delete(`${USUARIO_DELETE_URL}/${userId}`, { headers });
-            console.log('Usuario eliminado:', response.data);
-            alert('Usuario eliminado exitosamente.');
-            fetchUsers(); // Recargar la lista de usuarios
-        } catch (error) {
-            console.error('Error al eliminar el usuario:', error);
-            alert('Error al eliminar el usuario: ' + error.message);
-        }
-    }
-};
 
-// Función para eliminar los usuarios seleccionados
-const deleteSelectedUsers = async () => {
-    if (confirm('¿Estás seguro de que quieres eliminar los usuarios seleccionados?')) {
-        try {
-            const token = localStorage.getItem('token');
-            const headers = {
-                Authorization: `Bearer ${token}`,
-            };
-
-            // Eliminar usuarios individualmente
-            for (const userId of selectedUsers.value) {
-                await axios.delete(`${USUARIO_DELETE_URL}/${userId}`, { headers });
-                console.log(`Usuario ${userId} eliminado`);
-            }
-
-            alert('Usuarios eliminados exitosamente.');
-            selectedUsers.value = []; // Limpiar la selección
-            fetchUsers(); // Recargar la lista de usuarios
-        } catch (error) {
-            console.error('Error al eliminar los usuarios:', error);
-            alert('Error al eliminar los usuarios: ' + error.message);
-        }
-    }
-};
-
-onMounted(async () => {
+const toggleUserStatus = async (user) => {
     try {
-        const token = localStorage.getItem('token');
-        const headers = {
-            Authorization: `Bearer ${token}`,
-        };
-        const response = await axios.get(CAMPUS_ALL_URL, { headers });
-        campusOptions.value = response.data.data.map((campus) => ({
-            id: campus.id,
-            label: campus.nombre_campus,
-        }));
-    } catch (error) {
-        console.error('Error al obtener campus:', error);
-        alert('Error al obtener campus: ' + error.message);
+      if (user.habilitado === 1) {
+        await props.disableUser(user.id);
+        user.habilitado = 0;
+      } else {
+         await props.enableUser(user.id);
+         user.habilitado = 1;
+      }
+    } catch(error){
+        console.error('Error al cambiar el estado del usuario en la vista:', error);
     }
-    currentView.value = 'list'; // Mostrar la lista por defecto
-    await fetchUsers(); // Cargar la lista de usuarios al montar el componente
+};
+
+const deleteSelectedUsers = async () => {
+  if (confirm('¿Estás seguro de que quieres eliminar los usuarios seleccionados?')) {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      // Eliminar usuarios individualmente
+      for (const userId of selectedUsers.value) {
+        await axios.put(`${USUARIO_DELETE_URL}/${userId}`, { habilitado: 0 }, { headers });
+        console.log(`Usuario ${userId} deshabilitado`);
+      }
+
+      alert('Usuarios deshabilitados exitosamente.');
+      selectedUsers.value = []; // Limpiar la selección
+      await fetchUsers(); // Recargar la lista de usuarios
+    } catch (error) {
+      console.error('Error al deshabilitar los usuarios:', error);
+      alert('Error al deshabilitar los usuarios: ' + error.message);
+    }
+  }
+};
+onMounted(async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const response = await axios.get(CAMPUS_ALL_URL, { headers });
+    campusOptions.value = response.data.data.map((campus) => ({
+      id: campus.id,
+      label: campus.nombre_campus,
+    }));
+  } catch (error) {
+    console.error('Error al obtener campus:', error);
+    alert('Error al obtener campus: ' + error.message);
+  }
+     await fetchUsers();
 });
 
-defineExpose({
-    openPopup,
-});
-
+const handleEditUser = (user) => {
+  console.log('Editing user:', user);
+  // Here you would add logic to open a modal or navigate to an edit form
+};
 const closeButtonStyle = ref('default');
 const actionButtonStyle = ref('primary');
 const actionButtonText = ref(null); // Inicialmente no hay botón de acción
 </script>
 
 <style scoped>
-/* Estilos para la tabla */
-.table-responsive {
-  overflow-x: auto; /* Agrega scroll horizontal si es necesario */
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+.glassmorphic-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #333;
 }
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background-color: transparent;
-}
 
-.table th,
-.table td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px;
-  text-align: left;
-  color: #333; /* Cambiar el color a un gris más oscuro */
-}
-
-.table th {
-  font-weight: 600;
-  text-transform: uppercase; /* Convertir el encabezado en mayúsculas */
-  font-size: 0.9rem; /* Reducir el tamaño de la fuente */
-}
-
-.table tbody tr {
-  transition: background-color 0.3s ease;
-}
-
-.table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Reduce padding en las celdas de la tabla */
-.table th,
-.table td {
-  padding: 0.75rem;
-}
-
-.popup-btn {
-  padding: 0.8rem 1.8rem;
-  border-radius: 2rem;
-  font-size: 1rem;
-  cursor: pointer;
+.glassmorphic-btn {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: bold;
   transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.glassmorphic-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.glassmorphic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.glassmorphic-input, .glassmorphic-select {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 10px;
+  color: #333;
+}
+
+.glassmorphic-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.glassmorphic-table th,
+.glassmorphic-table td {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 15px;
+  text-align: left;
   border: none;
 }
 
-.default-btn {
+.glassmorphic-table th {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.glassmorphic-table tr {
+  transition: all 0.3s ease;
+}
+
+.glassmorphic-table tr:hover {
   background: rgba(255, 255, 255, 0.3);
-  color: #333;
 }
 
-.default-btn:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-/* Estilos para botones morados */
-.primary-btn {
-  background: rgba(96, 4, 132, 1); /* Morado */
-  color: white;
-}
-
-.primary-btn:hover {
-  background: rgba(96, 4, 132, 0.9);
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .add-user-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 10px;
+  margin-bottom: 20px;
 }
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .danger-btn {
-    background: rgba(220, 53, 69, 0.7);
-    color: white;
+  background: rgba(220, 53, 69, 0.7);
+  color: white;
 }
 
 .danger-btn:hover {
-    background: rgba(220, 53, 69, 0.9);
+  background: rgba(220, 53, 69, 0.9);
 }
-.glassmorphic-table {
-  border-radius: 1rem; /* Bordes redondeados */
-  background: rgba(255, 255, 255, 0.3); /* Fondo transparente */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Sombra sutil */
-  backdrop-filter: blur(5px); /* Efecto de desenfoque */
-  -webkit-backdrop-filter: blur(5px); /* Para compatibilidad con Safari */
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Borde sutil */
+
+.enable-btn {
+  background: rgba(40, 167, 69, 0.7);
+  color: white;
+}
+
+.enable-btn:hover {
+  background: rgba(40, 167, 69, 0.9);
+}
+
+.form-title, .list-title {
+  font-size: 24px;
+  margin-bottom: 20px;
   color: #333;
 }
-/* Estilos para alinear la imagen de perfil y redondear */
-.rounded-image {
-    border-radius: 50%; /* Redondea la imagen */
-    vertical-align: middle; /* Alinea verticalmente con el texto */
-    margin-right: 8px; /* Espacio entre la imagen y el texto */
+
+.radio-group {
+  display: flex;
+  gap: 20px;
 }
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.glassmorphic-checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.glassmorphic-checkbox:checked {
+  background: rgba(96, 4, 132, 0.7);
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+  .switch {
+   position: relative;
+   display: inline-block;
+   width: 120px;
+   height: 34px;
+  }
+
+  .switch input {
+   display: none;
+  }
+
+  .slider {
+   position: absolute;
+   cursor: pointer;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   background-color: #3C3C3C;
+   -webkit-transition: .4s;
+   transition: .4s;
+   border-radius: 34px;
+  }
+
+  .slider:before {
+   position: absolute;
+   content: "";
+   height: 26px;
+   width: 26px;
+   left: 4px;
+   bottom: 4px;
+   background-color: white;
+   -webkit-transition: .4s;
+   transition: .4s;
+   border-radius: 50%;
+  }
+
+  input:checked + .slider {
+   background-color: rgba(96, 4, 132, 1);
+  }
+
+  input:focus + .slider {
+   box-shadow: 0 0 1px rgba(96, 4, 132, 0.719);
+  }
+
+  input:checked + .slider:before {
+   -webkit-transform: translateX(26px);
+   -ms-transform: translateX(26px);
+   transform: translateX(85px);
+  }
+
+  /*------ ADDED CSS ---------*/
+  .slider:after {
+ content: 'DESABILITADO';
+ color: white;
+ display: block;
+ position: absolute;
+ transform: translate(-50%,-50%);
+ top: 50%;
+ left: 60%;
+ font-size: 10px;
+
+}
+
+input:checked + .slider:after {
+ content: 'HABILITADO';
+ left: 47%;
+}
+
+  /*--------- END --------*/
+.edit-btn{
+    margin-left: 5px;
+  background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.edit-btn:hover{
+    background: rgba(255, 255, 255, 0.3);
+}
+.action-cell {
+    display: flex;
+    align-items: center;
+}
+
 </style>
