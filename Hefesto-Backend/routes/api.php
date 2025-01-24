@@ -45,10 +45,10 @@ Route::prefix('v1')->group(function () {
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
             Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
+             Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
             Route::delete('delete/{id}', [IncidenciaController::class, 'delete'])->middleware('admin');
-            Route::post('all_mantenimientos', [IncidenciaController::class, 'allMantenimientos'])->middleware('tecnico');
-            Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
-        });
+           Route::post('all_mantenimientos', [IncidenciaController::class, 'allMantenimientos'])->middleware('tecnico');
+         });
     });
 
     Route::prefix('tecnico_incidencia')->group(function () {
@@ -119,10 +119,12 @@ Route::prefix('v1')->group(function () {
     });
     Route::prefix('usuario')->group(function () {
         Route::middleware('auth:api')->group(function () {
-            Route::get('all',[UserController::class, 'all'])->middleware('admin');
-            Route::get('show/{usuario}',[UserController::class, 'show'])->middleware('admin');
+           Route::get('all',[UserController::class, 'all'])->middleware('admin');
+           Route::get('show/{usuario}',[UserController::class, 'show'])->middleware('admin');
             Route::put('update/{usuario}',[UserController::class, 'update'])->middleware('admin');
-            Route::delete('delete/{usuario}',[UserController::class,'delete'])->middleware('admin');
+            Route::put('enable/{usuario}',[UserController::class, 'enable'])->middleware('admin');
+            Route::put('disable/{usuario}',[UserController::class, 'disable'])->middleware('admin');
+          Route::delete('delete/{usuario}',[UserController::class,'destroy'])->middleware('admin');
         });
     });
 });
