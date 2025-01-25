@@ -53,6 +53,10 @@ class Incidencia extends Model
         return $this->hasMany(TecnicoIncidencia::class, 'id_incidencia', 'id');
     }
 
+    public function mantenimientosIncidencias(){
+        return $this->hasMany(MantenimientoPreventivo::class, 'id_incidencia','id');
+    }
+
 
 
 }

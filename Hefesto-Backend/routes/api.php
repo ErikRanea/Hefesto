@@ -12,6 +12,8 @@ use App\Http\Controllers\TecnicoIncidenciaController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MantenimientoPreventivoController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\MantenimientoMaquinaController;
+use App\Models\MantenimientoMaquina;
 
 Route::prefix('v1')->group(function () {
 
@@ -102,7 +104,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-     Route::prefix('mantenimiento-preventivo')->group(function () {
+     Route::prefix('mantenimiento_preventivo')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('create', [MantenimientoPreventivoController::class, 'create'])->middleware('admin');
             Route::post('store', [MantenimientoPreventivoController::class, 'store'])->middleware('admin');
@@ -112,6 +114,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('delete/{mantenimiento_preventivo}',[MantenimientoPreventivoController::class,'delete'])->middleware('admin');
         });
     });
+
+
+    Route::prefix('mantenimiento_maquina')->group(function () {
+        Route::middleware('auth:api')->group( function () {
+            Route::post('asignar_mantenimiento', [MantenimientoMaquinaController::class,'asignarMantenimiento'])->middleware('admin');
+        });
+    });
+
+
 
     Route::prefix('tipo_incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
