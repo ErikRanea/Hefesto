@@ -121,7 +121,6 @@ const allMenuItems = {
   tecnico: [
     { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
-    { name: 'Mis incidencias', icon: '../src/assets/images/icons/mistickets.svg', to: '/mis-incidencias' },
     { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
   ],
