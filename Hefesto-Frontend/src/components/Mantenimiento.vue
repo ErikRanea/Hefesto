@@ -235,8 +235,10 @@
   import GlassmorphicPopup from './GlassmorphicPopup.vue';
   import CustomSelect from './CustomSelect.vue';
   import CustomInput from './CustomInput.vue';
+  import { useToast } from "vue-toastification";
   
   const loading = ref(true);
+  const toast = useToast();
   const error = ref(null);
   const incidencias = ref([]);
   const tiposIncidencia = ref([]);
@@ -440,51 +442,51 @@
       }
   };
   const fetchMantenimientosOptions = async () => {
-      try {
-            const mantenimientosData = await fetchMantenimientos();
-          mantenimientosOptions.value = mantenimientosData.map((mantenimiento) => ({
-              id: mantenimiento.id,
-              label: mantenimiento.nombre,
-          }));
-      } catch(error){
-          console.error('Error al obtener los mantenimientos para las opciones:', error);
-            error.value = {
-                  message: 'Error al obtener los mantenimientos para las opciones',
-                  type: 'api',
-              };
-      }
-  
-  }
-  onMounted(async () => {
-      try {
-          await fetchUserData();
-          const [tiposData, maquinasData] = await Promise.all([
-              fetchTipoIncidencias(),
-              fetchMaquinas(),
-          ]);
-  
-          tiposIncidencia.value = tiposData.map((tipo) => ({
-              id: tipo.id,
-              label: tipo.tipo,
-          }));
-  
-          maquinas.value = maquinasData.map((maquina) => ({
-              id: maquina.id,
-              label: maquina.nombre_maquina,
-          }));
-  
-        await fetchMantenimientosOptions();
-          maquinasOptions.value = maquinasData.map((maquina) => ({
-              id: maquina.id,
-              label: maquina.nombre_maquina,
-          }));
-          await loadIncidencias();
-          checkUserHasReclamada();
-      } catch (err) {
-          error.value = err;
-          loading.value = false;
-      }
-  });
+    try {
+        const mantenimientosData = await fetchMantenimientos();
+        console.log('Mantenimientos options:', mantenimientosData);
+        mantenimientosOptions.value = mantenimientosData.map((mantenimiento) => ({
+            id: mantenimiento.id,
+            label: mantenimiento.nombre, 
+        }));
+    } catch (error) {
+        console.error('Error al obtener los mantenimientos para las opciones:', error);
+        error.value = {
+            message: 'Error al obtener los mantenimientos para las opciones',
+            type: 'api',
+        };
+    }
+};
+onMounted(async () => {
+    try {
+        await fetchUserData();
+        const [tiposData, maquinasData] = await Promise.all([
+            fetchTipoIncidencias(),
+            fetchMaquinas(),
+        ]);
+
+        tiposIncidencia.value = tiposData.map((tipo) => ({
+            id: tipo.id,
+            label: tipo.tipo,
+        }));
+
+        maquinas.value = maquinasData.map((maquina) => ({
+            id: maquina.id,
+            label: maquina.nombre_maquina,
+        }));
+
+        await fetchMantenimientosOptions(); // Asegúrate de que esta línea esté presente
+        maquinasOptions.value = maquinasData.map((maquina) => ({
+            id: maquina.id,
+            label: maquina.nombre_maquina,
+        }));
+        await loadIncidencias();
+        checkUserHasReclamada();
+    } catch (err) {
+        error.value = err;
+        loading.value = false;
+    }
+});
   
   watch(incidencias, () => {
       checkUserHasReclamada();
@@ -543,30 +545,58 @@
   };
   
   const handleAsignarMantenimiento = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-          throw new Error('No token found');
-      }
-      try {
-          const apiUrl = `${API_AUTH_URL}/mantenimiento_maquina/asignar_mantenimiento`;
-          const response = await axios.post(apiUrl, asignarMantenimiento.value, {
-              headers: {
-                  Authorization: `Bearer ${token}`,
-              },
-          });
-  
-          if (response.status === 200) {
-              closeAsignarMantenimientoPopup();
-              await loadIncidencias();
-          }
-      } catch (error) {
-          console.error('Error al asignar el mantenimiento:', error);
-          error.value = {
-              message: 'Error al asignar el mantenimiento',
-              type: 'api',
-          };
-      }
-  };
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error('No token found');
+    }
+
+    // Validar que se hayan seleccionado tanto el mantenimiento como la máquina
+    if (!asignarMantenimiento.value.id_mantenimiento || !asignarMantenimiento.value.id_maquina) {
+        toast.error("Por favor seleccione tanto el mantenimiento como la máquina", {
+            timeout: 3000
+        });
+        return;
+    }
+
+    try {
+        const apiUrl = `${API_AUTH_URL}/mantenimiento_maquina/asignar_mantenimiento`;
+        
+        // Imprimir los datos que se van a enviar para debug
+        console.log('Datos a enviar:', asignarMantenimiento.value);
+
+        const response = await axios.post(apiUrl, {
+            id_mantenimiento: asignarMantenimiento.value.id_mantenimiento,
+            id_maquina: asignarMantenimiento.value.id_maquina
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        // Imprimir la respuesta para debug
+        console.log('Respuesta:', response);
+
+        if (response.data.success || response.status === 200) {
+            toast.success("Mantenimiento asignado correctamente", {
+                timeout: 3000
+            });
+            
+            closeAsignarMantenimientoPopup();
+            await loadIncidencias();
+        } else {
+            throw new Error(response.data.message || 'Error al asignar el mantenimiento');
+        }
+    } catch (error) {
+        console.error('Error al asignar el mantenimiento:', error);
+        toast.error(error.response?.data?.message || "Error al asignar el mantenimiento", {
+            timeout: 3000
+        });
+        error.value = {
+            message: 'Error al asignar el mantenimiento',
+            type: 'api',
+        };
+    }
+};
   const showIncidenciaDetailsPopup = ref(false);
   const selectedIncidencia = ref(null);
   const commentText = ref('');
@@ -757,31 +787,33 @@
   };
   
   const fetchMantenimientos = async () => {
-      try {
-          const token = localStorage.getItem('token');
-          if (!token) {
-              throw new Error('No token found');
-          }
-          const response = await axios.get(`${API_AUTH_URL}/mantenimiento_preventivo/all`, {
-              headers: {
-                  Authorization: `Bearer ${token}`,
-              },
-          });
-  
-          if (response.data && Array.isArray(response.data)) {
-              return response.data;
-          } else {
-              return [];
-          }
-      } catch (error) {
-          console.error('Error al obtener los mantenimientos:', error);
-             error.value = {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found');
+        }
+        const response = await axios.get(`${API_AUTH_URL}/mantenimiento_preventivo/all`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        console.log('Mantenimientos:', response.data);
+
+        if (response.data && Array.isArray(response.data.data)) {
+            return response.data.data; 
+        } else {
+            return [];
+        }
+    } catch (error) {
+        console.error('Error al obtener los mantenimientos:', error);
+            error.value = {
             message: 'Error al obtener los mantenimientos',
             type: 'api',
-          };
-          throw new Error('Error al obtener los mantenimientos');
-      }
-  };
+        };
+        throw new Error('Error al obtener los mantenimientos');
+    }
+};
   
   </script>
   <style scoped>
