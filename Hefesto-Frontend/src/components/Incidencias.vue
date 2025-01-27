@@ -256,16 +256,15 @@
     <GlassmorphicPopup
       :visible="showFiltroPopup"
       title="Filtros incidencias"
-      closeButtonText="Aplicar"
-      actionButtonText="Cancelar"
-      @close="closeFiltroPopup"
-      @action="cancelFilters"
+      closeButtonText="Cancelar"
+      actionButtonText="Aplicar"
+      @close="cancelFilters"
+      @action="closeFiltroPopup"
       >
 
       <template #popup-content>
         <div class="row">
           <div class="col">
-            <p>Filtros</p>
             <div class="search-bar">
               <CustomSelect
                     :options="campusOptions"
