@@ -246,7 +246,7 @@ $white-09: rgba(255, 255, 255, 0.9);
   background: $white-05;
   backdrop-filter: blur(10px);
   border-right: 1px solid $white-01;
-  height: 100vh;
+  height: 100%;
   position: sticky;
   top: 0;
   z-index: 1000;

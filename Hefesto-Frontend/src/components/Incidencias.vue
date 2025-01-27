@@ -406,7 +406,7 @@ const fetchData = async (url) => {
 const fetchTecnicoIncidencias = async () => {
     try {
 
-      if(!isOperario){
+      if(!isOperario.value){
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('No token found');
@@ -637,7 +637,9 @@ const handleCreateIncidencia = async () => {
             subtitulo: newIncidencia.value.subtitulo,
             estado: 0,
             id_maquina: Number(newIncidencia.value.id_maquina),
-            tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia)
+            tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia),
+            id_creador: 1,
+            id_mantenimiento: 1,
         };
 
         const response = await axios.post(apiUrl, requestData, {
@@ -765,7 +767,7 @@ const handleReclamarIncidencia = async () => {
     }
 }
 const closeErrorPopup = () =>{
-    showErrorPopup.value = false;
+    showErrorPopup.value         = false;
     errorMessage.value = '';
 }
 const openMotivoSalidaPopup = () => {
@@ -1499,4 +1501,5 @@ canvas {
     max-width: 100% !important;
   }
 }
+
 </style>
