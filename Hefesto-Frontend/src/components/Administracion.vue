@@ -1,88 +1,82 @@
 <template>
   <div class="container-fluid h-100">
     <div v-if="!showUsuariosCrud && !showCampusCrud && !showSeccionCrud && !showMaquinaCrud">
-        <div class="row">
-          <div class="col-md-6 h-100">
-            <div class="d-flex flex-column h-100">
-              <button class="glass-card mb-4" @click="openUsuariosCrud">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="card-body text-center">
-                    <h2 class="card-text">Usuarios</h2>
-                  </div>
-                  <div class="card-body text-center">
-                    <img src="../assets/images/icons/usuarios.svg" />
-                  </div>
-                </div>
-              </button>
-              <button class="glass-card mb-4" @click="openCampusCrud">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="card-body text-center">
-                    <h2 class="card-text">Campuses</h2>
-                  </div>
-                  <div class="card-body text-center">
-                    <img src="../assets/images/icons/campuses.svg" />
-                  </div>
-                </div>
-              </button>
-              <button class="glass-card mb-4" @click="openSeccionCrud">
-                <div class="d-flex justify-content-center align-items-center text-center">
-                  <div class="card-body text-center">
-                    <h2 class="card-text">Secciones</h2>
-                  </div>
-                  <div class="card-body text-center">
-                    <img width="144" src="../assets/images/icons/secciones.svg" />
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <button class="glass-card mb-4" @click="openMaquinaCrud">
-              <div class="justify-content-between align-items-center mb-3">
+      <div class="row">
+        <div class="col-md-6 h-100">
+          <div class="d-flex flex-column h-100">
+            <button class="glass-card mb-4" @click="openUsuariosCrud">
+              <div class="d-flex justify-content-between align-items-center h-100">
                 <div class="card-body text-center">
-                  <h2 class="card-text">Maquinas</h2>
+                  <h2 class="card-text">Usuarios</h2>
                 </div>
-                <div class="card-body-2 text-center">
-                  <img width="250" src="../assets/images/icons/maquinas.svg" />
+                <div class="card-body text-center">
+                  <img src="../assets/images/icons/usuarios.svg" width="100" />
                 </div>
               </div>
             </button>
-            <button class="glass-card">
-              <div class="d-flex justify-content-between align-items-center">
+            <button class="glass-card mb-4" @click="openCampusCrud">
+              <div class="d-flex justify-content-between align-items-center h-100">
                 <div class="card-body text-center">
-                  <h2 class="card-text">Mantenimientos preventivos</h2>
+                  <h2 class="card-text">Campuses</h2>
                 </div>
                 <div class="card-body text-center">
-                  <img width="180" src="../assets/images/icons/mantenimiento.svg" />
+                  <img src="../assets/images/icons/campuses.svg" width="100" />
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-6 h-100">
+          <div class="d-flex flex-column h-100">
+            <button class="glass-card mb-4" @click="openSeccionCrud">
+              <div class="d-flex justify-content-between align-items-center h-100">
+                <div class="card-body text-center">
+                  <h2 class="card-text">Secciones</h2>
+                </div>
+                <div class="card-body text-center">
+                  <img width="144" src="../assets/images/icons/secciones.svg" />
+                </div>
+              </div>
+            </button>
+            <button class="glass-card mb-4" @click="openMaquinaCrud">
+              <div class="d-flex justify-content-between align-items-center h-100">
+                <div class="card-body text-center">
+                  <h2 class="card-text">Maquinas</h2>
+                </div>
+                <div class="card-body text-center">
+                  <img width="250" src="../assets/images/icons/maquinas.svg" />
                 </div>
               </div>
             </button>
           </div>
         </div>
       </div>
-    <transition name="fade">
-       <CRUDusuario v-if="showUsuariosCrud"  @close="closeUsuariosCrud" :enableUser="enableUser" :disableUser="disableUser"  :API_AUTH_URL="API_AUTH_URL" :IMAGE_URL="IMAGE_URL" @back-to-list="closeUsuariosCrud"/>
-    </transition>
-       <transition name="fade">
-       <CRUDcampus v-if="showCampusCrud"  @close="closeCampusCrud" :enableCampus="enableCampus" :disableCampus="disableCampus"  :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeCampusCrud"/>
-    </transition>
-        <transition name="fade">
-       <CRUDsecciones v-if="showSeccionCrud"  @close="closeSeccionCrud" :enableSeccion="enableSeccion" :disableSeccion="disableSeccion"  :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeSeccionCrud"/>
-    </transition>
-    <transition name="fade">
-       <CRUDmaquinas v-if="showMaquinaCrud"  @close="closeMaquinaCrud" :enableMaquina="enableMaquina" :disableMaquina="disableMaquina"  :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeMaquinaCrud"/>
-    </transition>
-      <MaquinasPopup
-          ref="maquinasPopupRef"
-          :visible="popupVisible"
-          :title="popupTitle"
-          :subtitle="popupSubtitle"
-          :closeButtonText="popupCloseButtonText"
-          :actionButtonText="popupActionButtonText"
-          :token="token"
-          @close-popup="closePopup"
-      />
     </div>
+
+    <transition name="fade">
+      <CRUDusuario v-if="showUsuariosCrud" @close="closeUsuariosCrud" :enableUser="enableUser" :disableUser="disableUser" :API_AUTH_URL="API_AUTH_URL" :IMAGE_URL="IMAGE_URL" @back-to-list="closeUsuariosCrud" />
+    </transition>
+    <transition name="fade">
+      <CRUDcampus v-if="showCampusCrud" @close="closeCampusCrud" :enableCampus="enableCampus" :disableCampus="disableCampus" :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeCampusCrud" />
+    </transition>
+    <transition name="fade">
+      <CRUDsecciones v-if="showSeccionCrud" @close="closeSeccionCrud" :enableSeccion="enableSeccion" :disableSeccion="disableSeccion" :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeSeccionCrud" />
+    </transition>
+    <transition name="fade">
+      <CRUDmaquinas v-if="showMaquinaCrud" @close="closeMaquinaCrud" :enableMaquina="enableMaquina" :disableMaquina="disableMaquina" :API_AUTH_URL="API_AUTH_URL" @back-to-list="closeMaquinaCrud" />
+    </transition>
+
+    <MaquinasPopup
+      ref="maquinasPopupRef"
+      :visible="popupVisible"
+      :title="popupTitle"
+      :subtitle="popupSubtitle"
+      :closeButtonText="popupCloseButtonText"
+      :actionButtonText="popupActionButtonText"
+      :token="token"
+      @close-popup="closePopup"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -105,52 +99,52 @@ const showMaquinaCrud = ref(false);
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
 const ME_URL = `${API_AUTH_URL}/auth/me`;
-const enableUser = async (userId) => {
-    const token = localStorage.getItem('token');
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
-     try{
-        const response = await axios.put(`${API_AUTH_URL}/usuario/enable/${userId}`,{},{ headers });
-        console.log('Usuario habilitado:', response.data);
-      } catch(error){
-          console.error('Error al habilitar el usuario:', error);
 
-      }
+const enableUser = async (userId) => {
+  const token = localStorage.getItem('token');
+  const headers = {
+    Authorization: `Bearer ${token}`,
   };
+  try {
+    const response = await axios.put(`${API_AUTH_URL}/usuario/enable/${userId}`, {}, { headers });
+    console.log('Usuario habilitado:', response.data);
+  } catch (error) {
+    console.error('Error al habilitar el usuario:', error);
+  }
+};
 
 const disableUser = async (userId) => {
   const token = localStorage.getItem('token');
   const headers = {
     Authorization: `Bearer ${token}`,
   };
-  try{
-    const response = await axios.put(`${API_AUTH_URL}/usuario/disable/${userId}`,{}, { headers });
+  try {
+    const response = await axios.put(`${API_AUTH_URL}/usuario/disable/${userId}`, {}, { headers });
     console.log('Usuario deshabilitado:', response.data);
-  } catch(error){
-      console.error('Error al deshabilitar el usuario:', error);
+  } catch (error) {
+    console.error('Error al deshabilitar el usuario:', error);
   }
 };
 
 const openUsuariosCrud = () => {
-   showUsuariosCrud.value = true;
+  showUsuariosCrud.value = true;
 };
 
 const closeUsuariosCrud = () => {
- showUsuariosCrud.value = false;
+  showUsuariosCrud.value = false;
 };
-// Funciones para habilitar y deshabilitar campus desde el componente hijo
+
 const enableCampus = async (campusId) => {
   try {
     const token = localStorage.getItem('token');
-      const headers = {
-          Authorization: `Bearer ${token}`,
-      };
-       await axios.put(`${API_AUTH_URL}/campus/enable/${campusId}`,{},{headers});
-      console.log(`Campus ${campusId} habilitado`);
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    await axios.put(`${API_AUTH_URL}/campus/enable/${campusId}`, {}, { headers });
+    console.log(`Campus ${campusId} habilitado`);
   } catch (error) {
     console.error('Error al habilitar campus:', error);
-      throw error;
+    throw error;
   }
 };
 
@@ -160,32 +154,33 @@ const disableCampus = async (campusId) => {
     const headers = {
       Authorization: `Bearer ${token}`,
     };
-     await axios.put(`${API_AUTH_URL}/campus/disable/${campusId}`,{},{headers});
+    await axios.put(`${API_AUTH_URL}/campus/disable/${campusId}`, {}, { headers });
     console.log(`Campus ${campusId} deshabilitado`);
   } catch (error) {
     console.error('Error al deshabilitar campus:', error);
-       throw error;
+    throw error;
   }
 };
+
 const openCampusCrud = () => {
-   showCampusCrud.value = true;
+  showCampusCrud.value = true;
 };
 
 const closeCampusCrud = () => {
- showCampusCrud.value = false;
+  showCampusCrud.value = false;
 };
-// Funciones para habilitar y deshabilitar secciones desde el componente hijo
+
 const enableSeccion = async (seccionId) => {
   try {
     const token = localStorage.getItem('token');
-      const headers = {
-          Authorization: `Bearer ${token}`,
-      };
-       await axios.put(`${API_AUTH_URL}/seccion/enable/${seccionId}`,{},{headers});
-      console.log(`Seccion ${seccionId} habilitada`);
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    await axios.put(`${API_AUTH_URL}/seccion/enable/${seccionId}`, {}, { headers });
+    console.log(`Seccion ${seccionId} habilitada`);
   } catch (error) {
     console.error('Error al habilitar seccion:', error);
-      throw error;
+    throw error;
   }
 };
 
@@ -195,32 +190,33 @@ const disableSeccion = async (seccionId) => {
     const headers = {
       Authorization: `Bearer ${token}`,
     };
-     await axios.put(`${API_AUTH_URL}/seccion/disable/${seccionId}`,{},{headers});
+    await axios.put(`${API_AUTH_URL}/seccion/disable/${seccionId}`, {}, { headers });
     console.log(`Seccion ${seccionId} deshabilitada`);
   } catch (error) {
     console.error('Error al deshabilitar seccion:', error);
-       throw error;
+    throw error;
   }
 };
+
 const openSeccionCrud = () => {
-   showSeccionCrud.value = true;
+  showSeccionCrud.value = true;
 };
 
 const closeSeccionCrud = () => {
- showSeccionCrud.value = false;
+  showSeccionCrud.value = false;
 };
-// Funciones para habilitar y deshabilitar maquinas desde el componente hijo
+
 const enableMaquina = async (maquinaId) => {
   try {
     const token = localStorage.getItem('token');
-      const headers = {
-          Authorization: `Bearer ${token}`,
-      };
-       await axios.put(`${API_AUTH_URL}/maquina/enable/${maquinaId}`,{},{headers});
-      console.log(`Maquina ${maquinaId} habilitada`);
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    await axios.put(`${API_AUTH_URL}/maquina/enable/${maquinaId}`, {}, { headers });
+    console.log(`Maquina ${maquinaId} habilitada`);
   } catch (error) {
     console.error('Error al habilitar maquina:', error);
-      throw error;
+    throw error;
   }
 };
 
@@ -230,19 +226,20 @@ const disableMaquina = async (maquinaId) => {
     const headers = {
       Authorization: `Bearer ${token}`,
     };
-     await axios.put(`${API_AUTH_URL}/maquina/disable/${maquinaId}`,{},{headers});
+    await axios.put(`${API_AUTH_URL}/maquina/disable/${maquinaId}`, {}, { headers });
     console.log(`Maquina ${maquinaId} deshabilitada`);
   } catch (error) {
     console.error('Error al deshabilitar maquina:', error);
-       throw error;
+    throw error;
   }
 };
+
 const openMaquinaCrud = () => {
-   showMaquinaCrud.value = true;
+  showMaquinaCrud.value = true;
 };
 
 const closeMaquinaCrud = () => {
- showMaquinaCrud.value = false;
+  showMaquinaCrud.value = false;
 };
 
 // --- Variables del Popup ---
@@ -262,104 +259,109 @@ const openPopup = (type) => {
   popupType.value = type;
 
   if (type === "perfil") {
-      popupTitle.value = "Editar perfil";
-      popupSubtitle.value = "Edita tu perfil";
-      popupCloseButtonText.value = "Cerrar";
-      popupActionButtonText.value = "Guardar";
+    popupTitle.value = "Editar perfil";
+    popupSubtitle.value = "Edita tu perfil";
+    popupCloseButtonText.value = "Cerrar";
+    popupActionButtonText.value = "Guardar";
   } else if (type === "contraseña") {
-      popupTitle.value = "Cambiar contraseña";
-      popupSubtitle.value = "Introduce tu nueva contraseña";
-      popupCloseButtonText.value = "Cerrar";
-      popupActionButtonText.value = "Guardar";
+    popupTitle.value = "Cambiar contraseña";
+    popupSubtitle.value = "Introduce tu nueva contraseña";
+    popupCloseButtonText.value = "Cerrar";
+    popupActionButtonText.value = "Guardar";
   } else if (type === "fondo") {
-      popupTitle.value = "Cambiar fondo";
-      popupSubtitle.value = "Añade la descripción de tu fondo";
-      popupCloseButtonText.value = "Cerrar";
-      popupActionButtonText.value = "Aceptar";
+    popupTitle.value = "Cambiar fondo";
+    popupSubtitle.value = "Añade la descripción de tu fondo";
+    popupCloseButtonText.value = "Cerrar";
+    popupActionButtonText.value = "Aceptar";
   } else if (type === "maquinas") {
-      popupTitle.value = "Maquinas";
-      popupSubtitle.value = "Listado maquinas";
-      popupCloseButtonText.value = "Cerrar";
-      popupActionButtonText.value = "Aceptar";
-      maquinasPopupRef.value.fetchData();
+    popupTitle.value = "Maquinas";
+    popupSubtitle.value = "Listado maquinas";
+    popupCloseButtonText.value = "Cerrar";
+    popupActionButtonText.value = "Aceptar";
+    maquinasPopupRef.value.fetchData();
   }
 };
 
 const closePopup = () => {
   popupVisible.value = false;
 };
+
 const userImagePath = computed(() => {
   return userPicture.value
     ? `../src/assets/images/userpicture/${userPicture.value}`
     : null;
 });
+
 onMounted(async () => {
-token.value = localStorage.getItem("token");
-if (token.value) {
-  try {
-    const response = await axios.get(ME_URL, {
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    });
-    userName.value = response.data.name;
-    userPicture.value = response.data.foto_perfil;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
+  token.value = localStorage.getItem("token");
+  if (token.value) {
+    try {
+      const response = await axios.get(ME_URL, {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+      userName.value = response.data.name;
+      userPicture.value = response.data.foto_perfil;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   }
-}
 });
 </script>
 
 <style scoped>
 .glass-card {
-background: rgba(255, 255, 255, 0.2);
-border-radius: 16px;
-box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-backdrop-filter: blur(5px);
--webkit-backdrop-filter: blur(5px);
-border: 1px solid rgba(255, 255, 255, 0.3);
-width: 100%;
-height: auto;
-cursor: pointer;
-transition: transform 0.2s ease-in-out;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 100%;
+  height: 300px; /* Altura más grande */
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .glass-card:hover {
-transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .card-text {
-margin-top: 0;
-color: #333;
+  margin-top: 0;
+  color: #333;
+  font-size: 2rem; /* Texto más grande */
 }
 
 .card-body {
-padding: 32px;
+  padding: 24px; /* Padding más grande */
+  text-align: center;
 }
 
-.card-body-2 {
-padding: 120px;
-}
-
-.fade-enter-from{
+.fade-enter-from {
   opacity: 0;
 }
 
 .fade-enter-active {
- transition: opacity 0.3s;
+  transition: opacity 0.3s;
 }
 
 .fade-enter-to {
-opacity: 1;
+  opacity: 1;
 }
 
 .fade-leave-from {
- opacity: 1;
+  opacity: 1;
 }
+
 .fade-leave-active {
   transition: opacity 0.3s;
 }
+
 .fade-leave-to {
   opacity: 0;
 }
