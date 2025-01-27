@@ -637,9 +637,7 @@ const handleCreateIncidencia = async () => {
             subtitulo: newIncidencia.value.subtitulo,
             estado: 0,
             id_maquina: Number(newIncidencia.value.id_maquina),
-            tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia),
-            id_creador: 1,
-            id_mantenimiento: 1,
+            tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia)
         };
 
         const response = await axios.post(apiUrl, requestData, {

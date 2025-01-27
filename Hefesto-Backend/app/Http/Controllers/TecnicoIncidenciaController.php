@@ -162,7 +162,9 @@ class TecnicoIncidenciaController extends Controller
           
 
             $incidencia = Incidencia::find($request->get('id_incidencia'));
-            IncidenciaController::estadoCerrado($incidencia);
+
+            return response()->json(['Este es el resultado '.IncidenciaController::estadoCerrado($incidencia)]);
+            
             
          
 

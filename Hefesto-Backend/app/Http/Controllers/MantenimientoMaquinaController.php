@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
+
 class MantenimientoMaquinaController extends Controller
 {
     //
@@ -53,6 +54,36 @@ class MantenimientoMaquinaController extends Controller
         }
     }
 
+
+
+    public static function cerrarMantenimiento(MantenimientoMaquina $mantenimientoMaquina){
+
+
+
+        $mantenimientoPreventivo = MantenimientoPreventivo::find($mantenimientoMaquina->id_mantenimiento);
+        $mantenimientoMaquina->fecha_realizacion = Carbon::now();
+        $mantenimientoMaquina->save();
+
+
+
+        $periodicidad = $mantenimientoPreventivo->periodicidad;
+        $mantenimientoMaquina2 = new MantenimientoMaquina();
+        $mantenimientoMaquina2->id_mantenimiento = $mantenimientoPreventivo->id;
+        $mantenimientoMaquina2->id_maquina = $mantenimientoMaquina->id_maquina;
+        $mantenimientoMaquina2->fecha_proximo = Carbon::now()->addDays($periodicidad)->format('Y-m-d');  
+
+
+
+
+
+    
+        $mantenimientoMaquina2->save();
+
+        return "Llegamos a cerrar mantenimiento y tiene id ". $mantenimientoMaquina->id;
+
+
+
+    }
 
 
 }
