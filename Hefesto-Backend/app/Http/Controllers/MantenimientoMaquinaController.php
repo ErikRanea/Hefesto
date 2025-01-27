@@ -11,16 +11,14 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
+
 class MantenimientoMaquinaController extends Controller
 {
     //
 
     public function asignarMantenimiento(Request $request){
         try {
-            //code...
-
-        
-
+    
             $validator = Validator::make($request->all(),[
                 'id_maquina'=>['required','integer'],
                 'id_mantenimiento'=> ['required','integer'],
@@ -28,6 +26,7 @@ class MantenimientoMaquinaController extends Controller
                 'id_maquina.required' => 'El campo id_maquina es obligatorio',
                 'id_mantenimiento.required' => 'El campo id_mantenimiento es obligatorio'
             ]);
+
 
             if($validator->fails()){
                 return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
@@ -55,6 +54,36 @@ class MantenimientoMaquinaController extends Controller
         }
     }
 
+
+
+    public static function cerrarMantenimiento(MantenimientoMaquina $mantenimientoMaquina){
+
+
+
+        $mantenimientoPreventivo = MantenimientoPreventivo::find($mantenimientoMaquina->id_mantenimiento);
+        $mantenimientoMaquina->fecha_realizacion = Carbon::now();
+        $mantenimientoMaquina->save();
+
+
+
+        $periodicidad = $mantenimientoPreventivo->periodicidad;
+        $mantenimientoMaquina2 = new MantenimientoMaquina();
+        $mantenimientoMaquina2->id_mantenimiento = $mantenimientoPreventivo->id;
+        $mantenimientoMaquina2->id_maquina = $mantenimientoMaquina->id_maquina;
+        $mantenimientoMaquina2->fecha_proximo = Carbon::now()->addDays($periodicidad)->format('Y-m-d');  
+
+
+
+
+
+    
+        $mantenimientoMaquina2->save();
+
+        return "Llegamos a cerrar mantenimiento y tiene id ". $mantenimientoMaquina->id;
+
+
+
+    }
 
 
 }

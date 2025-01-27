@@ -142,6 +142,7 @@ Route::prefix('v1')->group(function () {
             Route::put('enable/{usuario}',[UserController::class, 'enable'])->middleware('admin');
             Route::put('disable/{usuario}',[UserController::class, 'disable'])->middleware('admin');
           Route::delete('delete/{usuario}',[UserController::class,'destroy'])->middleware('admin');
+          Route::put('reset_password',[UserController::class,'resetPassword']);
         });
     });
 });

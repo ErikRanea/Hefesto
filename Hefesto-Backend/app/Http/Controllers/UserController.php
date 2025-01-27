@@ -188,6 +188,49 @@ class UserController extends Controller
     }
 
 
+    public function resetPassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'new_password' => 'required|string|min:8',
+                'current_password' => 'required|string'
+            ],
+            [
+                'new_password.required' => 'El campo new_password es obligatorio',
+                'new_password.min' => 'La new_password debe de tener un mínimo de 8 caracteres',
+                'current_password.required' => 'El campo current_password es obligatorio',
+            ]
+        );
+    
+        if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+             $user = auth()->user();
+            if (!$user) {
+                 return response()->json(['error' => 'Usuario no encontrado'], Response::HTTP_UNAUTHORIZED);
+              }
+
+              // Check current password
+            if (!Hash::check($request->input('current_password'), $user->password)) {
+                return response()->json(['error' => 'La contraseña actual no es válida.'], Response::HTTP_UNAUTHORIZED);
+            }
+
+
+           
+            // Hash the new password
+            $hashedPassword = Hash::make($request->input('new_password'));
+
+           // Update the user's password in the database
+           $user->password = $hashedPassword;
+           $user->save();
+
+           return response()->json(['message' => 'Contraseña reseteada con éxito.'], Response::HTTP_OK);
+          } catch (Exception $e) {
+            return response()->json(['error' => 'Error al resetear la contraseña.', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
 
