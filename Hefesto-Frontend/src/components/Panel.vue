@@ -888,4 +888,92 @@ canvas {
     font-size: 0.8rem;
     font-weight: 500;
 }
+
+@media (max-width: 768px) {
+  .row {
+    --bs-gutter-x: 0.5rem !important;
+  }
+
+  .col-sm-6 {
+    flex: 0 0 auto;
+    width: 50% !important;
+    max-width: 50% !important;
+  }
+
+  .col-md-4,
+  .col-md-8 {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+  .card-bodyTotal {
+    padding: 1rem;
+  }
+  .pendiente-h2,
+  .curso-h2,
+  .cerrado-h2,
+    .total-h2{
+    font-size: 40px;
+  }
+
+  .incidencia-list {
+    padding: 10px;
+  }
+
+  .incidencia-list-header {
+    font-size: 0.8rem;
+    padding: 0 5px 10px 5px;
+    margin-bottom: 10px;
+  }
+
+  .incidencia-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    gap: 10px;
+  }
+
+  .incidencia-date {
+      min-width: 70px;
+    font-size: 0.7rem;
+  }
+
+  .incidencia-content {
+    gap: 10px;
+  }
+
+  .priority-marker {
+    height: 30px;
+    margin-right: 3px;
+  }
+
+  .incidencia-text {
+    font-size: 0.7rem;
+    margin-left: 5px;
+  }
+
+  .incidencia-status {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+  .incidencias-container{
+    padding: 0 5px;
+  }
+
+  .priority-legend {
+    font-size: 0.7rem;
+  }
+    .card-body {
+      padding: 10px;
+    }
+  .incidenciasabiertos {
+      font-size: 0.8rem;
+  }
+  .abiertos-h3 {
+      font-size: 1.3rem;
+  }
+}
 </style>
