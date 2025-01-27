@@ -3,7 +3,7 @@
     <div class="popup-card">
       <div class="popup-header">
         <h1 v-if="title" class="popup-title">{{ title }}</h1>
-        <button class="close-btn" @click="$emit('close')">&times;</button>
+        <button class="close-btn" @click="$emit('close')">×</button>
       </div>
       <p v-if="subtitle" class="popup-subtitle">{{ subtitle }}</p>
       <div class="popup-content">
@@ -12,16 +12,19 @@
         </slot>
       </div>
       <div class="popup-actions">
-        <button v-if="closeButtonText" class="popup-btn cancel-btn" @click="$emit('close')">
+        <slot name="popup-actions">
+        <button class="popup-btn" :class="{'default-btn': closeButtonStyle === 'default', 'cancel-btn': closeButtonStyle === 'cancel'}" @click="$emit('close')">
           {{ closeButtonText }}
         </button>
         <button
           v-if="actionButtonText"
-          class="popup-btn primary-btn"
+          class="popup-btn"
+          :class="{'primary-btn': actionButtonStyle === 'primary', 'secondary-btn': actionButtonStyle === 'secondary'}"
           @click="$emit('action')"
         >
           {{ actionButtonText }}
         </button>
+        </slot>
       </div>
     </div>
   </div>
@@ -52,6 +55,16 @@ defineProps({
     type: String,
     default: null,
   },
+  closeButtonStyle: {
+    type: String,
+    default: 'default', // Opciones: 'default', 'cancel'
+    validator: (value) => ['default', 'cancel'].includes(value),
+  },
+  actionButtonStyle: {
+    type: String,
+    default: 'primary', // Opciones: 'primary', 'secondary'
+    validator: (value) => ['primary', 'secondary'].includes(value),
+  },
 });
 
 defineEmits(['close', 'action']);
@@ -73,7 +86,7 @@ defineEmits(['close', 'action']);
 
 .popup-card {
   width: 90%;
-  max-width: 700px;
+  max-width: 900px; /* Aumenta el ancho máximo */
   background: rgba(255, 255, 255, 0.7);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(20px);
@@ -84,6 +97,7 @@ defineEmits(['close', 'action']);
   color: #333;
   display: flex;
   flex-direction: column;
+  overflow: auto; /* Permite el crecimiento vertical */
 }
 
 .popup-header {
@@ -120,7 +134,8 @@ defineEmits(['close', 'action']);
 
 .popup-content {
   margin-bottom: 2rem;
-  max-height: 60vh;
+  overflow-x: auto; /* Agrega desplazamiento horizontal si el contenido es demasiado ancho */
+  max-height: 70vh; /* Ajusta la altura máxima */
   overflow-y: auto;
   padding-right: 1rem;
 }
@@ -158,21 +173,39 @@ defineEmits(['close', 'action']);
   border: none;
 }
 
-.cancel-btn {
+.default-btn {
   background: rgba(255, 255, 255, 0.3);
   color: #333;
 }
 
-.cancel-btn:hover {
+.default-btn:hover {
   background: rgba(255, 255, 255, 0.5);
 }
 
+.cancel-btn {
+  background: rgba(220, 53, 69, 0.7); /* Rojo */
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: rgba(220, 53, 69, 0.9);
+}
+
 .primary-btn {
-  background: rgba(0, 123, 255, 0.7);
+  background: rgba(96, 4, 132, 1); /* Morado */
   color: white;
 }
 
 .primary-btn:hover {
+  background: rgba(96, 4, 132, 0.9);
+}
+
+.secondary-btn {
+  background: rgba(0, 123, 255, 0.7); /* Azul */
+  color: white;
+}
+
+.secondary-btn:hover {
   background: rgba(0, 123, 255, 0.9);
 }
 </style>

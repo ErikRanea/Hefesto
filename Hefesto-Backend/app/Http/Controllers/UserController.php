@@ -8,21 +8,21 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+       $perPage = $request->input('per_page', 20); // Numero de usuarios por pagina, default a 5
         if ($user->rol == 'administrador') {
-            $users = User::orderBy('name', 'asc')->get();
+           $users = User::orderBy('name', 'asc')->paginate($perPage);
         } else {
-            // For other roles, potentially show only themselves or a specific subset.
-            // Modify this logic as needed based on your application's requirements.
-            $users = User::where('id', $user->id)->get();
+            $users = User::where('id', $user->id)->paginate($perPage);
         }
         return response()->json($users);
     }
@@ -114,8 +114,8 @@ class UserController extends Controller
             'email' => ['sometimes', 'required', 'email', \Illuminate\Validation\Rule::unique('users')->ignore($user->id)],
             'password' => ['sometimes', 'required', 'string', 'min:8'],
             'rol' => ['sometimes', 'required', 'in:operario,tecnico,administrador'],
-            'foto_perfil' => ['nullable', 'string'],
             'habilitado' => ['sometimes', 'boolean'],
+            'id_campus' => ['sometimes','required','integer'],
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -129,8 +129,8 @@ class UserController extends Controller
             'password.min' => 'El campo contraseña debe tener un mínimo de :min caracteres.',
             'rol.required' => 'El campo rol es obligatorio.',
             'rol.in' => 'El rol seleccionado no es válido.',
-            'foto_perfil.string' => 'La foto de perfil debe ser una cadena de texto.',
             'habilitado.boolean' => 'El campo habilitado debe ser booleano.',
+            'id_campus.required' => 'El campo id_campues es obligatorio'
         ]);
 
         if ($validator->fails()) {
@@ -144,8 +144,8 @@ class UserController extends Controller
         if ($request->filled('email')) $validatedData['email'] = strip_tags($request->input('email'));
         if ($request->filled('password')) $validatedData['password'] = Hash::make($request->input('password'));
         if ($request->filled('rol')) $validatedData['rol'] = $request->input('rol');
-        if ($request->filled('foto_perfil')) $validatedData['foto_perfil'] = $request->input('foto_perfil');
         if ($request->has('habilitado')) $validatedData['habilitado'] = $request->boolean('habilitado');
+        if ($request->filled('id_campus')) $validatedData['id_campus'] = $request->input('id_campus');
 
         $user->update($validatedData);
 
@@ -176,9 +176,10 @@ class UserController extends Controller
         }
     }
 
-    public function all(){
+    public function all(Request $request){
         try {
-            $users = User::all();
+            $perPage = $request->input('per_page', 5); // Numero de usuarios por pagina, default a 5
+            $users = User::paginate($perPage);
             return response()->json(['data' => $users], Response::HTTP_ACCEPTED);
         } catch (Exception $e) {
             return response()->json(['error' => 'Error al obtener los usuarios.'], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -186,6 +187,62 @@ class UserController extends Controller
 
     }
 
+
+
+
+
+    /**
+     * Metodo estáticos
+     */
+
+
+    public static function createDummyUsers()
+    {
+        $users = [];
+        $roles = ['operario', 'tecnico', 'administrador'];
+
+        // Create 3 users per role
+        for ($i = 0; $i < 3; $i++) {
+            foreach ($roles as $role) {
+                $users[] = [
+                    'name' => "{$role}User" . ($i+1),
+                    'primer_apellido' => 'Test',
+                    'segundo_apellido' => 'User',
+                    'email' => Str::random(10) . '@example.com',
+                    'password' => Hash::make('password123'),
+                    'rol' => $role,
+                    'foto_perfil' => null,
+                    'habilitado' => true,
+                    'id_campus' => 2
+                ];
+            }
+        }
+
+        // Add a extra administrator user
+        $users[] = [
+                'name' => "adminUser" . 4,
+                'primer_apellido' => 'Test',
+                'segundo_apellido' => 'User',
+                'email' => Str::random(10) . '@example.com',
+                'password' => Hash::make('password123'),
+                'rol' => 'administrador',
+                'foto_perfil' => null,
+                'habilitado' => true,
+                'id_campus' => 2
+            ];
+        
+        // Create the users in the database
+        try {
+              foreach ($users as $userData) {
+                 User::create($userData);
+              }
+          }
+         catch(\Exception $e) {
+            return response()->json(['error' => 'Error al generar usuarios de prueba: ' . $e->getMessage()], 500);
+        }
+        return response()->json(['message' => '11 usuarios de prueba creados con éxito'], 201);
+
+    }
 
 
 }

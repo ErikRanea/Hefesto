@@ -80,6 +80,8 @@ class MainController extends Controller
             
 
 
+            UserController::createDummyUsers();
+
 
 
             $user = new User();
@@ -123,9 +125,7 @@ class MainController extends Controller
             $mantenimiento = new MantenimientoPreventivo();
             $mantenimiento->nombre = 'Se engrasa la maquina';
             $mantenimiento->descripcion = 'Mantenimiento preventivo';
-            $mantenimiento->id_maquina = $maquina->id;
             $mantenimiento->periodicidad = 1;
-            $mantenimiento->fecha_ultimo_mantenimiento = now();
             $mantenimiento->save();
 
             IncidenciaController::cargarIncidencias();

@@ -12,6 +12,8 @@ use App\Http\Controllers\TecnicoIncidenciaController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MantenimientoPreventivoController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\MantenimientoMaquinaController;
+use App\Models\MantenimientoMaquina;
 
 Route::prefix('v1')->group(function () {
 
@@ -43,12 +45,12 @@ Route::prefix('v1')->group(function () {
             Route::post('all', [IncidenciaController::class, 'all']);
             Route::post('all_cerradas', [IncidenciaController::class, 'allConCerradas']);
             Route::get('show/{id}', [IncidenciaController::class, 'show']);
-            Route::post('store', [IncidenciaController::class, 'store'])->middleware('tecnico');
+            Route::post('store', [IncidenciaController::class, 'store']);
             Route::put('update_estado/{incidencia}', [IncidenciaController::class, 'update_estado'])->middleware('tecnico');
+             Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
             Route::delete('delete/{id}', [IncidenciaController::class, 'delete'])->middleware('admin');
-            Route::post('all_mantenimientos', [IncidenciaController::class, 'allMantenimientos'])->middleware('tecnico');
-            Route::put('update_description/{id}', [IncidenciaController::class, 'updateDescription'])->middleware('tecnico');
-        });
+           Route::post('all_mantenimientos', [IncidenciaController::class, 'allMantenimientos'])->middleware('tecnico');
+         });
     });
 
     Route::prefix('tecnico_incidencia')->group(function () {
@@ -69,19 +71,23 @@ Route::prefix('v1')->group(function () {
     Route::prefix('campus')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('store', [CampusController::class, 'store'])->middleware('admin');
-            Route::get('all',[CampusController::class, 'all']);
-            Route::get('show/{campus}',[CampusController::class, 'show']);
-            Route::put('update/{campus}',[CampusController::class, 'update'])->middleware('admin');
-            Route::delete('delete/{campus}',[CampusController::class,'delete'])->middleware('admin');
+            Route::get('all',[CampusController::class, 'all'])->middleware('admin');
+             Route::get('show/{id}',[CampusController::class, 'show'])->middleware('admin');
+            Route::put('update/{id}',[CampusController::class, 'update'])->middleware('admin');
+            Route::put('enable/{id}',[CampusController::class, 'enable'])->middleware('admin');
+            Route::put('disable/{id}',[CampusController::class, 'disable'])->middleware('admin');
+           Route::delete('delete/{id}',[CampusController::class,'destroy'])->middleware('admin');
         });
     });
 
     Route::prefix('seccion')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('store', [SeccionController::class, 'store'])->middleware('admin');
-            Route::post('all',[SeccionController::class, 'all']);
-            Route::get('show/{seccion}',[SeccionController::class, 'show']);
-            Route::put('update/{seccion}',[SeccionController::class, 'update'])->middleware('admin');
+           Route::get('all',[SeccionController::class, 'all'])->middleware('admin');
+            Route::get('show/{seccion}',[SeccionController::class, 'show'])->middleware('admin');
+             Route::put('update/{seccion}',[SeccionController::class, 'update'])->middleware('admin');
+              Route::put('enable/{seccion}',[SeccionController::class, 'enable'])->middleware('admin');
+             Route::put('disable/{seccion}',[SeccionController::class, 'disable'])->middleware('admin');
             Route::delete('delete/{seccion}',[SeccionController::class,'delete'])->middleware('admin');
         });
     });
@@ -92,11 +98,13 @@ Route::prefix('v1')->group(function () {
             Route::post('all',[MaquinaController::class, 'all']);
             Route::get('show/{maquina}',[MaquinaController::class, 'show']);
             Route::put('update/{maquina}',[MaquinaController::class, 'update'])->middleware('admin');
+             Route::put('enable/{maquina}',[MaquinaController::class, 'enable'])->middleware('admin');
+            Route::put('disable/{maquina}',[MaquinaController::class, 'disable'])->middleware('admin');
             Route::delete('delete/{maquina}',[MaquinaController::class,'delete'])->middleware('admin');
         });
     });
 
-     Route::prefix('mantenimiento-preventivo')->group(function () {
+     Route::prefix('mantenimiento_preventivo')->group(function () {
         Route::middleware('auth:api')->group(function () {
             Route::post('create', [MantenimientoPreventivoController::class, 'create'])->middleware('admin');
             Route::post('store', [MantenimientoPreventivoController::class, 'store'])->middleware('admin');
@@ -106,6 +114,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('delete/{mantenimiento_preventivo}',[MantenimientoPreventivoController::class,'delete'])->middleware('admin');
         });
     });
+
+
+    Route::prefix('mantenimiento_maquina')->group(function () {
+        Route::middleware('auth:api')->group( function () {
+            Route::post('asignar_mantenimiento', [MantenimientoMaquinaController::class,'asignarMantenimiento'])->middleware('admin');
+        });
+    });
+
+
 
     Route::prefix('tipo_incidencia')->group(function () {
         Route::middleware('auth:api')->group(function () {
@@ -119,10 +136,12 @@ Route::prefix('v1')->group(function () {
     });
     Route::prefix('usuario')->group(function () {
         Route::middleware('auth:api')->group(function () {
-            Route::get('all',[UserController::class, 'all'])->middleware('admin');
-            Route::get('show/{usuario}',[UserController::class, 'show'])->middleware('admin');
+           Route::get('all',[UserController::class, 'all'])->middleware('admin');
+           Route::get('show/{usuario}',[UserController::class, 'show'])->middleware('admin');
             Route::put('update/{usuario}',[UserController::class, 'update'])->middleware('admin');
-            Route::delete('delete/{usuario}',[UserController::class,'delete'])->middleware('admin');
+            Route::put('enable/{usuario}',[UserController::class, 'enable'])->middleware('admin');
+            Route::put('disable/{usuario}',[UserController::class, 'disable'])->middleware('admin');
+          Route::delete('delete/{usuario}',[UserController::class,'destroy'])->middleware('admin');
         });
     });
 });

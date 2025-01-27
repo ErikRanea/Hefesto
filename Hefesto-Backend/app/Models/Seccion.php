@@ -8,12 +8,12 @@ class Seccion extends Model
 {
     //
     protected $table = 'secciones';
-    protected $fillable = ['nombre_seccion', 'habilitado'];
+    protected $fillable = ['nombre_seccion', 'habilitado','id_campus'];
 
 
     public function campus() 
     {
-        return $this->belongsTo(Campus::class, 'id_campus', 'id_campus');
+        return $this->belongsTo(Campus::class, 'id_campus');
     }
 
     public function maquinas(){
