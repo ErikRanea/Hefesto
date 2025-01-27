@@ -17,10 +17,7 @@ class MantenimientoMaquinaController extends Controller
 
     public function asignarMantenimiento(Request $request){
         try {
-            //code...
-
-        
-
+    
             $validator = Validator::make($request->all(),[
                 'id_maquina'=>['required','integer'],
                 'id_mantenimiento'=> ['required','integer'],
@@ -28,6 +25,7 @@ class MantenimientoMaquinaController extends Controller
                 'id_maquina.required' => 'El campo id_maquina es obligatorio',
                 'id_mantenimiento.required' => 'El campo id_mantenimiento es obligatorio'
             ]);
+
 
             if($validator->fails()){
                 return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);

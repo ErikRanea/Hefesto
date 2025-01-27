@@ -3,7 +3,7 @@
     <div class="col-12">
       <div class="incidencia-list glassmorphic-card">
         <div class="incidencia-list-header">
-          <div>Mantenimientos</div>
+          <div>Mantenimientos pendientes</div>
           <div class="boton-barra-box"><img class="img-fluid mb-3 boton-barra huge-icon" src="../assets/images/icons/filtro.svg" alt=""></div>
           <div class="priority-legend">
             <span><span class="priority-dot alta"></span> Alta</span>
