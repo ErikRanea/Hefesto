@@ -46,7 +46,21 @@
       <input type="password" id="password" class="form-control" placeholder="Tu contraseña">
     </template>
     <template #popup-content v-else-if="popupType === 'fondo'">
-      <textarea id="descripcion" class="form-control" placeholder="Descripción"></textarea>
+      <div class="background-options">
+      <div class="background-option" @click="changeBackground('style1')">
+        <div class="preview" :style="{ background: '#3E1E68' }"></div>
+        <p>Fondo 1</p>
+      </div>
+      <div class="background-option" @click="changeBackground('style2')">
+        <div class="preview" :style="{ background: '#1E3A57' }"></div>
+        <p>Fondo 2</p>
+      </div>
+      <div class="background-option" @click="changeBackground('style3')">
+        <div class="preview" :style="{ background: '#3D1E57' }"></div>
+        <p>Fondo 3</p>
+      </div>
+      <!-- Agrega más opciones según sea necesario -->
+    </div>
     </template>
   
     </GlassmorphicPopup>
@@ -93,6 +107,9 @@ const userName = ref(null);
 const selectedFile = ref(null);
 const userLastName = ref(null);
 
+// Estado para rastrear el estilo actual
+const currentStyle = ref(null);
+
 const openPopup = (type) => {
   popupVisible.value = true;
   popupType.value = type;
@@ -109,7 +126,7 @@ const openPopup = (type) => {
     popupActionButtonText.value = 'Guardar';
   } else if (type === 'fondo') {
     popupTitle.value = 'Cambiar fondo';
-    popupSubtitle.value = 'Añade la descripción de tu fondo';
+    popupSubtitle.value = 'Elige tu fondo';
     popupCloseButtonText.value = 'Cerrar';
     popupActionButtonText.value = 'Aceptar';
   }
@@ -133,7 +150,7 @@ const handleAction = async () => {
     location.reload();
   }
   else {
-    alert(`Action clicked on ${popupType.value}`);
+    //alert(`Action clicked on ${popupType.value}`);
   }
   closePopup();
 };
@@ -141,8 +158,6 @@ const handleAction = async () => {
 const onFileChange = (event) => {
   selectedFile.value = event.target.files[0];
 };
-
-
 
 const updateProfileImage = async () => {
   if (!selectedFile.value) return;
@@ -202,7 +217,40 @@ onMounted(async () => {
       console.error('Error fetching user data:', error);
     }
   }
+
+  const savedBackground = localStorage.getItem('selectedBackground');
+  if (savedBackground) {
+    changeBackground(savedBackground);
+  }
 });
+
+// Función para cambiar el fondo
+const changeBackground = (styleName) => {
+  // Eliminar el estilo anterior si existe
+  if (currentStyle.value) {
+    const oldStyle = document.getElementById('dynamic-background-style');
+    if (oldStyle) {
+      oldStyle.remove();
+    }
+  }
+
+  // Crear un nuevo elemento <link> para cargar el nuevo estilo
+  const link = document.createElement('link');
+  link.id = 'dynamic-background-style';
+  link.rel = 'stylesheet';
+  link.href = `/src/assets/backgrounds/${styleName}.css`; // Ruta al archivo CSS
+  document.head.appendChild(link);
+
+  // Guardar la selección en localStorage
+  localStorage.setItem('selectedBackground', styleName);
+
+  // Actualizar el estado
+  currentStyle.value = styleName;
+
+  // Cerrar el popup
+  closePopup();
+};
+
 </script>
 
 <style scoped>
@@ -263,4 +311,29 @@ onMounted(async () => {
 .huge-text {
   font-size: 1.8rem;
 }
+
+.background-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre las opciones de fondo */
+}
+.background-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px;
+    transition: background 0.3s ease;
+}
+.background-option:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.preview {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
 </style>
