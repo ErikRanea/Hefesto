@@ -310,7 +310,7 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .glass-card {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
@@ -319,50 +319,52 @@ onMounted(async () => {
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   width: 100%;
-  height: 300px; /* Altura más grande */
+  height: 300px; 
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  .card-text {
+    margin-top: 0;
+    color: #333;
+    font-size: 2rem; 
+  }
+
+  .card-body {
+    padding: 24px;
+    text-align: center;
+  }
 }
 
-.glass-card:hover {
-  transform: scale(1.05);
-}
+.fade {
+  &-enter-from {
+    opacity: 0;
+  }
 
-.card-text {
-  margin-top: 0;
-  color: #333;
-  font-size: 2rem; /* Texto más grande */
-}
+  &-enter-active {
+    transition: opacity 0.3s;
+  }
 
-.card-body {
-  padding: 24px; /* Padding más grande */
-  text-align: center;
-}
+  &-enter-to {
+    opacity: 1;
+  }
 
-.fade-enter-from {
-  opacity: 0;
-}
+  &-leave-from {
+    opacity: 1;
+  }
 
-.fade-enter-active {
-  transition: opacity 0.3s;
-}
+  &-leave-active {
+    transition: opacity 0.3s;
+  }
 
-.fade-enter-to {
-  opacity: 1;
-}
-
-.fade-leave-from {
-  opacity: 1;
-}
-
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.fade-leave-to {
-  opacity: 0;
+  &-leave-to {
+    opacity: 0;
+  }
 }
 </style>

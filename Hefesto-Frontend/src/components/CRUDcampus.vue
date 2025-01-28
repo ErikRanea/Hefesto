@@ -376,268 +376,284 @@
   });
   
   </script>
-  <style scoped>
-  .glassmorphic-container {
-  background: rgba(255, 255, 255, 0.1);
+  <style lang="scss" scoped>
+
+$white-01: rgba(255, 255, 255, 0.1);
+$white-02: rgba(255, 255, 255, 0.2);
+$white-03: rgba(255, 255, 255, 0.3);
+$white-05: rgba(255, 255, 255, 0.5);
+$white-18: rgba(255, 255, 255, 0.18);
+$purple-07: rgba(96, 4, 132, 0.7);
+$purple-1: rgba(96, 4, 132, 1);
+$purple-focus: rgba(96, 4, 132, 0.719);
+$red-07: rgba(220, 53, 69, 0.7);
+$red-09: rgba(220, 53, 69, 0.9);
+$green-07: rgba(40, 167, 69, 0.7);
+$green-09: rgba(40, 167, 69, 0.9);
+$gray-3C: #3C3C3C;
+$gray-90: #9098A9;
+
+
+.glassmorphic-container {
+  background: $white-01;
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid $white-18;
   color: #333;
-  
-  }
-  .pagination{
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 20px;
-    align-items: center;
-  }
-  
-  .glassmorphic-btn {
-  background: rgba(255, 255, 255, 0.2);
+}
+
+.pagination {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.glassmorphic-btn {
+  background: $white-02;
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid $white-03;
   color: #333;
   padding: 10px 20px;
   border-radius: 50px;
   font-weight: bold;
   transition: all 0.3s ease;
   cursor: pointer;
+
+  &:hover {
+    background: $white-03;
   }
-  
-  .glassmorphic-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  }
-  
-  .glassmorphic-form {
+}
+
+.glassmorphic-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  }
-  
-  .glassmorphic-input,
-  .glassmorphic-select {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    padding: 10px;
-    color: #333;
-    width: 300px;
-  }
-  
-  
-  
-  .glassmorphic-table {
+}
+
+.glassmorphic-input,
+.glassmorphic-select {
+  background: $white-02;
+  border: 1px solid $white-03;
+  border-radius: 10px;
+  padding: 10px;
+  color: #333;
+  width: 300px;
+}
+
+.glassmorphic-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 10px;
+
+  th,
+  td {
+    background: $white-02;
+    padding: 15px;
+    text-align: left;
+    border: none;
   }
-  
-  .glassmorphic-table th,
-  .glassmorphic-table td {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 15px;
-  text-align: left;
-  border: none;
+
+  th {
+    font-weight: bold;
+    text-transform: uppercase;
   }
-  
-  .glassmorphic-table th {
-  font-weight: bold;
-  text-transform: uppercase;
+
+  tr {
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $white-03;
+    }
   }
-  
-  .glassmorphic-table tr {
-  transition: all 0.3s ease;
-  }
-  
-  .glassmorphic-table tr:hover {
-  background: rgba(255, 255, 255, 0.3);
-  }
-  
-  
-  .add-campus-btn {
+}
+
+.add-campus-btn {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
-  }
-  
-  .btn-icon {
+}
+
+.btn-icon {
   width: 20px;
   height: 20px;
-  }
-  .search-bar {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .danger-btn {
-  background: rgba(220, 53, 69, 0.7);
+}
+
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.danger-btn {
+  background: $red-07;
   color: white;
+
+  &:hover {
+    background: $red-09;
   }
-  
-  .danger-btn:hover {
-  background: rgba(220, 53, 69, 0.9);
-  }
-  
-  .enable-btn {
-  background: rgba(40, 167, 69, 0.7);
+}
+
+.enable-btn {
+  background: $green-07;
   color: white;
+
+  &:hover {
+    background: $green-09;
   }
-  
-  .enable-btn:hover {
-  background: rgba(40, 167, 69, 0.9);
-  }
-  
-  .form-title, .list-title {
+}
+
+.form-title,
+.list-title {
   font-size: 24px;
   margin-bottom: 20px;
   color: #333;
-  }
-  
-  .radio-group {
-      display: flex; /* Cambia a flex */
-      flex-direction: row; /* Alinear horizontalmente */
-      gap: 20px; /* Añade espacio entre elementos */
-      margin-bottom: 10px;
-      align-items: center;
-   }
-  
-  .radio-label {
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.radio-label {
   display: flex;
   align-items: center;
   gap: 5px;
-  }
-  
-  .glassmorphic-checkbox {
+}
+
+.glassmorphic-checkbox {
   appearance: none;
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid $white-05;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.2);
+  background: $white-02;
   cursor: pointer;
+
+  &:checked {
+    background: $purple-07;
   }
-  
-  .glassmorphic-checkbox:checked {
-  background: rgba(96, 4, 132, 0.7);
-  }
-  
-  .table-container {
+}
+
+.table-container {
   overflow-x: auto;
   margin-bottom: 20px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 34px;
+
+  input {
+    display: none;
   }
-  .switch {
-   position: relative;
-   display: inline-block;
-   width: 120px;
-   height: 34px;
-  }
-  
-  .switch input {
-   display: none;
-  }
-  
+
   .slider {
-   position: absolute;
-   cursor: pointer;
-   top: 0;
-   left: 0;
-   right: 0;
-   bottom: 0;
-   background-color: #3C3C3C;
-   -webkit-transition: .4s;
-   transition: .4s;
-   border-radius: 34px;
-  }
-  
-  .slider:before {
-   position: absolute;
-   content: "";
-   height: 26px;
-   width: 26px;
-   left: 4px;
-   bottom: 4px;
-   background-color: white;
-   -webkit-transition: .4s;
-   transition: .4s;
-   border-radius: 50%;
-  }
-  
-  input:checked + .slider {
-   background-color: rgba(96, 4, 132, 1);
-  }
-  
-  input:focus + .slider {
-   box-shadow: 0 0 1px rgba(96, 4, 132, 0.719);
-  }
-  
-  input:checked + .slider:before {
-   -webkit-transform: translateX(26px);
-   -ms-transform: translateX(26px);
-   transform: translateX(85px);
-  }
-  
-  /*------ ADDED CSS ---------*/
-  .slider:after {
-  content: 'DESABILITADO';
-  color: white;
-  display: block;
-  position: absolute;
-  transform: translate(-50%,-50%);
-  top: 50%;
-  left: 60%;
-  font-size: 10px;
-  
-  }
-  
-  input:checked + .slider:after {
-  content: 'HABILITADO';
-  left: 47%;
-  }
-  
-  /*--------- END --------*/
-  .edit-btn{
-    margin-left: 5px;
-  background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #333;
-    padding: 5px 10px;
-    border-radius: 50px;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    position: absolute;
     cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $gray-3C;
+    transition: 0.4s;
+    border-radius: 34px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    &:after {
+      content: 'DESABILITADO';
+      color: white;
+      display: block;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 60%;
+      font-size: 10px;
+    }
   }
-  .edit-btn:hover{
-    background: rgba(255, 255, 255, 0.3);
+
+  input:checked + .slider {
+    background-color: $purple-1;
   }
-  .action-cell {
-    display: flex;
-    align-items: center;
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px $purple-focus;
   }
-  .form-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-  
+
+  input:checked + .slider:before {
+    transform: translateX(85px);
   }
-  .form-group label {
-      width: 150px;
-      text-align:left;
-      
+
+  input:checked + .slider:after {
+    content: 'HABILITADO';
+    left: 47%;
   }
-  
-  .checkbox-wrapper-47 input[type="radio"] {
+}
+
+.edit-btn {
+  margin-left: 5px;
+  background: $white-02;
+  backdrop-filter: blur(5px);
+  border: 1px solid $white-03;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 50px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: $white-03;
+  }
+}
+
+.action-cell {
+  display: flex;
+  align-items: center;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  label {
+    width: 150px;
+    text-align: left;
+  }
+}
+
+.checkbox-wrapper-47 {
+  margin-right: 15px;
+
+  input[type="radio"] {
     display: none;
     visibility: hidden;
   }
-  
-  .checkbox-wrapper-47 label {
+
+  label {
     position: relative;
     padding-left: 2em;
     padding-right: 1em;
@@ -645,39 +661,38 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+
+    &:before {
+      box-sizing: border-box;
+      content: " ";
+      position: absolute;
+      top: 0.3em;
+      left: 0;
+      display: block;
+      width: 1.4em;
+      height: 1.4em;
+      border: 2px solid $gray-90;
+      border-radius: 6px;
+      z-index: -1;
+    }
   }
-  
-  .checkbox-wrapper-47 label:before {
-    box-sizing: border-box;
-    content: " ";
-    position: absolute;
-    top: 0.3em;
-    left: 0;
-    display: block;
-    width: 1.4em;
-    height: 1.4em;
-    border: 2px solid #9098A9;
-    border-radius: 6px;
-    z-index: -1;
-  }
-  
-   .checkbox-wrapper-47 input[type=radio]:checked + label {
-       padding-left: 1em;
-      color: #fff; /* Color de texto cuando está seleccionado */
-  }
-  .checkbox-wrapper-47 input[type=radio]:checked + label:before {
+
+  input[type=radio]:checked + label {
+    padding-left: 1em;
+    color: white;
+
+    &:before {
       top: 0;
       width: 100%;
       height: 2em;
-      background: rgba(96, 4, 132, 1); /* Morado */
-      border-color: rgba(96, 4, 132, 1); /* Morado */
+      background: $purple-1;
+      border-color: $purple-1;
+    }
   }
-  
-  .checkbox-wrapper-47 label,
-  .checkbox-wrapper-47 label::before {
-      transition: 0.25s all ease;
+
+  label,
+  label::before {
+    transition: 0.25s all ease;
   }
-  .checkbox-wrapper-47 {
-      margin-right: 15px;
-  }
+}
   </style>
