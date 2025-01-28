@@ -18,7 +18,7 @@ class CheckMantenimientosPreventivos extends Command
     public function handle()
     {
         $hoy = Carbon::now()->toDateString();
-        $mantenimientoMaquinas = MantenimientoMaquina::whereDate('fecha_proximo', $hoy)->get();
+        $mantenimientoMaquinas = MantenimientoMaquina::whereDate('fecha_proximo', $hoy)->where('fecha_realizacion',null)->get();
 
          $this->info('Mantenimiento Maquinas: ' . ($mantenimientoMaquinas->isNotEmpty() ? "true" : "false"));
         if ($mantenimientoMaquinas->isNotEmpty()) {

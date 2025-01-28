@@ -578,10 +578,10 @@ const selectedCampus = ref(null);
 const campusOptions = ref([]);
 
 const filteredIncidencia = computed(() => {
-  if (!incidencias.value) {
+  if (!incidenciasPanel.value) {
     return [];
   }
-  let filtered = [...incidencias.value];
+  let filtered = [...incidenciasPanel.value];
   if (searchQuery.value) {
     const searchTerm = searchQuery.value.toLowerCase();
     filtered = filtered.filter(incidencia => {
@@ -737,8 +737,6 @@ const handleCreateIncidencia = async () => {
             estado: 0,
             id_maquina: Number(newIncidencia.value.id_maquina),
             tipo_incidencia: Number(newIncidencia.value.id_tipo_incidencia),
-            id_creador: 1,
-            id_mantenimiento: 1,
         };
 
         const response = await axios.post(apiUrl, requestData, {
@@ -1499,7 +1497,7 @@ canvas {
   gap: 10px;
   align-items: center;
   justify-content: center;
-
+}
 @media (max-width: 768px) {
   .row {
     --bs-gutter-x: 0.5rem !important;
