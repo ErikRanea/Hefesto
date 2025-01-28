@@ -316,18 +316,28 @@ const changeBackground = (styleName) => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+
+$white-01: rgba(255, 255, 255, 0.1);
+$white-02: rgba(255, 255, 255, 0.2);
+$white-03: rgba(255, 255, 255, 0.3);
+$white-05: rgba(255, 255, 255, 0.5);
+$white-06: rgba(255, 255, 255, 0.6);
+$white-07: rgba(255, 255, 255, 0.7);
+$white-08: rgba(255, 255, 255, 0.8);
+$white-09: rgba(255, 255, 255, 0.9);
+
 .container-fluid {
   padding: 15px;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.2);
+  background: $white-02; 
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid $white-03; 
   margin-bottom: 15px;
   width: 100%;
   height: auto;
@@ -338,65 +348,67 @@ const changeBackground = (styleName) => {
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
-}
 
-.glass-card:hover {
-  transform: scale(1.05);
-}
+  &:hover {
+    transform: scale(1.05);
+  }
 
-.glass-card .card-text {
-  margin-top: 0;
-  color: #333;
-}
+  .card-text {
+    margin-top: 0;
+    color: #333;
+  }
 
-/* Optional: Style for the icons */
-.glass-card img {
-  max-width: 50px;
-  height: auto;
-}
+  img {
+    max-width: 50px;
+    height: auto;
+  }
 
-.large-card {
-  padding: 45px;
-}
+  &.large-card {
+    padding: 45px;
+  }
 
-.full-height {
-  height: 100%;
-}
+  &.full-height {
+    height: 100%;
+  }
 
-.grow {
-  flex-grow: 1;
-}
+  &.grow {
+    flex-grow: 1;
+  }
 
-.huge-icon {
-  max-width: 120px;
-}
+  .huge-icon {
+    max-width: 120px;
+  }
 
-.huge-text {
-  font-size: 1.8rem;
+  .huge-text {
+    font-size: 1.8rem;
+  }
 }
 
 .background-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Espacio entre las opciones de fondo */
-}
-.background-option {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; 
+
+  .background-option {
     display: flex;
     align-items: center;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.2);
+    background: $white-02; 
     border-radius: 8px;
     padding: 8px;
     transition: background 0.3s ease;
-}
-.background-option:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-.preview {
-    width: 30px;
-    height: 30px;
-    border-radius: 4px;
-    margin-right: 10px;
+
+    &:hover {
+      background: $white-03; 
+    }
+
+    .preview {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+  }
 }
 
 </style>

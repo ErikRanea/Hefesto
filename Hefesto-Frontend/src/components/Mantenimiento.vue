@@ -816,249 +816,265 @@ const fetchMantenimientos = async () => {
 };
 
 </script>
-  <style scoped>
-  .create-incidencia-card {
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-  
-  .create-incidencia-card:hover {
+  <style lang="scss" scoped>
+$color-white: #fff;
+$color-light-gray: #f8f8f8;
+$color-gray: #ddd;
+$color-dark-gray: #666;
+$color-shadow: rgba(0, 0, 0, 0.1);
+$color-shadow-hover: rgba(0, 0, 0, 0.2);
+$color-high-priority: #FF5252;
+$color-medium-priority: #FFCA28;
+$color-low-priority: #4CAF50;
+$color-new: #B89B00;
+$color-pending: #B89B00;
+$color-maintenance: #000000;
+$color-closed: #000000;
+$color-in-progress: #600484;
+$color-primary: rgba(0, 123, 255, 0.9);
+$color-danger: rgba(255, 0, 0, 0.8);
+$color-text:#333;
+
+.create-incidencia-card {
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover {
     transform: scale(1.02);
     box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
   }
-  
-  .card-body-same-height {
-    min-height: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .glassmorphic-card {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
-  }
-  
-  .incidencia-panel {
-    width: 100%;
-    padding: 20px;
-    background-color: #f8f8f8;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .incidencia-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  .create-incidencia-btn {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 12px 20px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .create-incidencia-btn:hover {
+}
+
+.card-body-same-height {
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.glassmorphic-card {
+  background: rgba($color-white, 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba($color-white, 0.05) !important;
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
+}
+
+.incidencia-panel {
+  width: 100%;
+  padding: 20px;
+  background-color: $color-light-gray;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px $color-shadow;
+}
+
+.incidencia-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.create-incidencia-btn {
+  background-color: $color-white;
+  border: 1px solid $color-gray;
+  border-radius: 5px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
     background-color: #f0f0f0;
   }
-  
-  .boton-barra-box {
-    display: flex;
-    align-items: center;
-  }
-  
-  .boton-barra {
-    padding: 6px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-  
-  .plus-icon {
-    font-size: 1.5rem;
-    margin-top: -4px;
-  }
-  
-  .incidencia-stats {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .incidencia-stat-box {
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px;
-    border-radius: 5px;
-    min-width: 140px;
-    gap: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .incidencia-stat-box.active {
+}
+
+.boton-barra-box {
+  display: flex;
+  align-items: center;
+}
+
+.boton-barra {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.plus-icon {
+  font-size: 1.5rem;
+  margin-top: -4px;
+}
+
+.incidencia-stats {
+  display: flex;
+  gap: 10px;
+}
+
+.incidencia-stat-box {
+  background-color: $color-white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  border-radius: 5px;
+  min-width: 140px;
+  gap: 5px;
+  box-shadow: 0 2px 4px $color-shadow;
+
+  &.active {
     background-color: #e3fae8;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
-  
-  .title {
-    font-size: 0.8rem;
+}
+
+.title {
+  font-size: 0.8rem;
+}
+
+.count {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.icon {
+  font-size: 1.2rem;
+}
+
+.incidencia-list {
+  background-color: rgba($color-white, 0.7) !important;
+  border-radius: 5px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.incidencia-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0 10px 15px 10px;
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+  color: $color-dark-gray;
+}
+
+.priority-legend {
+  display: flex;
+  gap: 20px;
+}
+
+.priority-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 2px;
+}
+
+.alta {
+  background-color: $color-high-priority;
+}
+
+.media {
+  background-color: $color-medium-priority;
+}
+
+.baja {
+  background-color: $color-low-priority;
+}
+
+.incidencia-item {
+  display: flex;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  gap: 15px;
+  align-items: flex-start;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba($color-white, 0.1);
   }
-  
-  .count {
-    font-size: 1.4rem;
-    font-weight: bold;
-  }
-  
-  .icon {
-    font-size: 1.2rem;
-  }
-  
-  .incidencia-list {
-    background-color: rgba(255, 255, 255, 0.7) !important;
-    border-radius: 5px;
-    padding: 20px;
-    margin-top: 20px;
-  }
-  
-  .incidencia-list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 0 10px 15px 10px;
-    margin-bottom: 15px;
-    font-size: 0.8rem;
-    color: #666;
-  }
-  
-  .priority-legend {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .priority-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 2px;
-  }
-  
-  .alta {
-    background-color: #FF5252;
-  }
-  
-  .media {
-    background-color: #FFCA28;
-  }
-  
-  .baja {
-    background-color: #4CAF50;
-  }
-  
-  .incidencia-item {
-    display: flex;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    gap: 15px;
-    align-items: flex-start;
-    cursor: pointer;
-  }
-  
-  .incidencia-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .incidencia-date {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.8rem;
-    color: #666;
-    min-width: 100px;
-    flex-shrink: 0;
-  }
-  
-  .incidencia-date span:first-child {
+}
+
+.incidencia-date {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  color: $color-dark-gray;
+  min-width: 100px;
+  flex-shrink: 0;
+
+  span:first-child {
     font-weight: 500;
   }
-  
-  .incidencia-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-    flex: 1;
-  }
-  
-  .priority-marker {
-    width: 5px;
-    height: 40px;
-    border-radius: 2px;
-    flex-shrink: 0;
-    margin-right: 5px;
-  }
-  
-  .incidencia-text {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.9rem;
-    line-height: 1.3;
-    flex: 1;
-    margin-left: 10px;
-  }
-  
-  .incidencia-status-box {
-    display: flex;
-    align-items: center;
-  }
-  
-  .incidencia-status {
-    padding: 6px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-  
-  .nueva {
-    background-color: rgba(184, 155, 0, 0.17);
-    color: #B89B00;
-  }
-  
-  .pendiente {
-    background-color: rgba(184, 155, 0, 0.17);
-    color: #B89B00;
-  }
-  
-  .mantenimiento {
-    background-color: rgba(0, 0, 0, 0.17);
-    color: #000000;
-  }
-  
-  .cerrada {
-    background-color: rgba(0, 0, 0, 0.17);
-    color: #000000;
-  }
-  
-  .en-curso {
-    background-color: rgba(96, 4, 132, 0.17);
-    color: #600484;
-  }
-  
-  
-  .card.h-100 {
+}
+
+.incidencia-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex: 1;
+}
+
+.priority-marker {
+  width: 5px;
+  height: 40px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-right: 5px;
+}
+
+.incidencia-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  flex: 1;
+  margin-left: 10px;
+}
+
+.incidencia-status-box {
+  display: flex;
+  align-items: center;
+}
+
+.incidencia-status {
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.nueva {
+  background-color: rgba($color-new, 0.17);
+  color: $color-new;
+}
+
+.pendiente {
+  background-color: rgba($color-pending, 0.17);
+  color: $color-pending;
+}
+
+.mantenimiento {
+  background-color: rgba($color-maintenance, 0.17);
+  color: $color-maintenance;
+}
+
+.cerrada {
+  background-color: rgba($color-closed, 0.17);
+  color: $color-closed;
+}
+
+.en-curso {
+  background-color: rgba($color-in-progress, 0.17);
+  color: $color-in-progress;
+}
+.card.h-100 {
     height: calc(100vh - 200px) !important;
   }
   
@@ -1082,7 +1098,7 @@ const fetchMantenimientos = async () => {
   }
   
   .incidencias-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba($color-white, 0.1);
     border-radius: 4px;
   }
   
@@ -1102,12 +1118,12 @@ const fetchMantenimientos = async () => {
   .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #666;
+    color: $color-dark-gray;
   }
   
   .popup-btn1 {
-    background: rgba(0, 123, 255, 0.9);
-    color: white;
+    background: $color-primary;
+    color: $color-white;
     border: none;
     text-align: center;
     font-size: 1rem;
@@ -1117,12 +1133,12 @@ const fetchMantenimientos = async () => {
   }
   
   .popup-btn.primary {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba($color-white, 0.8);
     color: #000000;
   }
   .popup-btn.danger {
-      background-color: rgba(255, 0, 0, 0.8);
-      color: white;
+      background-color: $color-danger;
+      color: $color-white;
   }
   
   .popup-overlay {
@@ -1141,15 +1157,15 @@ const fetchMantenimientos = async () => {
   .popup-card {
     width: 700px;
     min-height: 300px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba($color-white, 0.7);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba($color-white, 0.18);
     border-radius: 1.5rem;
     padding: 2rem;
     z-index: 10;
-    color: #333;
+    color: $color-text;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1202,33 +1218,34 @@ const fetchMantenimientos = async () => {
   }
   
   .glassmorphic-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba($color-white, 0.2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    border: 1px solid rgba($color-white, 0.2);
+    color: $color-white;
     /* Text color */
     transition: background-color 0.3s ease;
     /* Smooth transition for hover effect */
-  }
   
-  .glassmorphic-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    &:hover {
+    background: rgba($color-white, 0.3);
   }
+}
+  
   
   .popup-btn.primary {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba($color-white, 0.8);
     color: #000000;
   }
   
   .glassmorphic-btn.cancel-btn {
     color: #000;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba($color-white, 0.8);
+      &:hover {
+        background: rgba($color-white, 0.9);
+      }
   }
   
-  .glassmorphic-btn.cancel-btn:hover {
-    background: rgba(255, 255, 255, 0.9);
-  }
   
   .custom-textarea {
     width: 100%;
@@ -1241,142 +1258,138 @@ const fetchMantenimientos = async () => {
     font-size: 1rem;
     line-height: 1.5;
     transition: border-color 0.3s ease;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba($color-white, 0.5);
     /* Fondo semi-transparente */
-    color: #333;
+    color: $color-text;
     /* Color del texto */
-  }
-  
-  .custom-textarea:focus {
-    border-color: #007bff;
-    outline: none;
-    /* Remueve el borde de focus predeterminado del navegador */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    /* Agrega una sombra al enfocar */
-  }
-  
-  .custom-textarea::placeholder {
-    color: #999;
-    /* Color del placeholder */
+    &:focus {
+        border-color: #007bff;
+        outline: none;
+        /* Remueve el borde de focus predeterminado del navegador */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        /* Agrega una sombra al enfocar */
+    }
+      &::placeholder {
+        color: #999;
+        /* Color del placeholder */
+    }
   }
   .action-buttons {
-      margin-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      align-items: center;
-  }
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
   .huge-icon {
     max-width: 20px;
-  }
-
-  @media (max-width: 768px) {
-  .row {
-    --bs-gutter-x: 0.5rem !important;
-  }
-
-  .col-sm-6 {
-    flex: 0 0 auto;
-    width: 50% !important;
-    max-width: 50% !important;
-  }
-
-    .col-12 {
-        width: 100% !important;
-        max-width: 100% !important;
+}
+@media (max-width: 768px) {
+    .row {
+      --bs-gutter-x: 0.5rem !important;
     }
-  .incidencia-list {
-    padding: 10px;
-    margin-top: 10px;
+  
+    .col-sm-6 {
+      flex: 0 0 auto;
+      width: 50% !important;
+      max-width: 50% !important;
+    }
+    .col-12 {
+      width: 100% !important;
+      max-width: 100% !important;
   }
-  .card-body {
-    padding: 1rem;
-  }
-  .card-bodytotal {
-    padding: 1rem;
-  }
-
-  .incidencia-list-header {
-    font-size: 0.9rem;
-    padding: 0 5px 10px 5px;
-    margin-bottom: 10px;
-  }
-
-  .incidencia-item {
-    padding: 10px;
-    margin-bottom: 5px;
-    gap: 10px;
-  }
-
-  .incidencia-date {
-    min-width: 70px;
-    font-size: 0.7rem;
-  }
-
-  .incidencia-content {
-    gap: 10px;
-  }
-
-  .priority-marker {
-    height: 30px;
-    margin-right: 3px;
-  }
-
-  .incidencia-text {
-    font-size: 0.8rem;
-    margin-left: 5px;
-  }
-
-  .incidencia-status {
-    padding: 4px 8px;
-    font-size: 0.7rem;
-  }
-  .action-buttons {
-      flex-direction: row;
-      flex-wrap: wrap;
-  }
-  .popup-card {
+    .incidencia-list {
+      padding: 10px;
+      margin-top: 10px;
+    }
+    .card-body {
+      padding: 1rem;
+    }
+    .card-bodytotal {
+      padding: 1rem;
+    }
+  
+    .incidencia-list-header {
+      font-size: 0.9rem;
+      padding: 0 5px 10px 5px;
+      margin-bottom: 10px;
+    }
+  
+    .incidencia-item {
+      padding: 10px;
+      margin-bottom: 5px;
+      gap: 10px;
+    }
+  
+    .incidencia-date {
+      min-width: 70px;
+      font-size: 0.7rem;
+    }
+  
+    .incidencia-content {
+      gap: 10px;
+    }
+  
+    .priority-marker {
+      height: 30px;
+      margin-right: 3px;
+    }
+  
+    .incidencia-text {
+      font-size: 0.8rem;
+      margin-left: 5px;
+    }
+  
+    .incidencia-status {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+    }
+    .action-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .popup-card {
         width: 90%;
         min-height: auto;
         max-height: 80vh;
         padding: 1rem;
     }
-    .popup-content{
-      margin-bottom: 1rem;
-    }
-
-    .popup-title {
-        font-size: 1.5rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .popup-subtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .popup-actions {
-        margin-top: 10px;
-        gap: 0.5rem;
+      .popup-content{
+          margin-bottom: 1rem;
+      }
+  
+      .popup-title {
+          font-size: 1.5rem;
+          margin-bottom: 0.8rem;
+      }
+  
+      .popup-subtitle {
+          font-size: 1rem;
+          margin-bottom: 1.5rem;
+      }
+  
+      .popup-actions {
+          margin-top: 10px;
+          gap: 0.5rem;
         flex-wrap: wrap;
         justify-content: center;
-    }
-    .popup-btn, .popup-btn1 {
-        font-size: 0.9rem;
-        padding: 0.6rem 1.2rem;
-        border-radius: 1.5rem;
-        text-align: center;
-    }
-      .incidencias-container{
-          padding: 0 5px;
       }
-
-  .priority-legend {
-    gap: 10px;
-    font-size: 0.8rem;
-  }
-    .huge-icon {
-      max-width: 15px;
+    .popup-btn, .popup-btn1 {
+          font-size: 0.9rem;
+          padding: 0.6rem 1.2rem;
+          border-radius: 1.5rem;
+          text-align: center;
+      }
+        .incidencias-container{
+            padding: 0 5px;
+        }
+  
+    .priority-legend {
+      gap: 10px;
+      font-size: 0.8rem;
     }
-}
+    .huge-icon {
+        max-width: 15px;
+    }
+  }
   </style>

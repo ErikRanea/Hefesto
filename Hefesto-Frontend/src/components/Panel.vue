@@ -1,45 +1,53 @@
 <template>
   <!-- Stats Cards -->
   <div class="row g-4 mb-4">
+    <!-- Tarjeta de incidencias pendientes -->
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-pending">
         <div class="card-body">
           <h6>Incidencias pendientes</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="pendiente-h2">{{ incidenciasPendientesCount }}</h2>
+             <!-- Icono de incidencias pendientes -->
             <img src="../assets/images/icons/pendientes.svg">
           </div>
         </div>
       </div>
     </div>
+     <!-- Tarjeta de incidencias en curso -->
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-in-progress">
         <div class="card-body">
           <h6>Incidencias en curso</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="curso-h2">{{ incidenciasEnCursoCount }}</h2>
+             <!-- Icono de incidencias en curso -->
             <img src="../assets/images/icons/curso.svg">
           </div>
         </div>
       </div>
     </div>
+    <!-- Tarjeta de incidencias cerradas -->
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-closed">
         <div class="card-body">
           <h6>Incidencias cerradas</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="cerrado-h2">{{ incidenciasCerradasCount }}</h2>
+             <!-- Icono de incidencias cerradas -->
             <img src="../assets/images/icons/cerrados.svg">
           </div>
         </div>
       </div>
     </div>
+    <!-- Tarjeta de total de incidencias -->
     <div class="col-sm-6 col-md-3">
       <div class="card glassmorphic-card colored-shadow-total">
         <div class="card-bodyTotal">
           <h6>Total de incidencias</h6>
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="total-h2">{{ totalIncidenciasCount }}</h2>
+            <!-- Icono de total de incidencias -->
             <img src="../assets/images/icons/total.svg">
           </div>
         </div>
@@ -51,23 +59,29 @@
   <div class="row g-4">
     <!-- Left Column - Charts -->
     <div class="col-md-4">
+       <!-- Tarjeta de incidencias abiertas hoy -->
       <div class="card glassmorphic-card mb-4">
         <div class="card-body">
           <div class="d-flex justify-content-between mb-4">
+             <!-- Título e información de incidencias abiertas hoy -->
             <div class="incidenciasabiertos">
               <h6 class="text-muted mb-1">Incidencias abiertas</h6>
               <div class="d-flex align-items-baseline">
+                 <!-- Contador de incidencias abiertas hoy -->
                 <span class="abiertos-h3 mb-0">{{ incidenciasAbiertasHoy }}</span>
                 <span class="text-muted ms-2" style="color: rgba(116, 116, 116, 1) !important;">hoy</span>
               </div>
             </div>
           </div>
+             <!-- Gráfico de líneas de incidencias -->
           <canvas ref="lineChart" height="100"></canvas>
         </div>
       </div>
+       <!-- Tarjeta de estadísticas -->
       <div class="card glassmorphic-card">
         <div class="card-body">
           <h5 class="card-title">Estadísticas</h5>
+          <!-- Gráfico de barras de estadísticas -->
           <canvas ref="barChart"></canvas>
         </div>
       </div>
@@ -75,20 +89,29 @@
 
     <!-- Right Column - Incidencias List -->
     <div class="col-md-8">
+         <!-- Lista de incidencias -->
         <div class="incidencia-list glassmorphic-card">
+           <!-- Encabezado de la lista de incidencias -->
             <div class="incidencia-list-header">
                 <div>Incidencias</div>
+                <!-- Leyenda de prioridades -->
                 <div class="priority-legend">
                     <span><span class="priority-dot alta"></span> Alta</span>
                     <span><span class="priority-dot media"></span> Media</span>
                     <span><span class="priority-dot baja"></span> Baja</span>
                 </div>
             </div>
+            <!-- Mensaje de carga -->
             <div v-if="loading">Cargando incidencias...</div>
+            <!-- Mensaje de error -->
             <div v-else-if="error">Error al cargar las incidencias.</div>
+              <!-- Contenedor de la lista de incidencias -->
              <div v-else class="incidencias-container">
+               <!-- Iteración sobre las incidencias filtradas -->
                 <div v-for="incidencia in incidenciasPanelFiltradas" :key="incidencia.id" class="incidencia-item">
+                  <!-- Marcador de prioridad -->
                     <div class="priority-marker" :class="incidencia.priority"></div>
+                      <!-- Contenido de cada incidencia -->
                       <div class="incidencia-content">
                           <div class="incidencia-date">
                             <span>{{ incidencia.date }}</span>
@@ -98,6 +121,7 @@
                             <div>{{ incidencia.titulo }}</div>
                             <small class="text-muted">{{ incidencia.subtitulo }}</small>
                           </div>
+                            <!-- Estado de la incidencia -->
                             <div class="incidencia-status-box">
                               <span class="incidencia-status" :class="incidencia.status.toLowerCase().replace(' ', '-')">
                                 {{ incidencia.status }}
@@ -117,23 +141,28 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { Chart } from 'chart.js/auto';
 import axios from 'axios';
 
+// Referencias para los elementos del gráfico
 const lineChart = ref(null);
 const barChart = ref(null);
-const incidencias = ref([]);
-const incidenciasPanel = ref([]); // Nuevo ref para las incidencias del panel
-const loading = ref(true);
-const error = ref(null);
-const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
-const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`;
-const ALL_INCIDENCIAS_URL_CERRADAS = `${API_AUTH_URL}/incidencia/all_cerradas`;
-const ME_URL = `${API_AUTH_URL}/auth/me`;
-const userRole = ref(null);
-const userId = localStorage.getItem('id');
 
+// Referencias para los datos de las incidencias
+const incidencias = ref([]);
+const incidenciasPanel = ref([]); // Referencia para las incidencias del panel
+const loading = ref(true); // Control de carga
+const error = ref(null); // Control de errores
+const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL; // URL base de la API
+const ALL_INCIDENCIAS_URL = `${API_AUTH_URL}/incidencia/all`; // URL para obtener todas las incidencias
+const ALL_INCIDENCIAS_URL_CERRADAS = `${API_AUTH_URL}/incidencia/all_cerradas`; // URL para obtener las incidencias cerradas
+const ME_URL = `${API_AUTH_URL}/auth/me`; // URL para obtener información del usuario
+const userRole = ref(null); // Referencia para el rol del usuario
+const userId = localStorage.getItem('id'); // Obtiene el ID del usuario desde el almacenamiento local
+
+// Variables computadas para determinar el rol del usuario
 const isTecnico = computed(() => userRole.value === 'tecnico');
 const isAdmin = computed(() => userRole.value === 'administrador');
 
 
+// Función para obtener la prioridad en formato de clase CSS
 const obtenerPrioridad = (prioridad) => {
     if (prioridad === "alta" || prioridad ==="media" || prioridad === "baja") {
         return prioridad;
@@ -142,6 +171,7 @@ const obtenerPrioridad = (prioridad) => {
     }
 };
 
+// Función para obtener el estado en formato de texto
 const obtenerEstado = (estado) => {
     switch (estado) {
         case 0:
@@ -173,7 +203,7 @@ const formatTime = (dateString) => {
     return date.toLocaleTimeString(undefined, options);
 };
 
-// Filtra incidencias para no mostrar las cerradas ni en mantenimiento y solo muestra 8 incidencias
+// Filtra las incidencias para no mostrar las cerradas ni en mantenimiento y muestra solo 8 incidencias
 const incidenciasFiltradas = computed(() => {
     return incidencias.value
         .slice(0, 8);
@@ -269,23 +299,24 @@ const generateChartData = (incidencias) => {
 // Función para generar datos para el gráfico de líneas
 const generateLineChartData = (incidencias) => {
     const today = new Date();
-    const hourlyData = Array(24).fill(0); // Initialize an array with 24 elements to store hourly data
+    const hourlyData = Array(24).fill(0); // Inicializa un array con 24 elementos para almacenar los datos horarios
 
     incidencias.forEach(incidencia => {
         const fechaIncidencia = new Date(incidencia.fecha_apertura);
-        // Check if the ticket was created today
+        // Comprueba si la incidencia fue creada hoy
         if (fechaIncidencia.getDate() === today.getDate() &&
             fechaIncidencia.getMonth() === today.getMonth() &&
             fechaIncidencia.getFullYear() === today.getFullYear()) {
             const hour = fechaIncidencia.getHours();
-            hourlyData[hour]++; // If it is today, increment count at this hour
+            hourlyData[hour]++; // Si es hoy, incrementa el conteo en esta hora
         }
 
     });
 
-    return hourlyData.slice(0, 24) //return the first 24 items of the array in case there are incidents with wrong data
+    return hourlyData.slice(0, 24) // Devuelve los primeros 24 elementos del array en caso de que haya incidencias con datos incorrectos
 };
 
+// Función para obtener los datos del usuario (rol)
 const fetchUserData = async () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -303,13 +334,16 @@ const fetchUserData = async () => {
     }
 };
 
+// Función que verifica si el usuario tiene el rol de técnico o administrador
 const checkUserHasReclamada = () => {
     if (isTecnico.value || isAdmin.value) {
     }
 }
 
+// Ciclo de vida del componente: onMounted (cuando el componente se monta)
 onMounted(async () => {
     try {
+        // Obtiene la información del usuario (rol)
         await fetchUserData()
         const token = localStorage.getItem('token');
         if (token) {
@@ -320,6 +354,7 @@ onMounted(async () => {
                         Authorization: `Bearer ${token}`
                     }
                 });
+                // Mapea los datos de las incidencias del panel
                 incidenciasPanel.value = responsePanel.data.map(incidencia => ({
                     ...incidencia,
                     priority: obtenerPrioridad(incidencia.prioridad),
@@ -332,12 +367,13 @@ onMounted(async () => {
                     fecha_cierre: incidencia.fecha_cierre,
                     id_tecnico: incidencia.id_mantenimiento
                 }));
-                  // Petición para las incidencias del dashboard (all_cerradas)
-                 const responseDashboard = await axios.post(ALL_INCIDENCIAS_URL_CERRADAS,{}, {
+                // Petición para las incidencias del dashboard (all_cerradas)
+                const responseDashboard = await axios.post(ALL_INCIDENCIAS_URL_CERRADAS,{}, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
+                 // Mapea los datos de las incidencias del dashboard
                 incidencias.value = responseDashboard.data.map(incidencia => ({
                     ...incidencia,
                     priority: obtenerPrioridad(incidencia.prioridad),
@@ -351,12 +387,11 @@ onMounted(async () => {
                     id_tecnico: incidencia.id_mantenimiento
                 }));
 
-
-
+                // Genera los datos para los gráficos
                 const chartData = generateChartData(incidencias.value);
                 const lineChartData = generateLineChartData(incidencias.value);
 
-
+                 // Crea el gráfico de líneas para las incidencias por hora
                 new Chart(lineChart.value, {
                     type: 'line',
                     data: {
@@ -371,6 +406,7 @@ onMounted(async () => {
                             borderWidth: 2
                         }]
                     },
+                     // Opciones del gráfico de líneas
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
@@ -404,7 +440,7 @@ onMounted(async () => {
                     }
                 });
 
-
+                 // Crea el gráfico de barras para las estadísticas de incidencias resueltas y abiertas
                 new Chart(barChart.value, {
                     type: 'bar',
                     data: {
@@ -426,6 +462,7 @@ onMounted(async () => {
                             }
                         ]
                     },
+                    // Opciones del gráfico de barras
                     options: {
                         responsive: true,
                         scales: {
@@ -458,19 +495,36 @@ onMounted(async () => {
     }
 });
 
+// Observador para cuando cambian las incidencias
 watch(incidencias, () => {
     checkUserHasReclamada();
 });
-
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+// Definición de colores
+$color-white: #fff;
+$color-light-gray: #f8f8f8;
+$color-gray: #ddd;
+$color-dark-gray: #666;
+$color-shadow: rgba(0, 0, 0, 0.1);
+$color-shadow-hover: rgba(0, 0, 0, 0.2);
+$color-high-priority: #FF5252;
+$color-medium-priority: #FFCA28;
+$color-low-priority: #4CAF50;
+$color-new: #B89B00;
+$color-pending: #B89B00;
+$color-maintenance: #000000;
+$color-closed: #000000;
+$color-in-progress: #600484;
+$color-text-muted: rgba(54, 54, 54, 0.6);
+
 .incidencia-panel {
   width: 100%;
   padding: 20px;
-  background-color: #f8f8f8;
+  background-color: $color-light-gray;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px $color-shadow;
 }
 
 .incidencia-header {
@@ -481,8 +535,8 @@ watch(incidencias, () => {
 }
 
 .create-incidencia-btn {
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: $color-white;
+  border: 1px solid $color-gray;
   border-radius: 5px;
   padding: 12px 20px;
   cursor: pointer;
@@ -491,10 +545,10 @@ watch(incidencias, () => {
   display: flex;
   align-items: center;
   gap: 8px;
-}
 
-.create-incidencia-btn:hover {
-  background-color: #f0f0f0;
+  &:hover {
+    background-color: #f0f0f0;
+  }
 }
 
 .plus-icon {
@@ -508,7 +562,7 @@ watch(incidencias, () => {
 }
 
 .incidencia-stat-box {
-  background-color: white;
+  background-color: $color-white;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -516,12 +570,12 @@ watch(incidencias, () => {
   border-radius: 5px;
   min-width: 140px;
   gap: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  box-shadow: 0 2px 4px $color-shadow;
 
-.incidencia-stat-box.active {
-  background-color: #e3fae8;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  &.active {
+    background-color: #e3fae8;
+    box-shadow: 0 0 10px $color-shadow-hover;
+  }
 }
 
 .title {
@@ -538,7 +592,7 @@ watch(incidencias, () => {
 }
 
 .incidencia-list {
-  background-color: rgba(255, 255, 255, 0.7) !important;
+  background-color: rgba($color-white, 0.7) !important;
   border-radius: 5px;
   padding: 20px;
 }
@@ -551,7 +605,7 @@ watch(incidencias, () => {
   padding: 0 10px 15px 10px;
   margin-bottom: 15px;
   font-size: 0.8rem;
-  color: #666;
+  color: $color-dark-gray;
 }
 
 .priority-legend {
@@ -568,15 +622,15 @@ watch(incidencias, () => {
 }
 
 .alta {
-  background-color: #FF5252;
+  background-color: $color-high-priority;
 }
 
 .media {
-  background-color: #FFCA28;
+  background-color: $color-medium-priority;
 }
 
 .baja {
-  background-color: #4CAF50;
+  background-color: $color-low-priority;
 }
 
 .incidencia-item {
@@ -587,23 +641,23 @@ watch(incidencias, () => {
   transition: all 0.2s ease;
   gap: 15px;
   align-items: flex-start;
-}
 
-.incidencia-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+    &:hover {
+        background-color: rgba($color-white, 0.1);
+    }
 }
 
 .incidencia-date {
   display: flex;
   flex-direction: column;
   font-size: 0.8rem;
-  color: #666;
+  color: $color-dark-gray;
   min-width: 100px;
   flex-shrink: 0;
-}
 
-.incidencia-date span:first-child {
-  font-weight: 500;
+  span:first-child {
+    font-weight: 500;
+  }
 }
 
 .incidencia-content {
@@ -611,6 +665,7 @@ watch(incidencias, () => {
   align-items: flex-start;
   gap: 20px;
   flex: 1;
+    width: 100%;
 }
 
 .priority-marker {
@@ -633,7 +688,7 @@ watch(incidencias, () => {
 .incidencia-status-box {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+    justify-content: flex-end;
 }
 
 .incidencia-status {
@@ -644,38 +699,38 @@ watch(incidencias, () => {
 }
 
 .nueva {
-  background-color: rgba(184, 155, 0, 0.17);
-  color: #B89B00;
+  background-color: rgba($color-new, 0.17);
+  color: $color-new;
 }
 
 .pendiente {
-  background-color: rgba(184, 155, 0, 0.17);
-  color: #B89B00;
+  background-color: rgba($color-pending, 0.17);
+  color: $color-pending;
 }
 
 .mantenimiento {
-  background-color: rgba(0, 0, 0, 0.17);
-  color: #000000;
+  background-color: rgba($color-maintenance, 0.17);
+  color: $color-maintenance;
 }
 
 .cerrada {
-  background-color: rgba(0, 0, 0, 0.17);
-  color: #000000;
+  background-color: rgba($color-closed, 0.17);
+  color: $color-closed;
 }
 
 .en-curso {
-  background-color: rgba(96, 4, 132, 0.17);
-  color: #600484;
+  background-color: rgba($color-in-progress, 0.17);
+  color: $color-in-progress;
 }
 
 .create-incidencia-card {
   cursor: pointer;
   transition: all 0.3s;
-}
 
-.create-incidencia-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
+  }
 }
 
 .card-body-same-height {
@@ -686,66 +741,60 @@ watch(incidencias, () => {
 }
 
 .glassmorphic-card {
-  background: rgba(255, 255, 255, 0.7) !important;
+  background: rgba($color-white, 0.7) !important;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba($color-white, 0.05) !important;
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
 }
 
 .pendiente-h2 {
-  color: #B89B00;
+  color: $color-pending;
   font-size: 70px;
 }
 
 .curso-h2 {
-  color: #600484;
+  color: $color-in-progress;
   font-size: 70px;
 }
 
 .cerrado-h2 {
-  color: #000000;
+  color: $color-maintenance;
   font-size: 70px;
 }
 .total-h2{
-  color: #ffffff;
-  font-size: 70px;
+    color: $color-white;
+    font-size: 70px;
 }
-
 .text-muted {
-  color: rgba(54, 54, 54, 0.6) !important;
+  color: $color-text-muted !important;
 }
-
 .h3 {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba($color-white, 0.9);
 }
-
 table {
-  background-color: transparent !important;
+    background-color: transparent !important;
 }
 
 .table-responsive {
-  max-height: calc(100vh - 300px);
-  overflow-y: auto;
-  background-color: transparent !important;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+    background-color: transparent !important;
 }
 
 .table > :not(caption) > * > * {
-  background-color: transparent !important;
+    background-color: transparent !important;
 }
-
 canvas {
-  max-height: 300px;
+    max-height: 300px;
 }
-
 .status-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
 }
-
 .card.h-100 {
-  height: calc(100vh - 200px) !important;
+    height: calc(100vh - 200px) !important;
 }
 
 .card-body {
@@ -753,58 +802,56 @@ canvas {
     display: flex;
     flex-direction: column;
 }
-
 .card-bodyTotal {
     padding: 1.8rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
-
 .incidencias-container {
-  max-height: 600px;
-  overflow-y: auto;
-  padding: 0 10px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 0 10px;
 }
 
 /* Add smooth scrollbar for the tickets container */
 .incidencias-container::-webkit-scrollbar {
-  width: 8px;
+    width: 8px;
 }
 
 .incidencias-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+    background: rgba($color-white, 0.1);
+    border-radius: 4px;
 }
 
 .incidencias-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
 }
 
 .incidencias-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.3);
 }
 
 
 
 .text-sm {
-  font-size: 0.875rem;
-  color: #000000;
+    font-size: 0.875rem;
+    color: #000000;
 }
 
 .btn-ver-todos {
-  background: transparent;
-  border: none;
-  color: #000000;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  padding: 0;
+    background: transparent;
+    border: none;
+    color: #000000;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    padding: 0;
 }
 
 .incidencias-list {
-  margin-top: 1rem;
+    margin-top: 1rem;
 }
 
 .incidencia-row {
@@ -821,18 +868,17 @@ canvas {
     border-radius: 2px;
     flex-shrink: 0;
     margin-right: 5px;
-}
-
-.incidencia-priority-bar.alta {
-  background-color: #FF5252;
-}
-
-.incidencia-priority-bar.media {
-  background-color: #FFCA28;
-}
-
-.incidencia-priority-bar.baja {
-  background-color: #4CAF50;
+    &.alta {
+      background-color: $color-high-priority;
+  }
+  
+  &.media {
+    background-color: $color-medium-priority;
+  }
+  
+  &.baja {
+    background-color: $color-low-priority;
+  }
 }
 
 .incidencia-content {
@@ -840,20 +886,20 @@ canvas {
     align-items: flex-start;
     gap: 20px;
     flex: 1;
-    width: 100%;
+        width: 100%;
 }
 
 .incidencia-date {
     display: flex;
     flex-direction: column;
     font-size: 0.8rem;
-    color: #666;
+    color: $color-dark-gray;
     min-width: 100px;
     flex-shrink: 0;
 }
 
 .incidencia-date span:first-child {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .incidencia-description {
@@ -875,7 +921,6 @@ canvas {
     color: #747474;
     font-size: 0.875rem;
 }
-
 .incidencia-status-box {
     display: flex;
     align-items: center;
@@ -959,21 +1004,21 @@ canvas {
     padding: 4px 8px;
     font-size: 0.7rem;
   }
-  .incidencias-container{
-    padding: 0 5px;
-  }
+    .incidencias-container{
+        padding: 0 5px;
+    }
 
   .priority-legend {
     font-size: 0.7rem;
   }
-    .card-body {
-      padding: 10px;
+  .card-body {
+    padding: 10px;
+  }
+    .incidenciasabiertos {
+        font-size: 0.8rem;
     }
-  .incidenciasabiertos {
-      font-size: 0.8rem;
-  }
-  .abiertos-h3 {
-      font-size: 1.3rem;
-  }
+    .abiertos-h3 {
+        font-size: 1.3rem;
+    }
 }
 </style>
