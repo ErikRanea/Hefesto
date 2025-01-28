@@ -261,10 +261,11 @@
       @close="cancelFilters"
       @action="closeFiltroPopup"
       >
-
+      
       <template #popup-content>
         <div class="row">
           <div class="col">
+
             <div class="search-bar">
               <CustomSelect
                     :options="campusOptions"
@@ -281,6 +282,7 @@
                     class="glassmorphic-select"
                   />
             </div>
+            <p>Filtros</p>
           </div>
         </div>
       </template>
@@ -416,7 +418,7 @@ const fetchData = async (url) => {
 const fetchTecnicoIncidencias = async () => {
     try {
 
-      if(!isOperario){
+      if(!isOperario.value){
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('No token found');
@@ -864,7 +866,7 @@ const handleReclamarIncidencia = async () => {
     }
 }
 const closeErrorPopup = () =>{
-    showErrorPopup.value = false;
+    showErrorPopup.value         = false;
     errorMessage.value = '';
 }
 const openMotivoSalidaPopup = () => {
@@ -1481,6 +1483,7 @@ canvas {
   width: 20px;
 }
 
+
 .glassmorphic-select{
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -1496,6 +1499,124 @@ canvas {
   gap: 10px;
   align-items: center;
   justify-content: center;
+
+@media (max-width: 768px) {
+  .row {
+    --bs-gutter-x: 0.5rem !important;
+  }
+  .col-sm-6 {
+    flex: 0 0 auto;
+    width: 50% !important;
+    max-width: 50% !important;
+  }
+
+  .incidencia-list {
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .incidencia-list-header {
+    font-size: 0.9rem;
+    padding: 0 5px 10px 5px;
+    margin-bottom: 10px;
+  }
+
+  .incidencia-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    gap: 10px;
+  }
+
+  .incidencia-date {
+    min-width: 70px;
+    font-size: 0.7rem;
+  }
+
+  .incidencia-content {
+    gap: 10px;
+  }
+
+  .priority-marker {
+    height: 30px;
+    margin-right: 3px;
+  }
+
+  .incidencia-text {
+    font-size: 0.8rem;
+    margin-left: 5px;
+  }
+
+  .incidencia-status {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+  .card-bodytotal {
+    padding: 1rem;
+  }
+  .pendiente-h2,
+  .curso-h2,
+  .cerrado-h2 {
+    font-size: 45px;
+  }
+  .action-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .popup-card {
+    width: 90%;
+    min-height: auto;
+    max-height: 80vh;
+    padding: 1rem;
+  }
+  .popup-content{
+    margin-bottom: 1rem;
+  }
+
+  .popup-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .popup-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .popup-actions {
+    margin-top: 10px;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .popup-btn, .popup-btn1 {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 1.5rem;
+    text-align: center;
+  }
+  .incidencias-container{
+    padding: 0 5px;
+  }
+  .priority-legend {
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+   .boton-filtro {
+    padding: 3px;
+  }
+    .imagen-filtro{
+        width: 15px;
+    }
+
+  .col-12 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
 }
 
 </style>

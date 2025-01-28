@@ -1,5 +1,5 @@
 <template>
-  <div class="background">
+   <div class="background">
    <span></span>
    <span></span>
    <span></span>
@@ -24,32 +24,35 @@
 </div>
   <div class="dashboard min-vh-100">
     <!-- Sidebar -->
-    <div class="sidebar p-0 d-flex flex-column">  <!-- Removed p-4-->
-      <div class="logo mb-5 p-4"> <!-- Added p-4 to logo -->
+    <div :class="['sidebar p-0 d-flex flex-column', { 'collapsed': isSidebarCollapsed }]">
+      <div class="logo mb-5 p-4">
         <img src="../assets/images/icons/logos.png" alt="Logo" class="img-fluid mb-4" style="max-width: 150px;">
       </div>
 
       <nav class="nav flex-column">
         <a v-for="item in filteredMenuItems"
-             :key="item.name"
-             href="#"
-             :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
-             @click.prevent="setActiveItem(item.name)">
+           :key="item.name"
+           href="#"
+           :class="['nav-link d-flex align-items-center', { active: activeItem === item.name }]"
+           @click.prevent="setActiveItem(item.name)">
           <img :src="item.icon" class="me-3" alt="" aria-hidden="true">
-          {{ item.name }}
+          <span >{{ item.name }}</span>  <!-- Elimina :class="{ 'd-none': isSidebarCollapsed }" -->
         </a>
       </nav>
 
       <button @click="logout" class="nav-link mt-auto d-flex align-items-center">
         <img src="../assets/images/icons/cerrar.svg" class="me-3" alt="" aria-hidden="true">
-        Cerrar sesión
+         <span >Cerrar sesión</span> <!-- Elimina :class="{ 'd-none': isSidebarCollapsed }" -->
       </button>
     </div>
 
     <!-- Main Content -->
-    <div class="main-content d-flex flex-column"> <!-- Added d-flex flex-column -->
+    <div class="main-content d-flex flex-column">
       <!-- Header -->
       <header class="header px-4 py-3 d-flex justify-content-between align-items-center">
+        <button @click="toggleSidebar" class="btn btn-link d-md-none text-white">
+          <i class="bi bi-list fs-4"></i>
+        </button>
         <h1 class="h4 mb-0"></h1>
         <div class="d-flex align-items-center gap-3">
           <div class="text-end">
@@ -66,17 +69,24 @@
       </header>
 
       <!-- Content Area -->
-      <div class="content flex-grow-1 d-flex flex-column"> <!-- Added d-flex flex-column and flex-grow-1-->
+      <div class="content flex-grow-1 d-flex flex-column">
         <div class="content-panel p-4 d-flex flex-column">
           <component :is="componenteActual" />
         </div>
       </div>
     </div>
+
+    <!-- Overlay for mobile -->
+    <div 
+      class="sidebar-overlay d-md-none" 
+      :class="{ 'active': isSidebarCollapsed }"
+      @click="toggleSidebar"
+    ></div>
   </div>
 </template>
 
 <script setup>
-import { ref, defineAsyncComponent , onMounted, computed } from 'vue'
+import { ref, defineAsyncComponent, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
@@ -115,7 +125,6 @@ const allMenuItems = {
   operario: [
     { name: 'Panel', icon: '../src/assets/images/icons/panel.svg', to: '/dashboard' },
     { name: 'Incidencias', icon: '../src/assets/images/icons/tickets.svg', to: '/incidencias' },
-    { name: 'Mantenimiento', icon: '../src/assets/images/icons/mantenimiento.svg', to: '/mantenimiento' },
     { name: 'Ajustes', icon: '../src/assets/images/icons/ajustes.svg', to: '/ajustes' }
   ],
   tecnico: [
@@ -204,6 +213,12 @@ const logout = async () => {
     isLoggingOut.value = false;
   }
 };
+
+const isSidebarCollapsed = ref(false);
+
+const toggleSidebar = () => {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -215,36 +230,53 @@ $white-07: rgba(255, 255, 255, 0.7);
 $white-08: rgba(255, 255, 255, 0.8);
 $white-09: rgba(255, 255, 255, 0.9);
 
-
 .dashboard {
   display: grid;
   grid-template-columns: 280px 1fr;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 50% 50%, $white-01 0%, transparent 50%);
-    animation: pulse 15s infinite;
-    z-index: 0;
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
   }
 }
-
 
 /* Glassmorphic Sidebar */
 .sidebar {
   background: $white-05;
   backdrop-filter: blur(10px);
   border-right: 1px solid $white-01;
-  height: 100vh;
+  height: 100%;
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 280px;
+  transition: transform 0.3s ease;
+
+  &.collapsed {
+    @media (min-width: 768px) {
+      width: 80px;
+
+      .nav-link {
+        justify-content: center;
+        padding: 0.8rem 0;
+      }
+
+      .logo img {
+        max-width: 50px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      transform: translateX(0);
+    }
+  }
+
+  @media (max-width: 767px) {
+    position: fixed;
+    transform: translateX(-100%);
+    width: 280px;
+  }
 }
 
 .nav-link {
@@ -262,6 +294,8 @@ $white-09: rgba(255, 255, 255, 0.9);
   }
 
   img {
+    width: 24px;
+    height: 24px;
     margin-right: 10px;
     vertical-align: middle;
   }
@@ -272,6 +306,55 @@ $white-09: rgba(255, 255, 255, 0.9);
   background: $white-05;
   backdrop-filter: blur(10px);
   color: white;
+}
+
+/* Main Content */
+.main-content {
+  min-height: 100vh;
+  width: 100%;
+  
+  @media (max-width: 767px) {
+    margin-left: 0;
+    width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+/* Content Panel */
+.content-panel {
+  background: $white-03;
+  backdrop-filter: blur(10px);
+  border: 1px solid $white-01;
+  flex-grow: 1;
+}
+
+/* Mobile Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.logo img {
+  max-width: 100px;
+  transition: all 0.3s ease;
+}
+
+.text-end {
+  display: flex;
+  flex-direction: column;
 }
 
 .user-name {
@@ -299,38 +382,7 @@ $white-09: rgba(255, 255, 255, 0.9);
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 50%;
   }
-}
-
-/* Content Area */
-.content-panel {
-  background: $white-03;
-  backdrop-filter: blur(10px);
-  border: 1px solid $white-01;
-  flex-grow: 1;
-}
-
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.5); opacity: 0.2; }
-  100% { transform: scale(1); opacity: 0.5; }
-}
-
-/* Make main content scrollable */
-.main-content {
-  overflow-y: auto;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.logo img {
-  max-width: 100px;
-}
-
-.text-end{
-  display: flex;
-  flex-direction: column;
 }
 </style>

@@ -188,6 +188,105 @@ class UserController extends Controller
     }
 
 
+    public function resetPassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'new_password' => 'required|string|min:8',
+                'current_password' => 'required|string'
+            ],
+            [
+                'new_password.required' => 'El campo new_password es obligatorio',
+                'new_password.min' => 'La new_password debe de tener un mínimo de 8 caracteres',
+                'current_password.required' => 'El campo current_password es obligatorio',
+            ]
+        );
+    
+        if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+
+             $user = auth()->user();
+            if (!$user) {
+                 return response()->json(['error' => 'Usuario no encontrado'], Response::HTTP_UNAUTHORIZED);
+              }
+
+              // Check current password
+            if (!Hash::check($request->input('current_password'), $user->password)) {
+                return response()->json(['error' => 'La contraseña actual no es válida.'], Response::HTTP_UNAUTHORIZED);
+            }
+
+
+           
+            // Hash the new password
+            $hashedPassword = Hash::make($request->input('new_password'));
+
+           // Update the user's password in the database
+           $user->password = $hashedPassword;
+           $user->save();
+
+           return response()->json(['message' => 'Contraseña reseteada con éxito.'], Response::HTTP_OK);
+          } catch (Exception $e) {
+            return response()->json(['error' => 'Error al resetear la contraseña.', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+    /**
+     * Metodo estáticos
+     */
+
+
+    public static function createDummyUsers()
+    {
+        $users = [];
+        $roles = ['operario', 'tecnico', 'administrador'];
+
+        // Create 3 users per role
+        for ($i = 0; $i < 3; $i++) {
+            foreach ($roles as $role) {
+                $users[] = [
+                    'name' => "{$role}User" . ($i+1),
+                    'primer_apellido' => 'Test',
+                    'segundo_apellido' => 'User',
+                    'email' => Str::random(10) . '@example.com',
+                    'password' => Hash::make('password123'),
+                    'rol' => $role,
+                    'foto_perfil' => null,
+                    'habilitado' => true,
+                    'id_campus' => 2
+                ];
+            }
+        }
+
+        // Add a extra administrator user
+        $users[] = [
+                'name' => "adminUser" . 4,
+                'primer_apellido' => 'Test',
+                'segundo_apellido' => 'User',
+                'email' => Str::random(10) . '@example.com',
+                'password' => Hash::make('password123'),
+                'rol' => 'administrador',
+                'foto_perfil' => null,
+                'habilitado' => true,
+                'id_campus' => 2
+            ];
+        
+        // Create the users in the database
+        try {
+              foreach ($users as $userData) {
+                 User::create($userData);
+              }
+          }
+         catch(\Exception $e) {
+            return response()->json(['error' => 'Error al generar usuarios de prueba: ' . $e->getMessage()], 500);
+        }
+        return response()->json(['message' => '11 usuarios de prueba creados con éxito'], 201);
+
+    }
+
 
 
 

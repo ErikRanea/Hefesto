@@ -14,6 +14,8 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Seccion;
 use App\Models\Campus;
+use App\Models\MantenimientoMaquina;
+use App\Models\MantenimientoPreventivo;
 
 class IncidenciaController extends Controller
 {
@@ -250,7 +252,8 @@ class IncidenciaController extends Controller
     public function allMantenimientos(Request $request){
         try{
             
-            $query = Incidencia::query();
+            $query = Incidencia::query()
+            ->where('habilitado', 1);
 
             
             if($request->has('id_campus')){
@@ -332,10 +335,32 @@ class IncidenciaController extends Controller
 }
 
     public static function estadoCerrado(Incidencia $incidencia){
-        $incidencia->estado = 3;
-        $incidencia->fecha_cierre = Date::now();
-        $incidencia->habilitado = 0;
-        $incidencia->save();
+
+   
+
+        if($incidencia->id_mantenimiento != null){
+            
+            $mantenimientoMaquina = MantenimientoMaquina::where('id_mantenimiento' , $incidencia->id_mantenimiento)
+            ->where('id_maquina',$incidencia->id_maquina)
+            ->where('fecha_realizacion',null)->first();
+
+            
+
+            $incidencia->estado = 3;
+            $incidencia->fecha_cierre = Date::now();
+            $incidencia->habilitado = 0;
+            $incidencia->save();
+
+     
+            return MantenimientoMaquinaController::cerrarMantenimiento($mantenimientoMaquina);
+
+        }
+        else{
+            $incidencia->estado = 3;
+            $incidencia->fecha_cierre = Date::now();
+            $incidencia->habilitado = 0;
+            $incidencia->save();
+        }
     }
 
     public static function estadoMantenimiento(Incidencia $incidencia){
@@ -496,5 +521,65 @@ class IncidenciaController extends Controller
               return response()->json(['error' => 'Error al cargar las incidencias, por favor intentalo de nuevo más tarde.', 'data' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public static function crearIncidenciaMantenimiento(MantenimientoMaquina $mantenimientoMaquina){
+          
+        try {
+            
+            $tipoIncidencia = TipoIncidencia::find(3);         
+            $maquina = Maquina::find($mantenimientoMaquina->id_maquina);       
+            $mantenimientoPreventivo = MantenimientoPreventivo::find($mantenimientoMaquina->id_mantenimiento);
+            $computoPrioridad = $tipoIncidencia->prioridad + $maquina ->prioridad;
+            $prioridad = '';
+
+            /**@author: Erik
+             * 
+             * En función de el computo de la prioridad de la máquina y del tipo de incidencia, lo que haremos en asignarle una gravedad
+             * 
+             * 6 5 | 4 3 | 2
+             *alta  media  baja   
+            */
+
+            switch($computoPrioridad){
+                case 6:
+                    $prioridad = 'alta';
+                    break;
+                case 5:
+                    $prioridad = 'alta';
+                    break;
+                case 4:
+                    $prioridad = 'media';
+                    break;
+                case 3:
+                    $prioridad = 'media';
+                    break;
+                case 2:
+                    $prioridad = 'baja';
+                    break;
+            }
+
+    
+
+            $incidencia = new Incidencia();
+            $incidencia->fecha_apertura = Date::now();
+            $incidencia->id_maquina = $maquina->id;
+            $incidencia->id_tipo_incidencia = $tipoIncidencia->id;
+            $incidencia->prioridad = $prioridad;
+            $incidencia->computo_prioridad = $computoPrioridad;
+            $incidencia->titulo = 'Mantenimiento preventivo ' . $mantenimientoPreventivo->nombre;
+            $incidencia->descripcion = $mantenimientoPreventivo->descripcion;
+            $incidencia->id_creador = 1;
+            $incidencia->estado = 0;
+            $incidencia->id_mantenimiento = $mantenimientoPreventivo->id;  
+
+            $incidencia->save();
+
+            return true;
+        } 
+        catch (Exception $e) {
+            return false;
+        }
+    }
+
 
 }
