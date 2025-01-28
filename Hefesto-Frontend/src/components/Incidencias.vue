@@ -95,7 +95,7 @@
       <div v-else-if="error">Error al cargar las incidencias.</div>
       <div v-else class="incidencias-container">
         <div
-          v-for="incidencia in incidenciasFiltradas"
+          v-for="incidencia in filteredIncidencia"
           :key="incidencia.date + incidencia.time"
           class="incidencia-item"
           @click="handleIncidenciaClick(incidencia)"
@@ -256,12 +256,32 @@
     <GlassmorphicPopup
       :visible="showFiltroPopup"
       title="Filtros incidencias"
-      closeButtonText="Cerrar"
-      @close="closeFiltroPopup">
-
+      closeButtonText="Cancelar"
+      actionButtonText="Aplicar"
+      @close="cancelFilters"
+      @action="closeFiltroPopup"
+      >
+      
       <template #popup-content>
         <div class="row">
           <div class="col">
+
+            <div class="search-bar">
+              <CustomSelect
+                    :options="campusOptions"
+                    :modelValue="selectedCampus"
+                    @update:modelValue="handleFilterCampusSelect"
+                    placeholder="Filtrar por campus"
+                    class="glassmorphic-select"
+                  />
+                  <CustomSelect
+                    :options="filteredSeccionOptions"
+                    :modelValue="selectedSeccion"
+                    @update:modelValue="handleFilterSeccionSelect"
+                    placeholder="Filtrar por seccion"
+                    class="glassmorphic-select"
+                  />
+            </div>
             <p>Filtros</p>
           </div>
         </div>
@@ -291,6 +311,8 @@ const ALL_TIPO_INCIDENCIAS_URL = `${API_AUTH_URL}/tipo_incidencia/all`;
 const ALL_MAQUINAS_URL = `${API_AUTH_URL}/maquina/all`;
 const ALL_TECNICO_INCIDENCIA_URL = `${API_AUTH_URL}/tecnico_incidencia/all`;
 const ME_URL = `${API_AUTH_URL}/auth/me`;
+const CAMPUS_ALL_URL = `${API_AUTH_URL}/campus/all`;
+const SECCION_ALL_URL = `${API_AUTH_URL}/seccion/all`;
 const userPicture = ref(null);
 const userId = ref(null);
 const userRole = ref(null);
@@ -331,16 +353,6 @@ const isSoloTecnico = computed(()=>{
     }
     return false
 })
-
-
-const incidenciasFiltradas = computed(() => {
-  if (!prioridadSeleccionada.value) {
-    return incidenciasPanel.value; // Muestra todas si no hay filtro
-  }
-  return incidenciasPanel.value.filter(
-    (incidencia) => incidencia.priority === prioridadSeleccionada.value
-  );
-});
 
 const obtenerPrioridad = (prioridad) => {
     if (prioridad === "alta" || prioridad ==="media" || prioridad === "baja") {
@@ -558,8 +570,80 @@ const checkUserHasReclamada = () => {
          hasReclamada.value = tecnicoIncidencias.value.some(incidencia => incidencia.id_tecnico === Number(userId.value) && incidencia.estado_tecnico === 'activo')
     }
 }
+
+const searchQuery = ref('');
+const selectedSeccion = ref(null);
+const seccionOptions = ref([]);
+const selectedCampus = ref(null);
+const campusOptions = ref([]);
+
+const filteredIncidencia = computed(() => {
+  if (!incidencias.value) {
+    return [];
+  }
+  let filtered = [...incidencias.value];
+  if (searchQuery.value) {
+    const searchTerm = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(incidencia => {
+      const incidenciaName = `${incidencia.titulo}`.toLowerCase();
+      return incidenciaName.includes(searchTerm);
+    });
+  }
+
+    if (selectedSeccion.value) {
+        filtered = filtered.filter(incidencia => {
+        const maquina = maquinas.value.find(maquina => maquina.id === incidencia.id_maquina);
+        return maquina?.id_seccion === selectedSeccion.value;
+    });
+    }
+
+    if (selectedCampus.value) {
+        filtered = filtered.filter(incidencia => {
+             const maquina = maquinas.value.find(maquina => maquina.id === incidencia.id_maquina);
+            const seccion = seccionOptions.value.find(seccion => seccion.id === maquina?.id_seccion);
+          return seccion?.id_campus === selectedCampus.value;
+        });
+      }
+
+  return filtered;
+});
+
+const filteredSeccionOptions = computed(() => {
+  if (selectedCampus.value) {
+    return seccionOptions.value.filter(seccion => seccion.id_campus === selectedCampus.value);
+  }
+  return seccionOptions.value;
+});
+
+const handleFilterSeccionSelect = (seccionId) =>{
+  selectedSeccion.value = seccionId;
+}
+
+const handleFilterCampusSelect = (campusId) =>{
+  selectedCampus.value = campusId;
+  selectedSeccion.value = null;
+}
+
+const searchQueryTemp = ref('');
+const selectedSeccionTemp = ref(null);
+const selectedCampusTemp = ref(null);
+
+const cancelFilters = () => {
+    searchQueryTemp.value = "";
+    selectedSeccionTemp.value = null;
+    selectedCampusTemp.value = null;
+    searchQuery.value = "";
+    selectedSeccion.value = null;
+    selectedCampus.value = null;
+    closeFiltroPopup();
+};
+
 onMounted(async () => {
     try {
+      const token = localStorage.getItem('token');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
         await fetchUserData()
         const [tiposData, maquinasData] = await Promise.all([
             fetchTipoIncidencias(),
@@ -574,11 +658,26 @@ onMounted(async () => {
         maquinas.value = maquinasData.map((maquina) => ({
             id: maquina.id,
             label: maquina.nombre_maquina,
+            id_seccion: maquina.id_seccion
         }));
+
+        const response = await axios.get(SECCION_ALL_URL, { headers });
+          seccionOptions.value = response.data.data.map((seccion) => ({
+            id: seccion.id,
+            label: seccion.nombre_seccion,
+            id_campus: seccion.id_campus,
+        }));
+
+        const campusResponse = await axios.get(CAMPUS_ALL_URL, { headers });
+        campusOptions.value = campusResponse.data.data.map((campus) => ({
+          id: campus.id,
+          label: campus.nombre_campus,
+        }));
+
         await Promise.all([
             loadIncidenciasDashboard(),
             loadIncidenciasPanel(),
-             fetchTecnicoIncidencias()
+            fetchTecnicoIncidencias()
         ]);
         checkUserHasReclamada();
     } catch (err) {
@@ -1384,6 +1483,23 @@ canvas {
   width: 20px;
 }
 
+
+.glassmorphic-select{
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 10px;
+  color: #333;
+  width: 300px;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+
 @media (max-width: 768px) {
   .row {
     --bs-gutter-x: 0.5rem !important;
@@ -1500,6 +1616,7 @@ canvas {
     width: 100% !important;
     max-width: 100% !important;
   }
+
 }
 
 </style>
